@@ -1168,10 +1168,12 @@ const DB = {
   g(k,d){try{return JSON.parse(localStorage.getItem('dv3_'+k))||d}catch{return d}},
   s(k,v){localStorage.setItem('dv3_'+k,JSON.stringify(v))},
 };
+const DEFAULT_PROXY = 'https://wandering-sunset-7186.tristoncomercial.workers.dev';
+
 const S = {
   user: null,
   key: DB.g('key',''),
-  proxyUrl: DB.g('proxyUrl',''),
+  proxyUrl: DB.g('proxyUrl', DEFAULT_PROXY),
   patients: DB.g('patients',[]),
   exams: DB.g('exams',[]),
   currentResult: null,
