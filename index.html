@@ -283,6 +283,18 @@ input::placeholder, textarea::placeholder {
 .tag-neutral { background: var(--fog); color: var(--ink3); }
 .tag-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 
+/* ── PLAN BADGES ── */
+.plan-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r999);font-size:11px;font-weight:700;}
+.plan-card{background:var(--snow);border:1.5px solid var(--fog);border-radius:var(--r16);padding:20px;cursor:pointer;transition:border-color var(--d-fast) var(--e-out),transform var(--d-fast) var(--e-out);}
+.plan-card:hover{border-color:var(--leaf);transform:translateY(-2px);}
+.plan-card.current{border-color:var(--leaf);background:var(--leaf-xl);}
+.plan-card.popular{border-color:var(--leaf);border-width:2px;}
+.plan-feat{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2);padding:3px 0;}
+.usage-bar{height:6px;background:var(--fog);border-radius:3px;overflow:hidden;margin-top:6px;}
+.usage-fill{height:100%;border-radius:3px;transition:width var(--d-deliberate) var(--e-out);}
+.sb-plan-chip{display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:var(--r8);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);margin-bottom:6px;cursor:pointer;transition:background var(--d-instant) var(--e-out);}
+.sb-plan-chip:hover{background:rgba(255,255,255,.08);}
+
 /* ═══ SECTION LABEL ═══ */
 .slbl { font-size: 10px; font-weight: 800; color: var(--mist); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
 
@@ -795,6 +807,14 @@ input::placeholder, textarea::placeholder {
         </button>
       </div>
       <div class="sb-footer">
+        <div class="sb-plan-chip" onclick="nav('settings');stTab('plan',document.querySelector('.sn-btn[data-tab=plan]'))">
+          <div id="sb-plan-icon" style="font-size:13px">🔬</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.65)" id="sb-plan-name">Gratuito</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.28)" id="sb-plan-usage">0 / 5 análises</div>
+          </div>
+          <div style="margin-left:auto;font-size:10px;color:rgba(255,255,255,.25)">→</div>
+        </div>
         <div class="sb-api-pill" onclick="nav('settings')">
           <div class="api-led off" id="api-led"></div>
           <div class="sb-api-txt">
@@ -1058,11 +1078,15 @@ input::placeholder, textarea::placeholder {
         <div class="screen-inner">
           <div class="settings-layout">
             <div class="card settings-nav">
-              <button class="sn-btn on" onclick="stTab('profile',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Perfil</button>
+              <button class="sn-btn" data-tab="plan" onclick="stTab('plan',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano</button>
+              <button class="sn-btn" onclick="stTab('profile',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Perfil</button>
               <button class="sn-btn" onclick="stTab('ai',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Claude AI</button>
               <button class="sn-btn" onclick="stTab('data',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="7 16 3 12 7 8"/><polyline points="17 8 21 12 17 16"/><line x1="3" y1="12" x2="21" y2="12"/></svg>Dados</button>
             </div>
             <div>
+              <div class="sp card cp" id="st-plan">
+                <div id="plan-panel-content"></div>
+              </div>
               <div class="sp on card cp" id="st-profile">
                 <div class="card-title" style="margin-bottom:18px">Informações profissionais</div>
                 <div class="fld-row"><div class="fld-grp"><label>Nome completo</label><input class="fld-in" id="s-name"/></div><div class="fld-grp"><label>CRMV</label><input class="fld-in" id="s-crmv"/></div></div>
@@ -1079,6 +1103,17 @@ input::placeholder, textarea::placeholder {
                 </div>
                 <div id="key-status" style="font-size:12px;margin-top:10px;color:var(--mist)"></div>
                 <div style="height:1px;background:var(--fog);margin:20px 0"></div>
+                <div class="s-row" style="padding:0 0 15px;border-bottom:1px solid var(--fog)">
+                  <div style="flex:1">
+                    <div class="s-lbl">URL do Proxy (recomendado)</div>
+                    <div class="s-desc" style="margin-bottom:10px">Cole aqui a URL do seu Cloudflare Worker. A chave API fica no servidor — necessário para GitHub Pages e produção.</div>
+                    <div class="api-row">
+                      <input type="text" id="s-proxy" placeholder="https://diagnovet.SEU-NOME.workers.dev" style="font-family:'JetBrains Mono',monospace"/>
+                      <button class="btn btn-dark btn-sm" onclick="saveProxy()">Salvar proxy</button>
+                    </div>
+                    <div id="proxy-status" style="font-size:12px;margin-top:8px;color:var(--mist)"></div>
+                  </div>
+                </div>
                 <div class="s-row" style="padding:0 0 15px;border-bottom:1px solid var(--fog)">
                   <div><div class="s-lbl">Fallback offline</div><div class="s-desc">Usar motor de regras locais quando a API não responder</div></div>
                   <button class="toggle on" onclick="this.classList.toggle('on')"></button>
@@ -1115,6 +1150,14 @@ input::placeholder, textarea::placeholder {
 
     </div><!-- end main-area -->
   </div><!-- end app-layout -->
+<!-- ── MODAL UPGRADE DE PLANO ── -->
+<div class="overlay" id="m-upgrade">
+  <div class="modal" style="max-width:600px">
+    <button class="modal-close" onclick="closeM('m-upgrade')">✕</button>
+    <div id="upgrade-content"></div>
+  </div>
+</div>
+
 </div><!-- end app -->
 
 <script>
@@ -1128,6 +1171,7 @@ const DB = {
 const S = {
   user: null,
   key: DB.g('key',''),
+  proxyUrl: DB.g('proxyUrl',''),
   patients: DB.g('patients',[]),
   exams: DB.g('exams',[]),
   currentResult: null,
@@ -1135,6 +1179,75 @@ const S = {
   examFilter: 'all',
 };
 function persist(){ DB.s('patients',S.patients); DB.s('exams',S.exams); }
+
+/* ══════════════════════════════════════════════
+   PLANOS & COTAS
+══════════════════════════════════════════════ */
+const PLANS = {
+  basico: {
+    id: 'basico',
+    name: 'Básico',
+    badge: 'Básico',
+    color: 'var(--cobalt-l)',
+    colorText: '#1E40AF',
+    analysesPerMonth: 200,
+    patients: 9999,
+    exportPDF: true,
+    exportJSON: true,
+    history: true,
+    advancedCytology: true,
+    prioritySupport: false,
+    description: 'Para clínicas veterinárias',
+    price: 'R$ 79/mês',
+  },
+  pro: {
+    id: 'pro',
+    name: 'Pro',
+    badge: '⭐ Pro',
+    color: 'var(--leaf-l)',
+    colorText: 'var(--leaf-d)',
+    analysesPerMonth: 9999,
+    patients: 9999,
+    exportPDF: true,
+    exportJSON: true,
+    history: true,
+    advancedCytology: true,
+    prioritySupport: true,
+    description: 'Para clínicas com alto volume',
+    price: 'R$ 179/mês',
+  },
+};
+
+function getUsage(){
+  // usage is stored per-user per-month: key = 'usage_USERID_YYYY-MM'
+  if(!S.user) return {count:0, month:''};
+  const month = new Date().toISOString().slice(0,7); // 'YYYY-MM'
+  const key = `usage_${S.user.id}_${month}`;
+  return { count: DB.g(key, 0), month, key };
+}
+function incrementUsage(){
+  const u = getUsage();
+  DB.s(u.key, u.count + 1);
+}
+function getUserPlan(){
+  if(!S.user) return PLANS.free;
+  return PLANS[S.user.plan || 'basico'];
+}
+function canAnalyze(){
+  const plan = getUserPlan();
+  const usage = getUsage();
+  return usage.count < plan.analysesPerMonth;
+}
+function usageLeft(){
+  const plan = getUserPlan();
+  const usage = getUsage();
+  return Math.max(0, plan.analysesPerMonth - usage.count);
+}
+function canExportPDF(){ return getUserPlan().exportPDF; }
+function canExportJSON(){ return getUserPlan().exportJSON; }
+function canAddPatient(){
+  return true; // both plans include unlimited patients
+}
 
 /* ── DEMO DATA ── */
 function seedDemo(){
@@ -1184,21 +1297,21 @@ function doRegister(){
   if(pass.length<6){showErr('Senha mínima de 6 caracteres.');return;}
   const accs=DB.g('accounts',[]);
   if(accs.find(a=>a.email===email)){showErr('E-mail já cadastrado.');return;}
-  const acc={id:'u'+Date.now(),title,name:`${title} ${name}`,crmv,specialty:spec,email,pass};
+  const acc={id:'u'+Date.now(),title,name:`${title} ${name}`,crmv,specialty:spec,email,pass,plan:'basico',planExpiry:null};
   accs.push(acc); DB.s('accounts',accs);
   enter(acc);
 }
 function demoLogin(){
   const accs=DB.g('accounts',[]);
   let acc=accs.find(a=>a.email==='demo@diagnovet.com');
-  if(!acc){ acc={id:'demo',title:'Dra.',name:'Dra. Leylla Patrick',crmv:'CRMV-PB 03245',specialty:'Clínica Geral',email:'demo@diagnovet.com',pass:'demo'}; accs.push(acc); DB.s('accounts',accs); }
+  if(!acc){ acc={id:'demo',title:'Dra.',name:'Dra. Leylla Patrick',crmv:'CRMV-PB 03245',specialty:'Clínica Geral',email:'demo@diagnovet.com',pass:'demo',plan:'pro',planExpiry:null}; accs.push(acc); DB.s('accounts',accs); }
   enter(acc);
 }
 function enter(acc){
   S.user=acc; seedDemo();
   document.getElementById('auth').style.display='none';
   document.getElementById('app').style.display='block';
-  updateUserUI(); updateKeyUI(); nav('dashboard');
+  updateUserUI(); updateKeyUI(); updatePlanUI(); nav('dashboard');
 }
 function doLogout(){
   S.user=null;
@@ -1220,13 +1333,24 @@ function updateUserUI(){
   if(document.getElementById('s-email')) document.getElementById('s-email').value=S.user.email||'';
 }
 function updateKeyUI(){
-  const on=!!S.key;
-  document.getElementById('api-led').className='api-led '+(on?'on':'off');
-  document.getElementById('api-lbl').textContent=on?'Claude AI ativo':'Modo offline';
+  const hasProxy=!!S.proxyUrl;
+  const hasKey=!!S.key;
+  const active=hasProxy||hasKey;
+  document.getElementById('api-led').className='api-led '+(active?'on':'off');
+  document.getElementById('api-lbl').textContent=hasProxy?'Proxy ativo':hasKey?'Claude AI ativo':'Modo offline';
   if(document.getElementById('s-key')) document.getElementById('s-key').value=S.key;
-  if(document.getElementById('key-status')) document.getElementById('key-status').innerHTML=on?'<span style="color:var(--leaf)">✓ Claude AI ativo — análises usam inteligência real</span>':'<span style="color:var(--mist)">Motor de regras clínicas offline</span>';
+  if(document.getElementById('s-proxy')) document.getElementById('s-proxy').value=S.proxyUrl||'';
+  if(document.getElementById('key-status')) document.getElementById('key-status').innerHTML=
+    hasProxy?'<span style="color:var(--leaf)">✓ Proxy ativo — chave segura no servidor</span>':
+    hasKey?'<span style="color:var(--leaf)">✓ Chave direta ativa (pode falhar no GitHub Pages)</span>':
+    '<span style="color:var(--mist)">Motor de regras clínicas offline</span>';
+  if(document.getElementById('proxy-status')) document.getElementById('proxy-status').innerHTML=
+    hasProxy?`<span style="color:var(--leaf)">✓ ${S.proxyUrl}</span>`:'';
   const notice=document.getElementById('run-notice');
-  if(notice) notice.textContent=S.key?'✓ Claude AI vai extrair e interpretar o arquivo automaticamente':'Modo offline — extrai o que consegue do texto; valores podem ser editados antes de analisar';
+  if(notice) notice.textContent=
+    hasProxy?'✓ Proxy ativo — Claude AI via servidor seguro':
+    hasKey?'✓ Chave direta configurada':
+    'Modo offline — configure o proxy em Configurações → Claude AI';
 }
 
 /* ══════════════════════════════════════════════
@@ -1711,15 +1835,67 @@ function populatePatientDropdown(){
 // Safe JSON extractor — handles Claude responses that may have surrounding text
 function safeParseJSON(raw) {
   if (!raw) return null;
-  // Try direct parse first
-  try { return JSON.parse(raw.trim()); } catch(e) {}
   // Strip markdown fences
   let clean = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  // Try direct parse
   try { return JSON.parse(clean); } catch(e) {}
-  // Extract first {...} block
-  const m = raw.match(/\{[\s\S]*\}/);
-  if (m) { try { return JSON.parse(m[0]); } catch(e) {} }
+  // Try original
+  try { return JSON.parse(raw.trim()); } catch(e) {}
+  // Extract first {...} block (greedy — gets the largest possible match)
+  const m = clean.match(/\{[\s\S]*/);
+  if (m) {
+    let attempt = m[0];
+    // Try as-is first
+    try { return JSON.parse(attempt); } catch(e) {}
+    // If truncated, try to close open structures
+    attempt = closeTruncatedJSON(attempt);
+    try { return JSON.parse(attempt); } catch(e) {}
+  }
   return null;
+}
+
+function closeTruncatedJSON(s) {
+  // Count open braces/brackets to determine what needs closing
+  let depth = 0;
+  let inStr = false;
+  let escape = false;
+  let lastValidPos = 0;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (escape) { escape = false; continue; }
+    if (c === '\\') { escape = true; continue; }
+    if (c === '"' && !escape) { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (c === '{' || c === '[') depth++;
+    else if (c === '}' || c === ']') { depth--; lastValidPos = i; }
+  }
+  // Trim to last complete value if truncated mid-string
+  let result = s;
+  if (inStr) {
+    // truncated inside a string — back up to before the opening quote
+    const lastQuote = s.lastIndexOf('"', s.length - 2);
+    if (lastQuote > 0) {
+      // Also remove trailing comma/colon before it
+      result = s.slice(0, lastQuote).replace(/[,:\s]+$/, '');
+    }
+  } else {
+    // Remove trailing incomplete key-value (ends with comma or colon)
+    result = s.replace(/[,:\s]+$/, '');
+  }
+  // Close open structures
+  const opens = [];
+  inStr = false; escape = false;
+  for (let i = 0; i < result.length; i++) {
+    const c = result[i];
+    if (escape) { escape = false; continue; }
+    if (c === '\\') { escape = true; continue; }
+    if (c === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (c === '{') opens.push('}');
+    else if (c === '[') opens.push(']');
+    else if (c === '}' || c === ']') opens.pop();
+  }
+  return result + opens.reverse().join('');
 }
 
 // Normalize a value string — strip units, keep number with comma/dot
@@ -1996,17 +2172,27 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
 
   let resp;
   try {
-    resp = await fetch('https://api.anthropic.com/v1/messages', {
+    // Use proxy if configured (recommended for GitHub Pages / production)
+    // Otherwise fall back to direct browser call with danger header
+    const endpoint = S.proxyUrl
+      ? S.proxyUrl.replace(/\/$/, '')
+      : 'https://api.anthropic.com/v1/messages';
+
+    const headers = S.proxyUrl
+      ? { 'Content-Type': 'application/json' }          // key lives on the server
+      : {
+          'Content-Type': 'application/json',
+          'x-api-key': S.key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        };
+
+    resp = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': S.key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
+      headers,
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 3000,
+        max_tokens: 4096,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: contentBlocks }]
       })
@@ -2055,6 +2241,12 @@ async function runImport() {
   if (!patientId) { toast('Selecione um paciente antes de analisar.', 'warn'); return; }
   if (!S.pendingFile) { toast('Selecione um arquivo para importar.', 'warn'); return; }
 
+  // ── PLAN QUOTA CHECK
+  if (!canAnalyze()) {
+    openUpgradeModal('analyses');
+    return;
+  }
+
   const patient = S.patients.find(p => p.id === patientId);
   if (!patient) { toast('Paciente não encontrado.', 'warn'); return; }
 
@@ -2069,7 +2261,7 @@ async function runImport() {
 
   const STEPS = [
     'Lendo arquivo...',
-    S.key ? 'Enviando para Claude AI...' : 'Executando análise local...',
+    (S.key || S.proxyUrl) ? 'Enviando para Claude AI...' : 'Executando análise local...',
     'Extraindo valores laboratoriais...',
     'Verificando intervalos de referência...',
     'Gerando interpretação clínica...'
@@ -2082,7 +2274,7 @@ async function runImport() {
     stepEl.textContent = STEPS[i];
     bar.style.width = ((i + 1) / STEPS.length * 100) + '%';
 
-    if (i === 1 && S.key) {
+    if (i === 1 && (S.key || S.proxyUrl)) {
       try {
         aiResult = await callClaudeWithFile(patient, context);
       } catch (e) {
@@ -2177,6 +2369,7 @@ async function runImport() {
 
   S.exams.unshift(exam);
   persist();
+  incrementUsage(); // ← track usage against plan quota
 
   S.currentResult = {
     patient, exam,
@@ -2848,7 +3041,7 @@ async function reanalyze(examId){
     stepEl.textContent = STEPS[i];
     bar.style.width = ((i + 1) / STEPS.length * 100) + '%';
 
-    if (i === 1 && S.key) {
+    if (i === 1 && (S.key || S.proxyUrl)) {
       try {
         const mText = Object.entries(exam.markers || {})
           .filter(([, v]) => v)
@@ -2874,17 +3067,19 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
 
         let resp;
         try {
-          resp = await fetch('https://api.anthropic.com/v1/messages', {
+          const endpoint = S.proxyUrl
+            ? S.proxyUrl.replace(/\/$/, '')
+            : 'https://api.anthropic.com/v1/messages';
+          const headers = S.proxyUrl
+            ? { 'Content-Type': 'application/json' }
+            : { 'Content-Type': 'application/json', 'x-api-key': S.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' };
+
+          resp = await fetch(endpoint, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': S.key,
-              'anthropic-version': '2023-06-01',
-              'anthropic-dangerous-direct-browser-access': 'true',
-            },
+            headers,
             body: JSON.stringify({
               model: 'claude-sonnet-4-20250514',
-              max_tokens: 3000,
+              max_tokens: 4096,
               system: SYSTEM_PROMPT,
               messages: [{ role: 'user', content: userContent }]
             })
@@ -3007,6 +3202,7 @@ function savePatient(){
   const id=document.getElementById('mp-id').value;
   const name=document.getElementById('mp-name').value.trim();
   if(!name){toast('Informe o nome do paciente.','warn');return;}
+  // Patient limit — both plans unlimited
   const data={name,species:document.getElementById('mp-species').value,breed:document.getElementById('mp-breed').value.trim(),sex:document.getElementById('mp-sex').value,age:document.getElementById('mp-age').value.trim(),weight:document.getElementById('mp-weight').value.trim(),owner:document.getElementById('mp-owner').value.trim(),history:document.getElementById('mp-history').value.trim()};
   if(id){
     const idx=S.patients.findIndex(p=>p.id===id);
@@ -3049,13 +3245,185 @@ function delPatient(id){
 }
 
 /* ══════════════════════════════════════════════
-   SETTINGS
+   PLAN UI & UPGRADE
 ══════════════════════════════════════════════ */
+function updatePlanUI(){
+  if(!S.user) return;
+  const plan = getUserPlan();
+  const usage = getUsage();
+  const pct = Math.min(100, Math.round(usage.count / plan.analysesPerMonth * 100));
+  const left = usageLeft();
+  const planIcons = {basico:'📋',pro:'⭐'};
+
+  // Sidebar chip
+  const sbPlanIcon = document.getElementById('sb-plan-icon');
+  const sbPlanName = document.getElementById('sb-plan-name');
+  const sbPlanUsage = document.getElementById('sb-plan-usage');
+  if(sbPlanIcon) sbPlanIcon.textContent = planIcons[plan.id]||'🔬';
+  if(sbPlanName) sbPlanName.textContent = `Plano ${plan.name}`;
+  if(sbPlanUsage){
+    if(plan.analysesPerMonth >= 9999){
+      sbPlanUsage.textContent = `${usage.count} análises este mês`;
+    } else {
+      sbPlanUsage.textContent = `${usage.count} / ${plan.analysesPerMonth} análises`;
+      sbPlanUsage.style.color = pct >= 90 ? 'var(--ruby)' : pct >= 70 ? 'var(--amber)' : 'rgba(255,255,255,.28)';
+    }
+  }
+}
+
+function renderPlanPanel(){
+  const plan = getUserPlan();
+  const usage = getUsage();
+  const pct = Math.min(100, Math.round(usage.count / (plan.analysesPerMonth < 9999 ? plan.analysesPerMonth : 200) * 100));
+  const left = usageLeft();
+  const barColor = pct >= 90 ? 'var(--ruby)' : pct >= 70 ? 'var(--amber)' : 'var(--leaf)';
+  const month = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+
+  const featureRow = (ok, text) => `
+    <div class="plan-feat">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${ok?'var(--leaf)':'var(--fog)'}" stroke-width="2.5" stroke-linecap="round">
+        ${ok ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}
+      </svg>
+      <span style="color:${ok?'var(--ink2)':'var(--mist)'}">${text}</span>
+    </div>`;
+
+  document.getElementById('plan-panel-content').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div class="card-title">Seu plano atual</div>
+        <div style="font-size:12px;color:var(--mist);margin-top:2px">${month}</div>
+      </div>
+      <span class="plan-badge" style="background:${plan.color};color:${plan.colorText}">${plan.badge}</span>
+    </div>
+
+    <!-- Usage meter -->
+    <div style="background:var(--paper);border-radius:var(--r12);padding:16px 18px;border:1px solid var(--fog);margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:600;color:var(--ink)">Análises com IA</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${barColor}">
+          ${plan.analysesPerMonth >= 9999 ? `${usage.count} usadas` : `${usage.count} / ${plan.analysesPerMonth}`}
+        </span>
+      </div>
+      ${plan.analysesPerMonth < 9999 ? `
+      <div class="usage-bar">
+        <div class="usage-fill" style="width:${pct}%;background:${barColor}"></div>
+      </div>
+      <div style="font-size:11px;color:${pct>=90?'var(--ruby)':'var(--mist)'};margin-top:6px">
+        ${left === 0 ? '⚠ Limite atingido — faça upgrade para continuar' : `${left} análise${left!==1?'s':''} restante${left!==1?'s':''} este mês`}
+      </div>` : `<div style="font-size:11px;color:var(--leaf);margin-top:4px">✓ Análises ilimitadas</div>`}
+    </div>
+
+    <!-- Current plan features -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">O que está incluído</div>
+      ${featureRow(true, plan.analysesPerMonth >= 9999 ? 'Análises ilimitadas' : `${plan.analysesPerMonth} análises por mês`)}
+      ${featureRow(true, `Até ${plan.patients >= 999 ? 'ilimitados' : plan.patients} pacientes`)}
+      ${featureRow(true, 'Exportação de laudos em PDF e JSON')}
+      ${featureRow(true, 'Histórico completo de exames')}
+      ${featureRow(true, 'Citologia e exames avançados')}
+      ${featureRow(plan.id === 'pro', 'Análises ilimitadas (sem cota mensal)')}
+      ${featureRow(plan.prioritySupport, 'Suporte prioritário')}
+    </div>
+
+    ${plan.id !== 'pro' ? `
+    <button class="btn btn-primary btn-md" style="width:100%;justify-content:center" onclick="openUpgradeModal('general')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      Fazer upgrade do plano
+    </button>` : `<div style="font-size:13px;color:var(--leaf);text-align:center;font-weight:600">✓ Você está no plano máximo — análises ilimitadas</div>`}
+
+    ${S.user?.isAdmin ? `
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--fog)">
+      <div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">Administrador — atribuir plano</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="admin-user-email" class="fld-in" placeholder="E-mail do usuário" style="flex:1"/>
+        <select id="admin-plan-sel" class="fld-sel" style="width:120px">
+          <option value="basico">Básico</option><option value="pro">Pro</option>
+        </select>
+        <button class="btn btn-dark btn-sm" onclick="adminSetPlan()">Aplicar</button>
+      </div>
+    </div>` : ''}
+  `;
+}
+
+function openUpgradeModal(reason){
+  const plan = getUserPlan();
+  const reasons = {
+    analyses: `Você atingiu o limite de ${plan.analysesPerMonth} análises/mês do plano Básico. Faça upgrade para o Pro e tenha análises ilimitadas.`,
+    export: 'Exportação de laudos disponível — faça upgrade para o Pro para ter acesso completo.',
+    patients: `Você atingiu o limite de pacientes do plano Básico.`,
+    general: 'Escolha o plano ideal para sua clínica.',
+  };
+
+  const planOrder = ['basico','pro'];
+  const currentIdx = planOrder.indexOf(plan.id);
+
+  document.getElementById('upgrade-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:32px;margin-bottom:10px">🚀</div>
+      <div class="modal-title">Fazer upgrade</div>
+      <div class="modal-sub">${reasons[reason]||reasons.general}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px;max-width:320px;margin-left:auto;margin-right:auto">
+      ${['pro'].map(pid => {
+        const p = PLANS[pid];
+        const isCurrent = plan.id === pid;
+        const isPopular = pid === 'pro';
+        return `
+        <div class="plan-card ${isCurrent?'current':''} ${isPopular?'popular':''}" onclick="${isCurrent?'':'selectPlan(\''+pid+'\')'}">
+          ${isPopular?`<div style="font-size:10px;font-weight:800;color:var(--leaf-d);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Mais popular</div>`:''}
+          ${isCurrent?`<div style="font-size:10px;font-weight:800;color:var(--leaf-d);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Plano atual</div>`:''}
+          <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.5px;margin-bottom:2px">${p.name}</div>
+          <div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:${isCurrent?'var(--leaf)':'var(--ink)'};letter-spacing:-1px;margin-bottom:8px">${p.price}</div>
+          <div style="font-size:11px;color:var(--mist);margin-bottom:12px">${p.description}</div>
+          <div class="plan-feat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>${p.analysesPerMonth >= 9999 ? 'Ilimitado' : p.analysesPerMonth + '/mês'}</span></div>
+          <div class="plan-feat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${p.exportPDF?'var(--leaf)':'var(--fog)'}" stroke-width="2.5" stroke-linecap="round">${p.exportPDF?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/>'}</svg><span style="color:${p.exportPDF?'var(--ink2)':'var(--mist)'}">Exportar PDF</span></div>
+          <div class="plan-feat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${p.advancedCytology?'var(--leaf)':'var(--fog)'}" stroke-width="2.5" stroke-linecap="round">${p.advancedCytology?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/>'}
+          </svg><span style="color:${p.advancedCytology?'var(--ink2)':'var(--mist)'}">Citologia avançada</span></div>
+          ${!isCurrent?`<button class="btn btn-primary btn-sm" style="width:100%;justify-content:center;margin-top:10px" onclick="event.stopPropagation();selectPlan('${pid}')">Selecionar</button>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="text-align:center;font-size:12px;color:var(--mist)">
+      Para fazer upgrade, entre em contato: <strong style="color:var(--leaf-d)">contato@diagnovet.com.br</strong>
+    </div>
+  `;
+  openM('m-upgrade');
+}
+
+function selectPlan(planId){
+  // In production this would redirect to payment
+  // For now, show contact message
+  closeM('m-upgrade');
+  toast(`Para assinar o plano Pro, entre em contato: contato@diagnovet.com.br`, 'ok');
+}
+
+/* ── ADMIN: assign plan to any user ── */
+function adminSetPlan(){
+  const email = document.getElementById('admin-user-email')?.value.trim();
+  const planId = document.getElementById('admin-plan-sel')?.value;
+  if(!email||!planId){ toast('Preencha e-mail e plano.','warn'); return; }
+  const accs = DB.g('accounts',[]);
+  const idx = accs.findIndex(a=>a.email===email);
+  if(idx<0){ toast('Usuário não encontrado.','err'); return; }
+  accs[idx].plan = planId;
+  DB.s('accounts', accs);
+  // If it's the current user, update live
+  if(S.user?.email === email){ S.user.plan = planId; updatePlanUI(); }
+  toast(`Plano ${PLANS[planId].name} atribuído a ${email}.`, 'ok');
+  renderPlanPanel();
+}
+
 function stTab(t,el){
-  document.querySelectorAll('.sn-btn').forEach(b=>b.classList.remove('on')); el.classList.add('on');
+  document.querySelectorAll('.sn-btn').forEach(b=>b.classList.remove('on'));
+  if(el) el.classList.add('on');
   document.querySelectorAll('.sp').forEach(p=>p.classList.remove('on'));
   document.getElementById('st-'+t)?.classList.add('on');
+  if(t==='plan') renderPlanPanel();
 }
+
+/* ══════════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════════ */
 function saveProfile(){
   if(!S.user) return;
   S.user.name=document.getElementById('s-name').value||S.user.name;
@@ -3070,6 +3438,12 @@ function saveKey(){
   if(k&&!k.startsWith('sk-ant-')){toast('Chave inválida — deve começar com sk-ant-','warn');return;}
   S.key=k; DB.s('key',k); updateKeyUI();
   toast(k?'Chave salva — Claude AI ativo!':'Modo offline configurado.','ok');
+}
+function saveProxy(){
+  const url=(document.getElementById('s-proxy')?.value||'').trim();
+  if(url&&!url.startsWith('https://')){toast('URL deve começar com https://','warn');return;}
+  S.proxyUrl=url; DB.s('proxyUrl',url); updateKeyUI();
+  toast(url?'Proxy salvo — chamadas roteadas pelo Worker seguro.':'Proxy removido.','ok');
 }
 
 /* ══════════════════════════════════════════════
@@ -3116,6 +3490,10 @@ function importBackup(input){
   reader.readAsText(file);
 }
 function exportOneExam(id){
+  if(!canExportPDF()&&!canExportJSON()){
+    openUpgradeModal('export');
+    return;
+  }
   const exam = S.exams.find(e => e.id === id);
   if(!exam){ toast('Exame não encontrado.','err'); return; }
   const patient = S.patients.find(p => p.id === exam.patientId) || {name:'Desconhecido',species:'—',breed:'—',age:'—',weight:'—',sex:'—',owner:'—'};
@@ -3646,6 +4024,7 @@ function updateCritBadge(){
    INIT
 ══════════════════════════════════════════════ */
 updateKeyUI();
+updatePlanUI();
 </script>
 </body>
 </html>
