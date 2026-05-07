@@ -792,6 +792,28 @@ input::placeholder, textarea::placeholder {
 </div>
 
 <!-- ── AUTH ── -->
+<script>
+// Funções críticas de UI — definidas antes do HTML para evitar ReferenceError
+function authTab(t){
+  const login = document.getElementById('at-login');
+  const reg   = document.getElementById('at-reg');
+  const fLogin = document.getElementById('f-login');
+  const fReg   = document.getElementById('f-reg');
+  if(login) login.classList.toggle('on', t==='login');
+  if(reg)   reg.classList.toggle('on', t==='register');
+  if(fLogin) fLogin.classList.toggle('hidden', t!=='login');
+  if(fReg)   fReg.classList.toggle('hidden', t!=='register');
+  const err = document.getElementById('auth-err');
+  if(err) err.classList.add('hidden');
+}
+function showErr(m){
+  const e = document.getElementById('auth-err');
+  if(!e) return;
+  e.style.cssText = '';
+  e.textContent = m;
+  e.classList.remove('hidden');
+}
+</script>
 <div id="auth">
 
   <!-- Animated background -->
@@ -896,6 +918,7 @@ input::placeholder, textarea::placeholder {
         <button class="btn-auth" onclick="doLogin()">Entrar na plataforma</button>
         <!-- Demo login hidden — use email + password form with demo credentials -->
         <div class="auth-footer" style="margin-top:14px">Sem conta? <span class="auth-link" onclick="authTab('register')">Cadastre-se</span></div>
+        <div style="text-align:center;margin-top:8px"><span class="auth-link" style="font-size:12px;color:var(--mist)" onclick="forgotPassword()">Esqueci minha senha</span></div>
       </div>
       <div id="f-reg" class="hidden">
         <div class="fld-row">
@@ -1333,6 +1356,9 @@ input::placeholder, textarea::placeholder {
                       <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px">Exportar dados</div>
                       <div style="font-size:11px;color:var(--mist);margin-bottom:12px;line-height:1.5">Baixe pacientes e exames em JSON.</div>
                       <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="exportAllJSON()">Exportar JSON</button>
+                    <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px;color:var(--cobalt);border-color:rgba(37,99,235,.3)" onclick="migrateToCloud()">
+                      ☁ Migrar para nuvem
+                    </button>
                     </div>
                     <div style="background:var(--paper);border-radius:var(--r12);padding:14px;border:1px solid var(--fog)">
                       <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px">Restaurar backup</div>
@@ -1419,7 +1445,184 @@ input::placeholder, textarea::placeholder {
 
 <script>
 /* ══════════════════════════════════════════════
-   PERSISTENCE
+   SUPABASE — cliente leve via fetch (sem SDK)
+   Compatível com Supabase REST API v1
+══════════════════════════════════════════════ */
+const SUPABASE_URL      = 'https://lgnwowtdhywlqafmwxzi.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxnbndvd3RkaHl3bHFhZm13eHppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxOTA2NTEsImV4cCI6MjA5Mzc2NjY1MX0.f0c3RsVUVc_ecGQgo83CCaE5QYFHrvhND9WhYx4fCXs';
+
+let _supa = null;
+let _supaSession = null; // JWT session token
+
+function initSupabase(){
+  // Build a lightweight Supabase client using native fetch
+  _supa = {
+
+    // ── Auth
+    auth: {
+      async signUp({ email, password, options }){
+        const r = await supaFetch('POST', '/auth/v1/signup', {
+          email, password,
+          data: options?.data || {}
+        }, true);
+        if(r.code || r.error) return { data: null, error: r.error || r };
+        if(r.access_token){ _supaSession = r.access_token; DB.s('supa_session', r); }
+        return { data: { user: r.user || r, session: r.access_token ? r : null }, error: null };
+      },
+
+      async signInWithPassword({ email, password }){
+        const r = await supaFetch('POST', '/auth/v1/token?grant_type=password', { email, password }, true);
+        if(r.error) return { data: null, error: r };
+        _supaSession = r.access_token;
+        DB.s('supa_session', r);
+        return { data: { user: r.user, session: r }, error: null };
+      },
+
+      async signOut(){
+        await supaFetch('POST', '/auth/v1/logout', {});
+        _supaSession = null;
+        DB.s('supa_session', null);
+      },
+
+      async getSession(){
+        // Try to restore from localStorage
+        const saved = DB.g('supa_session', null);
+        if(!saved?.access_token) return { data: { session: null } };
+        // Verify token not expired
+        try {
+          const payload = JSON.parse(atob(saved.access_token.split('.')[1]));
+          if(payload.exp * 1000 < Date.now()){
+            // Try refresh
+            if(saved.refresh_token){
+              const r = await supaFetch('POST', '/auth/v1/token?grant_type=refresh_token',
+                { refresh_token: saved.refresh_token }, true);
+              if(!r.error && r.access_token){
+                _supaSession = r.access_token;
+                DB.s('supa_session', r);
+                return { data: { session: { ...r, user: r.user } } };
+              }
+            }
+            DB.s('supa_session', null);
+            return { data: { session: null } };
+          }
+          _supaSession = saved.access_token;
+          return { data: { session: { ...saved, user: saved.user } } };
+        } catch { return { data: { session: null } }; }
+      },
+
+      async resetPasswordForEmail(email, opts){
+        const r = await supaFetch('POST', '/auth/v1/recover', { email }, true);
+        return { error: r.error || null };
+      },
+
+      onAuthStateChange(cb){ /* stub — not needed without realtime */ return { data: { subscription: { unsubscribe(){} } } }; },
+    },
+
+    // ── Database (PostgREST)
+    from(table){
+      return new SupaQuery(table);
+    },
+
+    // ── RPC
+    async rpc(fn, params){
+      const r = await supaFetch('POST', `/rest/v1/rpc/${fn}`, params);
+      return { data: r, error: r?.error || null };
+    },
+  };
+  console.log('✓ Supabase cliente leve inicializado');
+}
+
+// ── Query builder
+class SupaQuery {
+  constructor(table){ this._table=table; this._filters=[]; this._order=null; this._single=false; this._select='*'; }
+  select(cols){ this._select=cols; return this; }
+  eq(col,val){ this._filters.push(`${col}=eq.${encodeURIComponent(val)}`); return this; }
+  order(col, {ascending=true}={}){ this._order=`${col}.${ascending?'asc':'desc'}`; return this; }
+  single(){ this._single=true; return this; }
+
+  async then(resolve, reject){
+    try { resolve(await this._exec()); }
+    catch(e){ reject(e); }
+  }
+
+  async _exec(){
+    let qs = this._filters.length ? this._filters.join('&') : '';
+    if(this._action === 'update'){
+      const r = await supaFetch('PATCH', `/rest/v1/${this._table}?${qs}`, this._updates);
+      return { data: r, error: r?.code ? r : null };
+    }
+    if(this._action === 'delete'){
+      const r = await supaFetch('DELETE', `/rest/v1/${this._table}?${qs}`, null);
+      return { data: r, error: r?.code ? r : null };
+    }
+    // SELECT
+    qs = `select=${this._select}` + (qs ? '&'+qs : '');
+    if(this._order) qs += `&order=${this._order}`;
+    const r = await supaFetch('GET', `/rest/v1/${this._table}?${qs}`);
+    if(r?.code) return { data: null, error: r };
+    const data = this._single ? (Array.isArray(r) ? r[0]||null : r) : r;
+    return { data, error: null };
+  }
+
+  async insert(row){
+    const r = await supaFetch('POST', `/rest/v1/${this._table}`, row);
+    if(r?.code) return { data: null, error: r };
+    return { data: Array.isArray(r) ? r[0] : r, error: null };
+  }
+
+  async upsert(row){
+    const r = await supaFetch('POST', `/rest/v1/${this._table}`, row, false, {
+      'Prefer': 'resolution=merge-duplicates,return=representation'
+    });
+    return { data: r, error: r?.code ? r : null };
+  }
+
+  update(updates){
+    this._updates = updates;
+    this._action = 'update';
+    return this;
+  }
+
+  delete(){
+    this._action = 'delete';
+    return this;
+  }
+}
+
+// ── Core fetch helper
+async function supaFetch(method, path, body=null, isAuth=false, extraHeaders={}){
+  const headers = {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_ANON_KEY,
+    'Prefer': 'return=representation',
+    ...extraHeaders,
+  };
+  if(!isAuth && _supaSession){
+    headers['Authorization'] = `Bearer ${_supaSession}`;
+  } else {
+    headers['Authorization'] = `Bearer ${SUPABASE_ANON_KEY}`;
+  }
+  try {
+    const res = await fetch(SUPABASE_URL + path, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if(res.status === 204) return {};
+    const json = await res.json();
+    if(!res.ok) return { error: json, code: res.status };
+    return json;
+  } catch(e) {
+    return { error: { message: e.message }, code: 0 };
+  }
+}
+
+// ── Flag de modo: 'local' | 'cloud'
+// Muda para 'cloud' quando Supabase auth estiver ativo
+let DATA_MODE = 'cloud'; // 'local' | 'cloud'
+
+/* ══════════════════════════════════════════════
+   PERSISTENCE — híbrido local/cloud
 ══════════════════════════════════════════════ */
 const DB = {
   g(k,d){try{return JSON.parse(localStorage.getItem('dv3_'+k))||d}catch{return d}},
@@ -1435,6 +1638,7 @@ function escapeHTML(str) {
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#x27;');
 }
+
 const DEFAULT_PROXY = 'https://wandering-sunset-7186.tristoncomercial.workers.dev';
 
 // ── DEMO ACCOUNT — credenciais fixas (altere aqui quando quiser)
@@ -1447,16 +1651,113 @@ const S = {
   user: null,
   key: DB.g('key',''),
   proxyUrl: DB.g('proxyUrl', DEFAULT_PROXY),
-  patients: DB.g('patients',[]),
-  exams: DB.g('exams',[]),
+  patients: [],
+  exams: [],
   currentResult: null,
-  pendingFile: null, // {type,base64,mimeType,name,text}
+  pendingFile: null,
   examFilter: 'all',
 };
-function persist(){
+
+// ── Persist — salva local E na nuvem se conectado
+async function persist(){
   if(!S.user) return;
+  // Sempre salva local como fallback
   DB.s('patients_'+S.user.id, S.patients);
   DB.s('exams_'+S.user.id, S.exams);
+  // Cloud sync (não bloqueia UI)
+  if(DATA_MODE === 'cloud' && _supa) {
+    // Patients e exams são salvos individualmente em savePatient/saveExam
+    // persist() é apenas para o cache local
+  }
+}
+
+// ── Load data — local ou cloud
+async function loadUserData(userId){
+  if(DATA_MODE === 'cloud' && _supa){
+    try {
+      const [pRes, eRes] = await Promise.all([
+        _supa.from('patients').select('*').eq('user_id', userId).order('created_at', {ascending:false}),
+        _supa.from('exams').select('*').eq('user_id', userId).order('date', {ascending:false}),
+      ]);
+      if(!pRes.error) S.patients = pRes.data.map(supaPatientToLocal);
+      if(!eRes.error) S.exams    = eRes.data.map(supaExamToLocal);
+      // Cache locally
+      DB.s('patients_'+userId, S.patients);
+      DB.s('exams_'+userId, S.exams);
+      return;
+    } catch(e) {
+      console.warn('Cloud load failed, falling back to local:', e.message);
+    }
+  }
+  // Local fallback
+  S.patients = DB.g('patients_'+userId, []);
+  S.exams    = DB.g('exams_'+userId, []);
+}
+
+// ── Converters: Supabase ↔ local format
+function supaPatientToLocal(p){
+  return { id:p.id, name:p.name, species:p.species, breed:p.breed,
+           sex:p.sex, age:p.age, weight:p.weight, owner:p.owner, history:p.history };
+}
+function supaExamToLocal(e){
+  return { id:e.id, patientId:e.patient_id, type:e.type, date:e.date,
+           status:e.status, markers:e.markers||{}, result:e.result||{},
+           context:e.context, rawText:e.raw_text, usedAI:e.used_ai,
+           importedFileName:e.imported_file_name, hematozoarios:e.hematozoarios,
+           observacoes:e.observacoes, cytologyFindings:e.cytology_findings,
+           examTypeDetected:e.exam_type_detected };
+}
+function localExamToSupa(e, userId){
+  return { user_id:userId, patient_id:e.patientId, type:e.type, date:e.date,
+           status:e.status, markers:e.markers, result:e.result,
+           context:e.context, raw_text:e.rawText, used_ai:e.usedAI,
+           imported_file_name:e.importedFileName, hematozoarios:e.hematozoarios,
+           observacoes:e.observacoes, cytology_findings:e.cytologyFindings,
+           exam_type_detected:e.examTypeDetected };
+}
+
+// ── Save exam to cloud
+async function saveExamCloud(exam){
+  if(DATA_MODE !== 'cloud' || !_supa || !S.user) return;
+  try {
+    await _supa.from('exams').upsert(localExamToSupa(exam, S.user.id));
+  } catch(e) { console.warn('Cloud exam save failed:', e.message); }
+}
+
+// ── Save patient to cloud
+async function savePatientCloud(patient){
+  if(DATA_MODE !== 'cloud' || !_supa || !S.user) return;
+  try {
+    await _supa.from('patients').upsert({...patient, user_id: S.user.id});
+  } catch(e) { console.warn('Cloud patient save failed:', e.message); }
+}
+
+// ── Increment usage in cloud
+async function incrementUsageCloud(){
+  if(DATA_MODE !== 'cloud' || !_supa || !S.user) return;
+  try {
+    const month = new Date().toISOString().slice(0,7);
+    await _supa.rpc('increment_usage', { p_user_id: S.user.id, p_month: month });
+  } catch(e) { console.warn('Cloud usage increment failed:', e.message); }
+}
+
+// ── Migrate local data to Supabase (run once)
+async function migrateToCloud(){
+  if(!_supa || !S.user) { toast('Supabase não conectado.','err'); return; }
+  const patients = DB.g('patients_'+S.user.id, []);
+  const exams    = DB.g('exams_'+S.user.id, []);
+  if(!patients.length && !exams.length){ toast('Nenhum dado local para migrar.','info'); return; }
+
+  toast(`Migrando ${patients.length} pacientes e ${exams.length} exames...`, 'info');
+  const idMap = {};
+  for(const p of patients){
+    const {data} = await _supa.from('patients').insert({...p, id:undefined, user_id:S.user.id}).select().single();
+    if(data) idMap[p.id] = data.id;
+  }
+  for(const e of exams){
+    await _supa.from('exams').insert(localExamToSupa({...e, patientId: idMap[e.patientId]||e.patientId}, S.user.id));
+  }
+  toast('Migração concluída! Dados agora estão na nuvem.', 'ok');
 }
 
 /* ══════════════════════════════════════════════
@@ -1605,14 +1906,7 @@ function seedDemo(){
 /* ══════════════════════════════════════════════
    AUTH
 ══════════════════════════════════════════════ */
-function authTab(t){
-  document.getElementById('at-login').classList.toggle('on',t==='login');
-  document.getElementById('at-reg').classList.toggle('on',t==='register');
-  document.getElementById('f-login').classList.toggle('hidden',t!=='login');
-  document.getElementById('f-reg').classList.toggle('hidden',t!=='register');
-  document.getElementById('auth-err').classList.add('hidden');
-}
-function showErr(m){ const e=document.getElementById('auth-err'); e.textContent=m; e.classList.remove('hidden'); }
+// authTab and showErr defined inline before HTML (see script above auth div)
 
 // ── Password hashing (SHA-256 via Web Crypto API — no dependencies)
 async function hashPassword(password) {
@@ -1628,29 +1922,49 @@ async function doLogin(){
   const pass  = document.getElementById('a-pass').value;
   if(!email||!pass){showErr('Preencha e-mail e senha.');return;}
 
-  // Demo credentials checked directly (plaintext — demo account is not a real user)
+  // Demo account — local only, never goes to Supabase
   if(email === DEMO_EMAIL.toLowerCase() && pass === DEMO_PASS){
     demoLogin(); return;
   }
 
-  const accs = DB.g('accounts',[]);
-  const hashedInput = await hashPassword(pass);
-
-  // Support legacy plaintext passwords (accounts created before this fix)
-  // Try hashed first, fall back to plaintext, then migrate on success
-  let acc = accs.find(a => a.email.toLowerCase() === email && a.pass === hashedInput);
-  if(!acc){
-    // Legacy plaintext match → migrate to hashed automatically
-    const legacy = accs.find(a => a.email.toLowerCase() === email && a.pass === pass);
-    if(legacy){
-      legacy.pass = hashedInput; // migrate in-place
-      DB.s('accounts', accs);
-      acc = legacy;
+  // ── Supabase Auth (real users)
+  if(_supa){
+    const btn = document.querySelector('#f-login .btn-auth');
+    if(btn){ btn.disabled=true; btn.textContent='Entrando...'; }
+    try {
+      const { data, error } = await _supa.auth.signInWithPassword({ email, password: pass });
+      if(error){
+        // Fallback: try local accounts (beta users created before Supabase)
+        await loginLocal(email, pass);
+        return;
+      }
+      // Supabase login success
+      const profile = await getSupaProfile(data.user.id);
+      DATA_MODE = 'cloud';
+      await enter({ ...profile, id: data.user.id, email: data.user.email,
+                    supaUser: data.user });
+    } catch(e) {
+      showErr('Erro ao conectar. Tente novamente.');
+    } finally {
+      if(btn){ btn.disabled=false; btn.textContent='Entrar'; }
     }
+    return;
   }
 
+  // No Supabase — use local only
+  await loginLocal(email, pass);
+}
+
+async function loginLocal(email, pass){
+  const accs = DB.g('accounts',[]);
+  const hashedInput = await hashPassword(pass);
+  let acc = accs.find(a => a.email.toLowerCase() === email && a.pass === hashedInput);
+  if(!acc){
+    const legacy = accs.find(a => a.email.toLowerCase() === email && a.pass === pass);
+    if(legacy){ legacy.pass = hashedInput; DB.s('accounts', accs); acc = legacy; }
+  }
   if(!acc){showErr('E-mail ou senha incorretos.');return;}
-  enter(acc);
+  await enter(acc);
 }
 
 async function doRegister(){
@@ -1664,22 +1978,85 @@ async function doRegister(){
   if(pass.length<6){showErr('Senha mínima de 6 caracteres.');return;}
   if(!email.includes('@')||!email.includes('.')){showErr('E-mail inválido.');return;}
   if(!crmv.trim()){showErr('Informe o CRMV.');return;}
+
+  // ── Supabase Auth (real users)
+  if(_supa){
+    const btn = document.querySelector('#f-reg .btn-auth');
+    if(btn){ btn.disabled=true; btn.textContent='Criando conta...'; }
+    try {
+      const { data, error } = await _supa.auth.signUp({
+        email, password: pass,
+        options: { data: { name:`${title} ${name}`, crmv, specialty: spec } }
+      });
+      if(error){ showErr(error.message || error.msg || JSON.stringify(error)); return; }
+
+      // Update profile with extra fields immediately after signup
+      if(data.user){
+        await _supa.from('profiles').update({
+          name:      `${title} ${name}`,
+          crmv:      crmv,
+          specialty: spec,
+          plan:      'trial',
+          plan_expiry: new Date(Date.now()+7*24*60*60*1000).toISOString()
+        }).eq('id', data.user.id);
+      }
+
+      // Check if email confirmation required
+      if(!data.session){
+        showErr(''); // clear error
+        document.getElementById('auth-err').style.background='var(--leaf-l)';
+        document.getElementById('auth-err').style.color='var(--leaf-d)';
+        document.getElementById('auth-err').style.borderColor='rgba(22,168,126,.2)';
+        showErr('✓ Conta criada! Verifique seu e-mail para confirmar o cadastro.');
+        return;
+      }
+
+      DATA_MODE = 'cloud';
+      const profile = await getSupaProfile(data.user.id);
+      await enter({ ...profile, id: data.user.id, email: data.user.email,
+                    supaUser: data.user }, true);
+    } catch(e) {
+      showErr('Erro ao criar conta. Tente novamente.');
+    } finally {
+      if(btn){ btn.disabled=false; btn.textContent='Criar conta'; }
+    }
+    return;
+  }
+
+  // No Supabase — local fallback
   const accs = DB.g('accounts',[]);
   if(accs.find(a=>a.email.toLowerCase()===email)){showErr('E-mail já cadastrado.');return;}
-
   const hashedPass = await hashPassword(pass);
-  const acc = {
-    id: 'u'+Date.now(),
-    title, name:`${title} ${name}`,
-    crmv, specialty:spec,
-    email, pass: hashedPass,  // ← stored as hash, never plaintext
-    plan:'trial', planExpiry: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
-    createdAt: new Date().toISOString(),
-  };
+  const acc = { id:'u'+Date.now(), title, name:`${title} ${name}`, crmv,
+    specialty:spec, email, pass:hashedPass, plan:'trial',
+    planExpiry: new Date(Date.now()+7*24*60*60*1000).toISOString(),
+    createdAt: new Date().toISOString() };
   accs.push(acc); DB.s('accounts',accs);
-  enter(acc);
+  await enter(acc);
 }
-function demoLogin(){
+
+async function forgotPassword(){
+  if(!_supa){ toast('Recuperação de senha disponível apenas com Supabase ativo.','warn'); return; }
+  const email = document.getElementById('a-email').value.trim().toLowerCase();
+  if(!email){ showErr('Digite seu e-mail no campo acima primeiro.'); return; }
+  const { error } = await _supa.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname,
+  });
+  if(error){ showErr(error.message); return; }
+  document.getElementById('auth-err').className='auth-err';
+  document.getElementById('auth-err').style.cssText='background:var(--leaf-l);border-color:rgba(22,168,126,.2);color:var(--leaf-d)';
+  document.getElementById('auth-err').textContent='✓ E-mail de recuperação enviado. Verifique sua caixa de entrada.';
+  document.getElementById('auth-err').classList.remove('hidden');
+}
+async function getSupaProfile(userId){
+  if(!_supa) return { plan:'trial', plan_expiry: new Date(Date.now()+7*24*60*60*1000).toISOString() };
+  try {
+    const { data } = await _supa.from('profiles').select('*').eq('id', userId).single();
+    return data || { plan:'trial', plan_expiry: new Date(Date.now()+7*24*60*60*1000).toISOString() };
+  } catch { return { plan:'trial' }; }
+}
+
+async function demoLogin(){
   const accs=DB.g('accounts',[]);
   let acc=accs.find(a=>a.email===DEMO_EMAIL);
   if(!acc){
@@ -1688,24 +2065,52 @@ function demoLogin(){
          plan:'pro',planExpiry:null,isDemo:true};
     accs.push(acc); DB.s('accounts',accs);
   }
-  enter(acc);
+  await enter(acc);
 }
-function enter(acc){
-  S.user=acc;
-  // Load this user's data (isolated per user ID)
-  S.patients = DB.g('patients_'+acc.id, []);
-  S.exams    = DB.g('exams_'+acc.id, []);
-  seedDemo(); // only populates demo account
-  // Reset nav history for fresh session
+
+async function enter(acc, isNew = false){
+  // Normalize — Supabase profile uses snake_case, app uses camelCase
+  acc.plan       = acc.plan       || 'trial';
+  acc.planExpiry = acc.planExpiry || acc.plan_expiry  || null;
+  acc.name       = acc.name       || acc.full_name    || acc.email || '';
+  acc.crmv       = acc.crmv       || acc.crmv_number  || '';
+  acc.specialty  = acc.specialty  || '';
+  acc.clinic     = acc.clinic     || acc.clinic_name  || '';
+
+  S.user = acc;
+
+  // Persist normalized profile to localStorage (so fields survive page refresh in local mode)
+  const accs = DB.g('accounts',[]);
+  const idx = accs.findIndex(a => a.id === acc.id);
+  if(idx >= 0){
+    accs[idx] = { ...accs[idx],
+      name: acc.name, crmv: acc.crmv,
+      specialty: acc.specialty, clinic: acc.clinic,
+      plan: acc.plan, planExpiry: acc.planExpiry
+    };
+    DB.s('accounts', accs);
+  }
+
+  await loadUserData(acc.id);
+  seedDemo();
   _navHistory = [];
-  try { history.replaceState({screen:'dashboard'},'','#dashboard'); } catch(e) {}
+  try { history.replaceState({screen:'dashboard'},'','#dashboard'); } catch(e){}
   document.getElementById('auth').style.display='none';
   document.getElementById('app').style.display='block';
   updateUserUI(); updateKeyUI(); updatePlanUI(); nav('dashboard');
+
+  // Show personalized welcome message
+  const name = acc.name || acc.email || '';
+  if(!acc.isDemo){
+    setTimeout(() => showWelcome(name, isNew ? 'new' : 'returning'), 600);
+  }
 }
+
 function doLogout(){
+  if(_supa && DATA_MODE === 'cloud') _supa.auth.signOut();
   S.user=null;
   S.patients=[]; S.exams=[]; S.currentResult=null;
+  DATA_MODE = 'local';
   document.getElementById('app').style.display='none';
   document.getElementById('auth').style.display='flex';
   document.getElementById('a-email').value='';
@@ -1779,6 +2184,107 @@ function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   const bd = document.getElementById('sb-backdrop');
   if(bd) bd.classList.remove('on');
+}
+
+/* ══════════════════════════════════════════════
+   WELCOME MESSAGES — mensagens personalizadas
+══════════════════════════════════════════════ */
+const WELCOME_MSGS = {
+  new: [
+    (n) => `Bem-vindo(a), ${n}! 🐾 Seu trial de 7 dias começa agora.`,
+    (n) => `Olá, ${n}! Estamos felizes em ter você aqui. Vamos fazer seu primeiro exame?`,
+    (n) => `${n}, seja bem-vindo(a) ao DiagnoVet! Sua conta está pronta.`,
+  ],
+  returning: [
+    (n) => `Olá de novo, ${n}! 👋 O que analisamos hoje?`,
+    (n) => `Bem-vindo(a) de volta, ${n}! Pronto(a) para mais diagnósticos?`,
+    (n) => `Oi, ${n}! Que bom ter você por aqui novamente.`,
+    (n) => `${n}, que bom te ver! Vamos ver os exames de hoje?`,
+    (n) => `Olá, ${n}! Seus pacientes estão esperando. 🐱🐶`,
+    (n) => `De volta ao trabalho, ${n}? Vamos lá!`,
+  ],
+  morning: [
+    (n) => `Bom dia, ${n}! ☀️ Pronto(a) para começar o dia?`,
+    (n) => `Bom dia, ${n}! Que seus diagnósticos de hoje sejam certeiros.`,
+  ],
+  afternoon: [
+    (n) => `Boa tarde, ${n}! 🌤 Continuando os atendimentos?`,
+    (n) => `Boa tarde, ${n}! O que analisamos agora?`,
+  ],
+  night: [
+    (n) => `Boa noite, ${n}! 🌙 Plantão ativo?`,
+    (n) => `Boa noite, ${n}! Ainda trabalhando? Vamos ajudar.`,
+  ],
+};
+
+function showWelcome(fullName, type = 'returning'){
+  // Extract first name + title
+  const parts = (fullName || '').trim().split(' ');
+  let displayName = parts[0]; // "Dra." or first name
+  if(parts.length > 1 && (parts[0]==='Dr.'||parts[0]==='Dra.')){
+    displayName = parts[0] + ' ' + parts[1]; // "Dra. Leylla"
+  }
+
+  // Pick message pool based on type + time of day
+  const hour = new Date().getHours();
+  let pool;
+  if(type === 'new'){
+    pool = WELCOME_MSGS.new;
+  } else if(hour >= 5 && hour < 12){
+    pool = [...WELCOME_MSGS.morning, ...WELCOME_MSGS.returning];
+  } else if(hour >= 12 && hour < 18){
+    pool = [...WELCOME_MSGS.afternoon, ...WELCOME_MSGS.returning];
+  } else {
+    pool = [...WELCOME_MSGS.night, ...WELCOME_MSGS.returning];
+  }
+
+  const msg = pool[Math.floor(Math.random() * pool.length)](displayName);
+
+  // Show as a special welcome toast
+  showWelcomeToast(msg);
+}
+
+function showWelcomeToast(msg){
+  // Remove existing welcome toast if any
+  document.getElementById('welcome-toast')?.remove();
+
+  const t = document.createElement('div');
+  t.id = 'welcome-toast';
+  t.style.cssText = `
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--night); color:var(--snow); border-radius:var(--r999);
+    padding:12px 20px; font-size:14px; font-weight:500; font-family:'Plus Jakarta Sans',sans-serif;
+    box-shadow:0 8px 32px rgba(9,22,16,.4), 0 0 0 1px rgba(22,168,126,.2);
+    z-index:9999; white-space:nowrap; max-width:90vw; overflow:hidden; text-overflow:ellipsis;
+    opacity:0; transition:opacity .3s ease, transform .3s ease;
+    display:flex; align-items:center; gap:10px;
+  `;
+  t.innerHTML = `
+    <div style="width:8px;height:8px;border-radius:50%;background:var(--leaf);flex-shrink:0;animation:pulse 2s infinite"></div>
+    <span>${msg}</span>
+  `;
+  document.body.appendChild(t);
+
+  // Animate in
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      t.style.opacity = '1';
+      t.style.transform = 'translateX(-50%) translateY(0)';
+    });
+  });
+
+  // Auto-dismiss after 4s
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(10px)';
+    setTimeout(() => t.remove(), 400);
+  }, 4000);
+
+  // Tap to dismiss
+  t.addEventListener('click', () => {
+    t.style.opacity = '0';
+    setTimeout(() => t.remove(), 300);
+  });
 }
 
 /* ══════════════════════════════════════════════
@@ -2869,6 +3375,7 @@ async function runImport() {
   persist();
   incrementUsage(); // ← track usage against plan quota
   if(getUserPlan().id === 'trial') incrementDailyUsage();
+  saveExamCloud(exam); // ← sync to Supabase (non-blocking)
 
   S.currentResult = {
     patient, exam,
@@ -4372,13 +4879,31 @@ function stTab(t,el){
 ══════════════════════════════════════════════ */
 function saveProfile(){
   if(!S.user) return;
-  S.user.name      = document.getElementById('s-name')?.value   || S.user.name;
-  S.user.crmv      = document.getElementById('s-crmv')?.value   || S.user.crmv;
-  S.user.specialty = document.getElementById('s-spec')?.value   || S.user.specialty;
-  S.user.clinic    = document.getElementById('s-clinic')?.value || S.user.clinic;
-  const accs = DB.g('accounts',[]); const idx = accs.findIndex(a=>a.id===S.user.id);
+  const getName  = (id) => document.getElementById(id)?.value.trim() || '';
+  S.user.name      = getName('s-name')    || S.user.name;
+  S.user.crmv      = getName('s-crmv')    || S.user.crmv;
+  S.user.specialty = getName('s-spec')    || S.user.specialty;
+  S.user.clinic    = getName('s-clinic')  || S.user.clinic;
+
+  // Save to localStorage accounts
+  const accs = DB.g('accounts',[]);
+  const idx = accs.findIndex(a => a.id === S.user.id);
   if(idx>=0){ accs[idx]={...accs[idx],...S.user}; DB.s('accounts',accs); }
-  updateUserUI(); toast('Perfil atualizado com sucesso.','ok');
+
+  // Save to Supabase profiles
+  if(DATA_MODE === 'cloud' && _supa && S.user.id){
+    _supa.from('profiles').update({
+      name:      S.user.name,
+      crmv:      S.user.crmv,
+      specialty: S.user.specialty,
+      clinic:    S.user.clinic,
+    }).eq('id', S.user.id).then(({error}) => {
+      if(error) console.warn('Profile cloud save failed:', error);
+    });
+  }
+
+  updateUserUI();
+  toast('Perfil atualizado com sucesso.','ok');
 }
 function saveKey(){
   const k=document.getElementById('s-key')?.value.trim()||'';
@@ -4909,8 +5434,18 @@ body{
 
   <!-- FOOTER -->
   <div class="report-footer">
-    <div class="footer-brand">Diagno<em>Vet</em> · Diagnóstico Veterinário com IA</div>
-    <div>${printedAt} · ${exam.usedAI?'Claude AI':'Motor local'}</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
+      <div>
+        <div class="footer-brand">Diagno<em>Vet</em> · Diagnóstico Veterinário com IA</div>
+        <div>${printedAt} · ${exam.usedAI?'Claude AI':'Motor local'}</div>
+      </div>
+      <div style="text-align:right;border-top:1px solid var(--fog);padding-top:10px;min-width:200px">
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">${escapeHTML(S.user?.name||'Médico(a) Veterinário(a)')}</div>
+        ${S.user?.crmv ? `<div style="font-size:11px;color:var(--mist);margin-top:2px">${escapeHTML(S.user.crmv)}</div>` : ''}
+        ${S.user?.specialty ? `<div style="font-size:11px;color:var(--mist)">${escapeHTML(S.user.specialty)}</div>` : ''}
+        ${S.user?.clinic ? `<div style="font-size:11px;color:var(--mist)">${escapeHTML(S.user.clinic)}</div>` : ''}
+      </div>
+    </div>
   </div>
 
 </div>
@@ -4970,8 +5505,82 @@ function updateCritBadge(){
 /* ══════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════ */
+initSupabase();
 updateKeyUI();
 updatePlanUI();
+
+// ── Lidar com redirect de confirmação de e-mail
+// Supabase redireciona para: app.html#access_token=xxx&type=signup
+async function handleEmailRedirect(){
+  const hash = window.location.hash;
+  if(!hash) return false;
+  const params = new URLSearchParams(hash.replace('#',''));
+  const accessToken  = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+  const type         = params.get('type'); // 'signup' | 'recovery' | 'magiclink'
+  if(!accessToken) return false;
+
+  // Limpa o hash da URL (não fica exposto)
+  try { history.replaceState(null,'', window.location.pathname); } catch(e){}
+
+  // Salva a sessão
+  const session = { access_token: accessToken, refresh_token: refreshToken };
+  _supaSession = accessToken;
+  DB.s('supa_session', session);
+
+  // Busca dados do usuário
+  const userRes = await supaFetch('GET', '/auth/v1/user');
+  if(!userRes?.id) return false;
+
+  const profile = await getSupaProfile(userRes.id);
+  DATA_MODE = 'cloud';
+
+  if(type === 'signup'){
+    await enter({ ...profile, id: userRes.id, email: userRes.email, supaUser: userRes });
+    showWelcome(profile.name || userRes.email, 'new');
+    return true;
+  }
+  if(type === 'recovery'){
+    // Redireciona para tela de nova senha (futura implementação)
+    await enter({ ...profile, id: userRes.id, email: userRes.email, supaUser: userRes });
+    toast('Defina uma nova senha em Configurações → Minha Conta.', 'info');
+    return true;
+  }
+  return false;
+}
+
+// ── Restaurar sessão Supabase ao recarregar a página
+(async () => {
+  if(!_supa) return;
+  try {
+    // Primeiro verifica se veio de redirect de e-mail
+    const handled = await handleEmailRedirect();
+    if(handled) return;
+
+    // Senão, tenta restaurar sessão existente
+    const { data } = await _supa.auth.getSession();
+    if(data?.session?.user){
+      const user = data.session.user;
+      const profile = await getSupaProfile(user.id);
+      DATA_MODE = 'cloud';
+      await enter({ ...profile, id: user.id, email: user.email, supaUser: user });
+    }
+  } catch(e) {
+    console.warn('Session restore failed:', e.message);
+  }
+})();
+
+// ── Escutar mudanças de auth (logout em outra aba, token expirado, etc.)
+if(_supa){
+  _supa.auth.onAuthStateChange(async (event, session) => {
+    if(event === 'SIGNED_OUT' && S.user?.supaUser){
+      doLogout();
+    }
+    if(event === 'TOKEN_REFRESHED'){
+      console.log('✓ Token Supabase renovado');
+    }
+  });
+}
 </script>
 </body>
 </html>
