@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.workers.dev https://api.anthropic.com; img-src 'self' data: blob:; object-src 'none'; base-uri 'self';">
+<meta name="description" content="DiagnoVet — Diagnóstico veterinário com IA."/>
+<meta name="theme-color" content="#091610"/>
 <title>DiagnoVet — Diagnóstico Veterinário com IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -106,85 +109,86 @@ input::placeholder, textarea::placeholder {
 @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 .fade-in { animation: fadeSlide var(--d-base) var(--e-out) both; }
 
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeSlide  { from { opacity:0; transform:translateY(8px);  } to { opacity:1; transform:none; } }
+@keyframes fadeUp     { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+@keyframes fadeIn     { from { opacity:0; } to { opacity:1; } }
+@keyframes spin       { to   { transform:rotate(360deg); } }
+@keyframes pulse      { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+@keyframes float      { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+@keyframes glow       { 0%,100% { opacity:.4; transform:scale(1); } 50% { opacity:.7; transform:scale(1.08); } }
+@keyframes orb1       { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(30px,-20px) scale(1.1); } }
+@keyframes orb2       { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(-20px,30px) scale(.9); } }
+@keyframes orb3       { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(15px,15px) scale(1.05); } }
+@keyframes pawBeat    { 0%,100% { transform:scale(1); } 50% { transform:scale(1.04); } }
+@keyframes cardIn     { from { opacity:0; transform:translateY(32px) scale(.97); } to { opacity:1; transform:none; } }
+.fade-in { animation:fadeSlide var(--d-base) var(--e-out) both; }
+
 /* ═══ AUTH ═══ */
 #auth {
-  position: fixed; inset: 0; z-index: 900;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--night); overflow-y: auto; padding: 20px;
+  position:fixed; inset:0; z-index:900;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--night); overflow-y:auto;
+  padding:clamp(16px,4vw,40px);
 }
-#auth::before {
-  content: ''; position: fixed; inset: 0; pointer-events: none;
-  background:
-    radial-gradient(ellipse 55% 60% at 75% 45%, rgba(22,168,126,.1) 0%, transparent 65%),
-    radial-gradient(ellipse 35% 45% at 15% 75%, rgba(37,99,235,.06) 0%, transparent 55%);
-}
+.auth-bg { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+.auth-bg-orb { position:absolute; border-radius:50%; filter:blur(70px); }
+.auth-bg-orb-1 { width:520px; height:520px; background:radial-gradient(circle, rgba(22,168,126,.18) 0%, transparent 70%); top:-100px; right:-80px; animation:orb1 12s ease-in-out infinite; }
+.auth-bg-orb-2 { width:400px; height:400px; background:radial-gradient(circle, rgba(37,99,235,.12) 0%, transparent 70%); bottom:-60px; left:-60px; animation:orb2 15s ease-in-out infinite; }
+.auth-bg-orb-3 { width:280px; height:280px; background:radial-gradient(circle, rgba(22,168,126,.08) 0%, transparent 70%); top:40%; left:40%; animation:orb3 10s ease-in-out infinite; }
+.auth-bg-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(22,168,126,.04) 1px, transparent 1px),linear-gradient(90deg, rgba(22,168,126,.04) 1px, transparent 1px); background-size:48px 48px; mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); }
+.auth-bg-logo { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); opacity:.04; animation:pawBeat 6s ease-in-out infinite; pointer-events:none; }
 .auth-card {
-  display: grid; grid-template-columns: 480px 440px;
-  border-radius: var(--r28); overflow: hidden;
-  box-shadow: var(--shN); position: relative; z-index: 1;
-  max-width: 100%;
+  display:grid; grid-template-columns:minmax(0,480px) minmax(0,420px);
+  border-radius:var(--r28); overflow:hidden;
+  box-shadow:0 32px 100px rgba(0,0,0,.55), 0 0 0 1px rgba(22,168,126,.12);
+  position:relative; z-index:1; width:100%; max-width:920px;
+  animation:cardIn var(--d-slow) var(--e-out) both;
 }
 .auth-panel-l {
-  background: linear-gradient(155deg, var(--night3) 0%, #0B2416 60%, #0A1E12 100%);
-  padding: 52px 48px; display: flex; flex-direction: column; gap: 0;
-  border-right: 1px solid rgba(22,168,126,.1);
+  background:linear-gradient(160deg, #0D2118 0%, #091610 60%, #071410 100%);
+  padding:clamp(32px,5vw,56px) clamp(28px,4vw,52px);
+  display:flex; flex-direction:column;
+  border-right:1px solid rgba(22,168,126,.1);
+  position:relative; overflow:hidden;
 }
-.auth-logotype { display: flex; align-items: center; gap: 12px; margin-bottom: 60px; }
-.auth-logotype-mark {
-  width: 40px; height: 40px; background: var(--leaf); border-radius: 11px;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.auth-logotype-name {
-  font-family: 'Sora', sans-serif; font-size: 22px; color: var(--snow);
-  letter-spacing: -.3px;
-}
-.auth-logotype-name em { color: var(--leaf); font-style: normal; }
-.auth-headline {
-  font-family: 'Sora', sans-serif;
-  font-size: clamp(28px, 3.5vw, 40px); color: var(--snow);
-  line-height: 1.1; letter-spacing: -.5px; margin-bottom: 18px;
-}
-.auth-headline i { color: var(--leaf); font-style: normal; font-weight: 800; }
-.auth-lead { font-size: 14px; color: rgba(255,255,255,.42); line-height: 1.75; font-weight: 300; max-width: 340px; margin-bottom: 48px; letter-spacing: .01em; }
-.auth-feats { display: flex; flex-direction: column; gap: 13px; }
-.auth-feat { display: flex; align-items: center; gap: 12px; font-size: 13px; color: rgba(255,255,255,.55); }
-.auth-feat-icon {
-  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
-  background: rgba(22,168,126,.1); border: 1px solid rgba(22,168,126,.2);
-  display: flex; align-items: center; justify-content: center;
-}
-.auth-stamp { margin-top: auto; padding-top: 40px; font-size: 10px; color: rgba(255,255,255,.18); font-family: 'JetBrains Mono', monospace; letter-spacing: .03em; }
-
-.auth-panel-r { background: var(--snow); padding: 52px 48px; display: flex; flex-direction: column; justify-content: center; }
-.auth-form-head { margin-bottom: 32px; }
-.auth-form-title { font-family: 'Sora', sans-serif; font-size: 26px; color: var(--ink); margin-bottom: 5px; letter-spacing: -1px; font-weight: 800; }
-.auth-form-sub { font-size: 13px; color: var(--ink3); }
-.auth-tabs { display: flex; background: var(--paper); border-radius: var(--r8); padding: 3px; margin-bottom: 28px; }
-.auth-tab { flex: 1; padding: 9px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--ink3); border: none; background: none; cursor: pointer; transition: color var(--d-instant) var(--e-out), background var(--d-instant) var(--e-out), border-color var(--d-instant) var(--e-out), box-shadow var(--d-fast) var(--e-out), transform var(--d-fast) var(--e-out); }
-.auth-tab.on { background: var(--snow); color: var(--ink); box-shadow: var(--sh1); }
-.fld { margin-bottom: 14px; }
-.fld label { display: block; font-size: 11px; font-weight: 700; color: var(--ink3); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 6px; }
-.fld input, .fld select {
-  width: 100%; padding: 11px 14px; border-radius: var(--r8);
-  border: 1px solid var(--ghost); background: var(--paper);
-  font-size: 14px; color: var(--ink); outline: none;
-  transition: border-color var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out);
-}
-.fld input:focus, .fld select:focus { border-color: var(--leaf); box-shadow: 0 0 0 3px rgba(22,168,126,.12); background: var(--snow); }
-.fld-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.auth-err { background: var(--ruby-l); border: 1px solid rgba(220,53,69,.25); border-radius: var(--r8); padding: 10px 14px; font-size: 13px; color: #8B1A20; margin-bottom: 14px; }
-.btn-auth {
-  width: 100%; padding: 13px; background: var(--leaf); border: none; border-radius: var(--r12);
-  font-size: 14px; font-weight: 700; color: var(--snow); cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: color var(--d-fast) var(--e-out), background var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out), transform var(--d-fast) var(--e-out); margin-top: 6px;
-}
-.btn-auth:hover { background: var(--leaf-d); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(22,168,126,.3); }
-.btn-auth:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
-.auth-footer { text-align: center; font-size: 13px; color: var(--ink3); margin-top: 18px; }
-.auth-link { color: var(--leaf-d); font-weight: 600; cursor: pointer; }
-.auth-link:hover { text-decoration: underline; }
-.auth-demo-btn { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--fog); text-align: center; }
+.auth-panel-l::before { content:''; position:absolute; top:-80px; right:-80px; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle, rgba(22,168,126,.12) 0%, transparent 70%); animation:glow 8s ease-in-out infinite; }
+.auth-logotype { display:flex; align-items:center; gap:12px; margin-bottom:clamp(32px,5vh,60px); animation:fadeUp .5s .1s var(--e-out) both; }
+.auth-logotype-mark { width:40px; height:40px; background:var(--leaf); border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 20px rgba(22,168,126,.4); animation:pawBeat 4s ease-in-out infinite; }
+.auth-logotype-name { font-family:'Sora',sans-serif; font-size:22px; color:var(--snow); letter-spacing:-.8px; font-weight:800; }
+.auth-logotype-name em { color:var(--leaf); font-style:normal; }
+.auth-paw-hero { display:flex; justify-content:center; margin-bottom:28px; animation:float 6s ease-in-out infinite; }
+.auth-headline { font-family:'Sora',sans-serif; font-size:clamp(22px,3vw,36px); color:var(--snow); line-height:1.1; letter-spacing:-1px; margin-bottom:16px; font-weight:800; animation:fadeUp .5s .25s var(--e-out) both; }
+.auth-headline i { color:var(--leaf); font-style:normal; }
+.auth-lead { font-size:13px; color:rgba(255,255,255,.4); line-height:1.75; font-weight:300; margin-bottom:32px; animation:fadeUp .5s .35s var(--e-out) both; }
+.auth-feats { display:flex; flex-direction:column; gap:11px; animation:fadeUp .5s .45s var(--e-out) both; }
+.auth-feat { display:flex; align-items:center; gap:11px; font-size:13px; color:rgba(255,255,255,.5); }
+.auth-feat-icon { width:26px; height:26px; border-radius:7px; flex-shrink:0; background:rgba(22,168,126,.1); border:1px solid rgba(22,168,126,.2); display:flex; align-items:center; justify-content:center; }
+.auth-stamp { margin-top:auto; padding-top:32px; font-size:10px; color:rgba(255,255,255,.15); font-family:'JetBrains Mono',monospace; letter-spacing:.04em; }
+.auth-panel-r { background:var(--snow); padding:clamp(28px,5vw,52px) clamp(24px,4vw,52px); display:flex; flex-direction:column; justify-content:center; animation:fadeIn .4s .2s var(--e-out) both; }
+.auth-form-head { margin-bottom:28px; }
+.auth-form-title { font-family:'Sora',sans-serif; font-size:clamp(20px,2.5vw,26px); color:var(--ink); margin-bottom:5px; letter-spacing:-1px; font-weight:800; }
+.auth-form-sub { font-size:13px; color:var(--ink3); }
+.auth-tabs { display:flex; background:var(--paper); border-radius:var(--r8); padding:3px; margin-bottom:24px; }
+.auth-tab { flex:1; padding:9px 16px; border-radius:6px; font-size:13px; font-weight:700; color:var(--ink3); border:none; background:none; cursor:pointer; transition:color var(--d-instant) var(--e-out), background var(--d-instant) var(--e-out), box-shadow var(--d-fast) var(--e-out); letter-spacing:-.1px; }
+.auth-tab.on { background:var(--snow); color:var(--ink); box-shadow:var(--sh1); }
+.fld { margin-bottom:14px; }
+.fld label { display:block; font-size:10px; font-weight:800; color:var(--mist); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+.fld input, .fld select { width:100%; padding:11px 14px; border-radius:var(--r8); border:1px solid var(--ghost); background:var(--paper); font-size:14px; color:var(--ink); outline:none; transition:border-color var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out); }
+.fld input:focus, .fld select:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,168,126,.12); background:var(--snow); }
+.fld-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.auth-err { background:var(--ruby-l); border:1px solid rgba(220,53,69,.25); border-radius:var(--r8); padding:10px 14px; font-size:13px; color:#8B1A20; margin-bottom:14px; }
+.btn-auth { width:100%; padding:13px; background:var(--leaf); border:none; border-radius:var(--r12); font-size:14px; font-weight:800; color:var(--snow); cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:-.1px; margin-top:6px; transition:background var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out), transform var(--d-fast) var(--e-out); }
+.btn-auth:hover { background:var(--leaf-d); transform:translateY(-1px); box-shadow:0 6px 20px rgba(22,168,126,.3); }
+.btn-auth:active { transform:translateY(0); }
+.btn-auth:disabled { opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+.auth-footer { text-align:center; font-size:13px; color:var(--ink3); margin-top:16px; }
+.auth-link { color:var(--leaf-d); font-weight:600; cursor:pointer; }
+.auth-link:hover { text-decoration:underline; }
+.auth-demo-btn { margin-top:20px; padding-top:20px; border-top:1px solid var(--fog); text-align:center; }
+@media (max-width:860px) { .auth-card { grid-template-columns:1fr; max-width:460px; } .auth-panel-l { display:none; } .auth-panel-r { border-radius:var(--r28); } }
+@media (max-width:480px) { #auth { padding:0; align-items:flex-end; } .auth-card { max-width:100%; border-radius:var(--r28) var(--r28) 0 0; } .auth-panel-r { padding:28px 22px max(28px, env(safe-area-inset-bottom)); } .auth-mobile-brand { display:flex !important; } .fld-row { grid-template-columns:1fr; gap:0; } }
+.auth-mobile-brand { display:none; align-items:center; justify-content:center; gap:10px; margin-bottom:20px; }
 
 /* ═══ APP SHELL ═══ */
 #app { display: none; height: 100vh; overflow: hidden; }
@@ -241,6 +245,30 @@ input::placeholder, textarea::placeholder {
   height: var(--th); background: var(--snow); border-bottom: 1px solid var(--fog);
   padding: 0 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
 }
+/* ── Usage strip ── */
+.usage-strip {
+  height: 3px; background: var(--fog); flex-shrink: 0; overflow: hidden;
+  cursor: pointer; transition: height var(--d-fast) var(--e-out);
+}
+.usage-strip:hover { height: 5px; }
+.usage-strip-fill {
+  height: 100%; border-radius: 0 2px 2px 0;
+  transition: width var(--d-deliberate) var(--e-out), background var(--d-base) var(--e-out);
+}
+/* Usage popup */
+.usage-popup {
+  position: absolute; top: calc(var(--th) + 3px); right: 20px; z-index: 100;
+  background: var(--night); color: var(--snow); border-radius: var(--r12);
+  padding: 14px 18px; box-shadow: var(--sh3); min-width: 220px;
+  animation: fadeSlide var(--d-fast) var(--e-out) both;
+  border: 1px solid rgba(255,255,255,.08);
+}
+.usage-popup::before {
+  content: ''; position: absolute; top: -6px; right: 24px;
+  width: 12px; height: 12px; background: var(--night);
+  transform: rotate(45deg); border-left: 1px solid rgba(255,255,255,.08);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
 .topbar-l { display: flex; align-items: center; gap: 12px; }
 .topbar-title { font-family: 'Sora', sans-serif; font-size: 17px; color: var(--ink); letter-spacing: -.5px; font-weight: 700; }
 .topbar-r { display: flex; align-items: center; gap: 8px; }
@@ -283,7 +311,26 @@ input::placeholder, textarea::placeholder {
 .tag-neutral { background: var(--fog); color: var(--ink3); }
 .tag-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 
-/* ── PLAN BADGES ── */
+/* ── TRIAL BANNER ── */
+.trial-banner {
+  display:none; align-items:center; gap:10px;
+  padding:8px 20px; background:linear-gradient(90deg,#7A4800 0%,#5C3400 100%);
+  border-bottom:1px solid rgba(255,200,80,.15); flex-shrink:0;
+  cursor:pointer; transition:background var(--d-fast) var(--e-out);
+}
+.trial-banner:hover { background:linear-gradient(90deg,#8B5000 0%,#6B3C00 100%); }
+.trial-banner.on { display:flex; }
+.trial-dot { width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;animation:pulse 2s infinite; }
+.trial-text { font-size:12px;color:rgba(255,220,120,.9);font-weight:600;flex:1;letter-spacing:-.05px; }
+.trial-cta { font-size:11px;font-weight:800;color:var(--amber);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap; }
+
+/* ── ANNUAL TOGGLE ── */
+.billing-toggle { display:flex;align-items:center;gap:0;background:var(--paper);border-radius:var(--r999);padding:3px;border:1px solid var(--fog); }
+.billing-opt { padding:7px 18px;border-radius:var(--r999);font-size:12px;font-weight:700;color:var(--mist);cursor:pointer;transition:all var(--d-fast) var(--e-out);border:none;background:none;white-space:nowrap; }
+.billing-opt.on { background:var(--night);color:var(--snow); }
+.annual-badge { display:inline-flex;align-items:center;padding:2px 7px;border-radius:var(--r999);background:rgba(22,168,126,.15);color:var(--leaf-d);font-size:10px;font-weight:800;margin-left:5px;border:1px solid rgba(22,168,126,.25); }
+
+/* ── PLAN CARDS ── */
 .plan-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r999);font-size:11px;font-weight:700;}
 .plan-card{background:var(--snow);border:1.5px solid var(--fog);border-radius:var(--r16);padding:20px;cursor:pointer;transition:border-color var(--d-fast) var(--e-out),transform var(--d-fast) var(--e-out);}
 .plan-card:hover{border-color:var(--leaf);transform:translateY(-2px);}
@@ -497,8 +544,32 @@ input::placeholder, textarea::placeholder {
 .mbc-bar { flex: 1; border-radius: 3px 3px 0 0; min-height: 4px; }
 
 /* ═══ RESPONSIVE ═══ */
+/* ══ MOBILE BOTTOM NAV ══ */
+.mob-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: var(--snow); border-top: 1px solid var(--fog);
+  padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(12,26,20,.08);
+}
+.mob-nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; padding: 6px 4px;
+  background: none; border: none; cursor: pointer;
+  color: var(--mist); font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px; font-weight: 600; letter-spacing: -.02em;
+  transition: color var(--d-instant) var(--e-out);
+}
+.mob-nav-btn.on { color: var(--leaf); }
+.mob-nav-btn svg { transition: transform var(--d-fast) var(--e-spring); }
+.mob-nav-btn.on svg { transform: translateY(-1px); }
+
+/* ══ TABLET/MOBILE ══ */
 @media (max-width: 900px) {
-  .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; z-index: 300; transition: left var(--d-fast) var(--e-out); width: 260px; }
+  .sidebar {
+    position: fixed; left: -280px; top: 0; bottom: 0; z-index: 300;
+    transition: left var(--d-slow) var(--e-out); width: 272px;
+  }
   .sidebar.open { left: 0; box-shadow: var(--shN); }
   .hamburger { display: flex !important; }
   .dash-kpi { grid-template-columns: 1fr 1fr; }
@@ -508,12 +579,59 @@ input::placeholder, textarea::placeholder {
   .et-head, .et-row { grid-template-columns: 1.8fr 1fr 80px; }
   .et-th:nth-child(n+3):not(:last-child), .et-cell:nth-child(n+3):not(:last-child) { display: none; }
   .screen-inner { padding: 16px; }
-  .pt-grid { grid-template-columns: 1fr; }
+  .pt-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  /* Sidebar overlay backdrop */
+  .sidebar-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 299;
+    background: rgba(9,22,16,.5); backdrop-filter: blur(2px);
+  }
+  .sidebar-backdrop.on { display: block; }
 }
+
+/* ══ MOBILE ══ */
 @media (max-width: 600px) {
-  .topbar { padding: 0 14px; }
+  .mob-nav { display: flex; }
+  .main-area { padding-bottom: 60px; } /* space for bottom nav */
+  .topbar { padding: 0 14px; height: 50px; }
   .topbar-r .btn span { display: none; }
+  .topbar-r .btn { padding: 7px 10px; }
+  .dash-kpi { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi-val { font-size: 32px; letter-spacing: -1.5px; }
+  .screen-inner { padding: 12px 14px 20px; }
+  .card { border-radius: var(--r12); }
+  /* Auth mobile */
+  #auth { padding: 16px; align-items: flex-start; padding-top: 40px; }
+  .auth-panel-r { padding: 28px 24px; border-radius: var(--r20); }
+  .auth-form-title { font-size: 22px; }
+  /* Import screen mobile */
+  .import-layout { gap: 16px; }
+  .dropzone { padding: 36px 20px; }
+  .dz-title { font-size: 14px; }
+  /* Result hero mobile */
+  .result-hero { flex-direction: column; gap: 12px; }
+  .result-hero svg { display: none; } /* hide score circle on small screens */
+  .rh-name { font-size: 20px; }
+  /* Patients grid mobile */
+  .pt-grid { grid-template-columns: 1fr; }
+  /* Exams table mobile */
+  .et-head, .et-row { grid-template-columns: 1fr 70px; }
+  .et-th:nth-child(n+2):not(:last-child), .et-cell:nth-child(n+2):not(:last-child) { display: none; }
+  /* Modal mobile */
+  .modal { border-radius: var(--r20) var(--r20) 0 0; max-height: 92vh; margin: auto 0 0; }
+  .overlay { align-items: flex-end; padding: 0; }
+  /* KPI grid mobile */
   .dash-kpi { grid-template-columns: 1fr 1fr; }
+  /* Settings mobile */
+  .settings-layout { grid-template-columns: 1fr; }
+  .settings-nav { display: flex; overflow-x: auto; border-radius: var(--r12); gap: 0; }
+  .sn-btn { flex-shrink: 0; border-bottom: 2px solid transparent; border-radius: 0; }
+  .sn-btn.on { border-bottom-color: var(--leaf); background: transparent; }
+  /* Processing overlay mobile */
+  #proc { padding: 24px; }
+  /* Topbar title mobile */
+  .topbar-title { font-size: 15px; }
+  /* Back button label hide on very small */
+  #back-btn span { display: none; }
 }
 /* ══ EXTRA TYPOGRAPHY POLISH ══ */
 
@@ -675,19 +793,39 @@ input::placeholder, textarea::placeholder {
 
 <!-- ── AUTH ── -->
 <div id="auth">
+
+  <!-- Animated background -->
+  <div class="auth-bg">
+    <div class="auth-bg-orb auth-bg-orb-1"></div>
+    <div class="auth-bg-orb auth-bg-orb-2"></div>
+    <div class="auth-bg-orb auth-bg-orb-3"></div>
+    <div class="auth-bg-grid"></div>
+    <!-- Giant background paw -->
+    <div class="auth-bg-logo">
+      <svg width="560" height="560" viewBox="0 0 24 24" fill="none">
+        <circle cx="9.5" cy="5.2" r="2.4" fill="white"/>
+        <circle cx="14.5" cy="5.2" r="2.4" fill="white"/>
+        <circle cx="5.8" cy="9.4" r="1.9" fill="white"/>
+        <circle cx="18.2" cy="9.4" r="1.9" fill="white"/>
+        <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white"/>
+        <circle cx="2" cy="7" r="1.5" fill="#3B82F6"/>
+        <circle cx="22" cy="7" r="1.5" fill="#3B82F6"/>
+        <line x1="9.5" y1="5.2" x2="2" y2="7" stroke="#3B82F6" stroke-width="1"/>
+        <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+
   <div class="auth-card">
     <div class="auth-panel-l">
       <div class="auth-logotype">
         <div class="auth-logotype-mark">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <!-- Paw: 4 toe pads -->
             <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
             <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
             <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".88"/>
             <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".88"/>
-            <!-- Paw: central pad (larger) -->
             <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".96"/>
-            <!-- Neural nodes -->
             <circle cx="2" cy="7" r="1.5" fill="#3B82F6" opacity=".85"/>
             <circle cx="22" cy="7" r="1.5" fill="#3B82F6" opacity=".85"/>
             <line x1="9.5" y1="5.2" x2="2" y2="7" stroke="#3B82F6" stroke-width="1" opacity=".6"/>
@@ -696,18 +834,53 @@ input::placeholder, textarea::placeholder {
         </div>
         <div class="auth-logotype-name">Diagno<em>Vet</em></div>
       </div>
+
+      <!-- Animated paw hero -->
+      <div class="auth-paw-hero">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="none">
+          <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".9"/>
+          <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".9"/>
+          <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".8"/>
+          <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".8"/>
+          <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".95"/>
+          <circle cx="2" cy="7" r="1.8" fill="#3B82F6" opacity=".9"/>
+          <circle cx="22" cy="7" r="1.8" fill="#3B82F6" opacity=".9"/>
+          <line x1="9.5" y1="5.2" x2="2" y2="7" stroke="#3B82F6" stroke-width="1.2" opacity=".7" stroke-dasharray="8" stroke-dashoffset="0"/>
+          <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width="1.2" opacity=".7" stroke-dasharray="8" stroke-dashoffset="0"/>
+        </svg>
+      </div>
+
       <div class="auth-headline">Diagnóstico<br>veterinário<br><i>inteligente</i></div>
-      <div class="auth-lead">Importe o arquivo do exame — PDF, imagem ou texto — e receba uma análise clínica completa em segundos, sem digitar nada manualmente.</div>
+      <div class="auth-lead">Importe o arquivo do exame — PDF, imagem ou texto — e receba análise clínica completa em segundos.</div>
       <div class="auth-feats">
         <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Importação de PDF, JPG, PNG e CSV</div>
         <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Extração automática de valores por IA</div>
         <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Interpretação clínica com Claude AI</div>
         <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Histórico e comparação entre exames</div>
-        <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Exportação de laudos e backups</div>
+        <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Exportação de laudos profissionais</div>
       </div>
       <div class="auth-stamp">DiagnoVet v3.0 · AI Veterinary Platform</div>
     </div>
+
     <div class="auth-panel-r">
+      <!-- Mobile only brand (shown when left panel is hidden) -->
+      <div class="auth-mobile-brand">
+        <div class="auth-logotype-mark" style="width:36px;height:36px;border-radius:10px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
+            <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
+            <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".88"/>
+            <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".88"/>
+            <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".96"/>
+            <circle cx="2" cy="7" r="1.5" fill="#3B82F6" opacity=".85"/>
+            <circle cx="22" cy="7" r="1.5" fill="#3B82F6" opacity=".85"/>
+            <line x1="9.5" y1="5.2" x2="2" y2="7" stroke="#3B82F6" stroke-width="1" opacity=".6"/>
+            <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width="1" opacity=".6"/>
+          </svg>
+        </div>
+        <span style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.8px">Diagno<em style="color:var(--leaf);font-style:normal">Vet</em></span>
+      </div>
+
       <div class="auth-form-head">
         <div class="auth-form-title">Acesse sua conta</div>
         <div class="auth-form-sub">Plataforma exclusiva para médicos-veterinários.</div>
@@ -721,9 +894,7 @@ input::placeholder, textarea::placeholder {
         <div class="fld"><label>E-mail profissional</label><input id="a-email" type="email" placeholder="dra@clinica.com.br" autocomplete="email"/></div>
         <div class="fld"><label>Senha</label><input id="a-pass" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
         <button class="btn-auth" onclick="doLogin()">Entrar na plataforma</button>
-        <div class="auth-demo-btn">
-          <button class="btn btn-ghost btn-sm" onclick="demoLogin()" style="width:100%;justify-content:center">Entrar como Dra. Leylla (demo)</button>
-        </div>
+        <!-- Demo login hidden — use email + password form with demo credentials -->
         <div class="auth-footer" style="margin-top:14px">Sem conta? <span class="auth-link" onclick="authTab('register')">Cadastre-se</span></div>
       </div>
       <div id="f-reg" class="hidden">
@@ -747,6 +918,9 @@ input::placeholder, textarea::placeholder {
 <!-- ── APP ── -->
 <div id="app">
   <div class="app-layout">
+    <!-- SIDEBAR BACKDROP (mobile) -->
+    <div class="sidebar-backdrop" id="sb-backdrop" onclick="closeSidebar()"></div>
+
     <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
       <div class="sb-top">
@@ -774,6 +948,7 @@ input::placeholder, textarea::placeholder {
         <div class="sb-avatar" id="sb-av">DV</div>
         <div class="sb-user-info">
           <div class="name" id="sb-nm">Carregando...</div>
+          <div id="sb-demo-badge" style="display:none;font-size:9px;font-weight:800;color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin-top:2px">● CONTA DEMO</div>
           <div class="role" id="sb-rl">Veterinário(a)</div>
         </div>
       </div>
@@ -833,8 +1008,12 @@ input::placeholder, textarea::placeholder {
     <div class="main-area">
       <header class="topbar">
         <div class="topbar-l">
-          <button class="hamburger" id="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
+          <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <button id="back-btn" onclick="navBack()" style="display:none;background:none;border:none;cursor:pointer;padding:4px 8px 4px 2px;color:var(--ink3);align-items:center;gap:4px;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;transition:color var(--d-instant) var(--e-out)" onmouseover="this.style.color='var(--leaf)'" onmouseout="this.style.color='var(--ink3)'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Voltar
           </button>
           <div class="topbar-title" id="page-title">Dashboard</div>
         </div>
@@ -850,6 +1029,17 @@ input::placeholder, textarea::placeholder {
         </div>
       </header>
 
+      <!-- Trial banner (shown only during trial) -->
+      <div class="trial-banner" id="trial-banner" onclick="openUpgradeModal('trial')">
+        <div class="trial-dot"></div>
+        <div class="trial-text" id="trial-banner-text">Período trial ativo — 7 dias restantes · 0/10 exames hoje</div>
+        <div class="trial-cta">Ver planos →</div>
+      </div>
+
+      <!-- Usage strip (all screens) -->
+      <div class="usage-strip" id="usage-strip" onclick="toggleUsagePopup()" title="Uso do plano"></div>
+      <div id="usage-popup" style="display:none;position:fixed;top:calc(var(--th) + 3px);right:20px;z-index:100"></div>
+
       <!-- ── DASHBOARD ── -->
       <div class="screen on" id="sc-dashboard">
         <div class="screen-inner">
@@ -864,13 +1054,11 @@ input::placeholder, textarea::placeholder {
             </div>
             <div style="display:flex;flex-direction:column;gap:14px">
               <div class="card cp fade-in">
-                <div style="margin-bottom:14px"><div class="card-title">Atividade</div></div>
-                <div class="mini-bar-chart" id="dash-chart"></div>
-                <div style="display:flex;gap:12px;margin-top:8px">
-                  <span style="font-size:11px;color:var(--mist);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--leaf);display:inline-block"></span>Normal</span>
-                  <span style="font-size:11px;color:var(--mist);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--amber);display:inline-block"></span>Atenção</span>
-                  <span style="font-size:11px;color:var(--mist);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--ruby);display:inline-block"></span>Crítico</span>
+                <div style="margin-bottom:14px">
+                  <div class="card-title">Distribuição de resultados</div>
+                  <div class="card-sub">Por status clínico</div>
                 </div>
+                <div id="dash-pie"></div>
               </div>
               <div class="card cp fade-in">
                 <div style="margin-bottom:14px"><div class="card-title">Pacientes recentes</div></div>
@@ -1073,76 +1261,121 @@ input::placeholder, textarea::placeholder {
         <div class="screen-inner"><div id="result-area" class="fade-in"></div></div>
       </div>
 
+      <!-- ── PLANS (mobile standalone) ── -->
+      <div class="screen" id="sc-plans">
+        <div class="screen-inner" id="plans-screen-inner"></div>
+      </div>
+
       <!-- ── SETTINGS ── -->
       <div class="screen" id="sc-settings">
         <div class="screen-inner">
           <div class="settings-layout">
-            <div class="card settings-nav">
-              <button class="sn-btn" data-tab="plan" onclick="stTab('plan',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano</button>
-              <button class="sn-btn" onclick="stTab('profile',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Perfil</button>
-              <button class="sn-btn" onclick="stTab('ai',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Claude AI</button>
-              <button class="sn-btn" onclick="stTab('data',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="7 16 3 12 7 8"/><polyline points="17 8 21 12 17 16"/><line x1="3" y1="12" x2="21" y2="12"/></svg>Dados</button>
+
+            <!-- Nav: 2 tabs only -->
+            <div class="card settings-nav" id="settings-nav-card">
+              <button class="sn-btn on" data-tab="profile" onclick="stTab('profile',this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                Minha Conta
+              </button>
+              <button class="sn-btn" data-tab="plan" onclick="stTab('plan',this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Plano
+              </button>
+              <!-- Demo-only: API tab -->
+              <button class="sn-btn" data-tab="ai" id="sn-ai-tab" style="display:none" onclick="stTab('ai',this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                API / Proxy
+              </button>
             </div>
+
             <div>
+              <!-- ── MINHA CONTA ── -->
+              <div class="sp on card cp" id="st-profile">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--fog)">
+                  <div style="width:52px;height:52px;border-radius:50%;background:var(--leaf);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0" id="s-avatar">🐾</div>
+                  <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.3px" id="s-display-name">—</div>
+                    <div style="font-size:12px;color:var(--mist);margin-top:2px" id="s-display-crmv">—</div>
+                  </div>
+                </div>
+
+                <div class="fld-grp" style="margin-bottom:14px">
+                  <label>Nome completo</label>
+                  <input class="fld-in" id="s-name" placeholder="Dr(a). Nome Sobrenome"/>
+                </div>
+                <div class="fld-row">
+                  <div class="fld-grp">
+                    <label>CRMV</label>
+                    <input class="fld-in" id="s-crmv" placeholder="CRMV-XX 00000"/>
+                  </div>
+                  <div class="fld-grp">
+                    <label>Especialidade</label>
+                    <input class="fld-in" id="s-spec" placeholder="Clínica Geral"/>
+                  </div>
+                </div>
+                <div class="fld-row" style="margin-bottom:20px">
+                  <div class="fld-grp">
+                    <label>Clínica / Hospital</label>
+                    <input class="fld-in" id="s-clinic" placeholder="Nome da clínica"/>
+                  </div>
+                  <div class="fld-grp">
+                    <label>E-mail</label>
+                    <input class="fld-in" id="s-email" type="email" placeholder="email@clinica.com.br"/>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary btn-md" onclick="saveProfile()" style="margin-bottom:20px">Salvar alterações</button>
+
+                <div style="padding-top:16px;border-top:1px solid var(--fog)">
+                  <div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:12px">Dados e backup</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <div style="background:var(--paper);border-radius:var(--r12);padding:14px;border:1px solid var(--fog)">
+                      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px">Exportar dados</div>
+                      <div style="font-size:11px;color:var(--mist);margin-bottom:12px;line-height:1.5">Baixe pacientes e exames em JSON.</div>
+                      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="exportAllJSON()">Exportar JSON</button>
+                    </div>
+                    <div style="background:var(--paper);border-radius:var(--r12);padding:14px;border:1px solid var(--fog)">
+                      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px">Restaurar backup</div>
+                      <div style="font-size:11px;color:var(--mist);margin-bottom:12px;line-height:1.5">Importe a partir de um JSON.</div>
+                      <input type="file" id="backup-file" accept=".json" style="display:none" onchange="importBackup(this)"/>
+                      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="document.getElementById('backup-file').click()">Selecionar arquivo</button>
+                      <div id="backup-status" style="font-size:11px;margin-top:8px;text-align:center;color:var(--mist)"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--fog)">
+                  <button class="btn btn-ghost btn-sm" style="color:var(--ruby);border-color:rgba(220,53,69,.25)" onclick="doLogout()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sair da conta
+                  </button>
+                </div>
+              </div>
+
+              <!-- ── PLANO ── -->
               <div class="sp card cp" id="st-plan">
                 <div id="plan-panel-content"></div>
               </div>
-              <div class="sp on card cp" id="st-profile">
-                <div class="card-title" style="margin-bottom:18px">Informações profissionais</div>
-                <div class="fld-row"><div class="fld-grp"><label>Nome completo</label><input class="fld-in" id="s-name"/></div><div class="fld-grp"><label>CRMV</label><input class="fld-in" id="s-crmv"/></div></div>
-                <div class="fld-row"><div class="fld-grp"><label>Especialidade</label><input class="fld-in" id="s-spec"/></div><div class="fld-grp"><label>Clínica</label><input class="fld-in" id="s-clinic"/></div></div>
-                <div class="fld-grp" style="margin-bottom:20px"><label>E-mail</label><input class="fld-in" id="s-email" type="email"/></div>
-                <button class="btn btn-primary btn-md" onclick="saveProfile()">Salvar alterações</button>
-              </div>
+
+              <!-- ── API / PROXY (demo only) ── -->
               <div class="sp card cp" id="st-ai">
                 <div class="card-title" style="margin-bottom:6px">Chave da API Claude</div>
-                <div style="font-size:13px;color:var(--ink3);line-height:1.65;margin-bottom:16px">Configure sua chave para ativar a análise com <strong style="color:var(--leaf)">Claude AI real</strong>. Sem ela, o sistema usa o motor de regras clínicas local — funcional, mas sem leitura automática de PDF/imagem. Obtenha em <strong style="color:var(--leaf)">console.anthropic.com</strong></div>
+                <div style="font-size:13px;color:var(--ink3);line-height:1.65;margin-bottom:16px">Configure sua chave para ativar a análise com <strong style="color:var(--leaf)">Claude AI real</strong>. Obtenha em <strong style="color:var(--leaf)">console.anthropic.com</strong></div>
                 <div class="api-row">
                   <input type="password" id="s-key" placeholder="sk-ant-api03-..."/>
                   <button class="btn btn-dark btn-sm" onclick="saveKey()">Salvar chave</button>
                 </div>
                 <div id="key-status" style="font-size:12px;margin-top:10px;color:var(--mist)"></div>
                 <div style="height:1px;background:var(--fog);margin:20px 0"></div>
-                <div class="s-row" style="padding:0 0 15px;border-bottom:1px solid var(--fog)">
-                  <div style="flex:1">
-                    <div class="s-lbl">URL do Proxy (recomendado)</div>
-                    <div class="s-desc" style="margin-bottom:10px">Cole aqui a URL do seu Cloudflare Worker. A chave API fica no servidor — necessário para GitHub Pages e produção.</div>
-                    <div class="api-row">
-                      <input type="text" id="s-proxy" placeholder="https://diagnovet.SEU-NOME.workers.dev" style="font-family:'JetBrains Mono',monospace"/>
-                      <button class="btn btn-dark btn-sm" onclick="saveProxy()">Salvar proxy</button>
-                    </div>
-                    <div id="proxy-status" style="font-size:12px;margin-top:8px;color:var(--mist)"></div>
-                  </div>
+                <div class="s-lbl" style="margin-bottom:6px">URL do Proxy</div>
+                <div style="font-size:12px;color:var(--mist);margin-bottom:10px">URL do Cloudflare Worker — chave fica no servidor.</div>
+                <div class="api-row">
+                  <input type="text" id="s-proxy" placeholder="https://diagnovet.SEU-NOME.workers.dev" style="font-family:'JetBrains Mono',monospace"/>
+                  <button class="btn btn-dark btn-sm" onclick="saveProxy()">Salvar</button>
                 </div>
-                <div class="s-row" style="padding:0 0 15px;border-bottom:1px solid var(--fog)">
-                  <div><div class="s-lbl">Fallback offline</div><div class="s-desc">Usar motor de regras locais quando a API não responder</div></div>
-                  <button class="toggle on" onclick="this.classList.toggle('on')"></button>
-                </div>
-                <div class="s-row" style="border:none;padding:15px 0 0">
-                  <div><div class="s-lbl">Alertas críticos</div><div class="s-desc">Destacar automaticamente valores fora do intervalo crítico</div></div>
-                  <button class="toggle on" onclick="this.classList.toggle('on')"></button>
-                </div>
+                <div id="proxy-status" style="font-size:12px;margin-top:8px;color:var(--mist)"></div>
               </div>
-              <div class="sp card cp" id="st-data">
-                <div class="card-title" style="margin-bottom:6px">Backup e restauração</div>
-                <div style="font-size:13px;color:var(--ink3);margin-bottom:20px">Exporte todos os dados para backup ou importe um arquivo anterior.</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-                  <div style="background:var(--paper);border-radius:var(--r12);padding:18px;border:1px solid var(--fog)">
-                    <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px">Exportar</div>
-                    <div style="font-size:12px;color:var(--mist);margin-bottom:14px;line-height:1.5">Baixe todos os pacientes e exames em JSON.</div>
-                    <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="exportAllJSON()">Exportar JSON</button>
-                    <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px" onclick="exportCSV()">Exportar CSV</button>
-                  </div>
-                  <div style="background:var(--paper);border-radius:var(--r12);padding:18px;border:1px solid var(--fog)">
-                    <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px">Importar</div>
-                    <div style="font-size:12px;color:var(--mist);margin-bottom:14px;line-height:1.5">Restaure a partir de um backup JSON.</div>
-                    <input type="file" id="backup-file" accept=".json" style="display:none" onchange="importBackup(this)"/>
-                    <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;border-color:var(--cobalt);color:var(--cobalt)" onclick="document.getElementById('backup-file').click()">Selecionar arquivo</button>
-                    <div id="backup-status" style="font-size:11px;margin-top:10px;text-align:center;color:var(--mist)"></div>
-                  </div>
-                </div>
-                <div style="background:var(--amber-l);border-radius:var(--r8);padding:12px 14px;font-size:12px;color:var(--amber);border:1px solid rgba(232,145,26,.2)">⚠ Importar vai mesclar dados — novos registros são adicionados, existentes mantidos.</div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -1150,6 +1383,30 @@ input::placeholder, textarea::placeholder {
 
     </div><!-- end main-area -->
   </div><!-- end app-layout -->
+<!-- ── MOBILE BOTTOM NAV ── -->
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-btn on" data-sc="dashboard" onclick="nav('dashboard')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    <span>Início</span>
+  </button>
+  <button class="mob-nav-btn" data-sc="import" onclick="nav('import')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <span>Importar</span>
+  </button>
+  <button class="mob-nav-btn" data-sc="exams" onclick="nav('exams')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
+    <span>Exames</span>
+  </button>
+  <button class="mob-nav-btn" data-sc="patients" onclick="nav('patients')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a7 7 0 0114 0v2"/></svg>
+    <span>Pacientes</span>
+  </button>
+  <button class="mob-nav-btn" data-sc="plans" onclick="nav('plans')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    <span>Planos</span>
+  </button>
+</nav>
+
 <!-- ── MODAL UPGRADE DE PLANO ── -->
 <div class="overlay" id="m-upgrade">
   <div class="modal" style="max-width:600px">
@@ -1168,7 +1425,23 @@ const DB = {
   g(k,d){try{return JSON.parse(localStorage.getItem('dv3_'+k))||d}catch{return d}},
   s(k,v){localStorage.setItem('dv3_'+k,JSON.stringify(v))},
 };
+
+// ── XSS protection — use on ALL user-generated content before innerHTML injection
+function escapeHTML(str) {
+  return String(str||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
 const DEFAULT_PROXY = 'https://wandering-sunset-7186.tristoncomercial.workers.dev';
+
+// ── DEMO ACCOUNT — credenciais fixas (altere aqui quando quiser)
+const DEMO_EMAIL = 'demo@diagnovet.com.br';
+const DEMO_PASS  = 'DiagnoVet@2025';
+const DEMO_NAME  = 'Dra. Leylla Patrick';
+const DEMO_CRMV  = 'CRMV-PB 03245';
 
 const S = {
   user: null,
@@ -1180,12 +1453,37 @@ const S = {
   pendingFile: null, // {type,base64,mimeType,name,text}
   examFilter: 'all',
 };
-function persist(){ DB.s('patients',S.patients); DB.s('exams',S.exams); }
+function persist(){
+  if(!S.user) return;
+  DB.s('patients_'+S.user.id, S.patients);
+  DB.s('exams_'+S.user.id, S.exams);
+}
 
 /* ══════════════════════════════════════════════
    PLANOS & COTAS
 ══════════════════════════════════════════════ */
 const PLANS = {
+  trial: {
+    id: 'trial',
+    name: 'Trial',
+    badge: '⏱ Trial',
+    color: '#FEF5E7',
+    colorText: '#7A4800',
+    analysesPerMonth: 9999,   // no monthly cap — daily cap instead
+    analysesPerDay: 10,
+    trialDays: 7,
+    patients: 9999,
+    exportPDF: false,
+    exportJSON: false,
+    history: true,
+    advancedCytology: true,
+    prioritySupport: false,
+    description: '7 dias gratuitos',
+    price: 'Grátis',
+    priceMonthly: 0,
+    priceAnnual: 0,
+    priceAnnualTotal: 0,
+  },
   basico: {
     id: 'basico',
     name: 'Básico',
@@ -1193,14 +1491,19 @@ const PLANS = {
     color: 'var(--cobalt-l)',
     colorText: '#1E40AF',
     analysesPerMonth: 200,
+    analysesPerDay: 9999,
     patients: 9999,
     exportPDF: true,
-    exportJSON: true,
+    exportJSON: false,
     history: true,
     advancedCytology: true,
     prioritySupport: false,
     description: 'Para clínicas veterinárias',
-    price: 'R$ 79/mês',
+    price: 'R$ 67,90/mês',
+    priceMonthly: 67.90,
+    priceAnnual: 54.32,           // per month when billed annually
+    priceAnnualTotal: 651.84,     // total annual (20% off)
+    discount: 20,
   },
   pro: {
     id: 'pro',
@@ -1209,6 +1512,7 @@ const PLANS = {
     color: 'var(--leaf-l)',
     colorText: 'var(--leaf-d)',
     analysesPerMonth: 9999,
+    analysesPerDay: 9999,
     patients: 9999,
     exportPDF: true,
     exportJSON: true,
@@ -1216,7 +1520,11 @@ const PLANS = {
     advancedCytology: true,
     prioritySupport: true,
     description: 'Para clínicas com alto volume',
-    price: 'R$ 179/mês',
+    price: 'R$ 97,90/mês',
+    priceMonthly: 97.90,
+    priceAnnual: 68.53,           // per month when billed annually (30% off)
+    priceAnnualTotal: 822.36,     // total annual (30% off)
+    discount: 30,
   },
 };
 
@@ -1233,10 +1541,35 @@ function incrementUsage(){
 }
 function getUserPlan(){
   if(!S.user) return PLANS.free;
-  return PLANS[S.user.plan || 'basico'];
+  return PLANS[S.user.plan || 'trial'];
+}
+function getTrialStatus(){
+  if(!S.user) return {active:false, expired:false, daysLeft:0, examsToday:0, canUse:false};
+  const plan = getUserPlan();
+  if(plan.id !== 'trial') return {active:false, expired:false, daysLeft:0, examsToday:0, canUse:true};
+  const expiry = S.user.planExpiry ? new Date(S.user.planExpiry) : new Date(Date.now() + 7*24*60*60*1000);
+  const now = new Date();
+  const msLeft = expiry - now;
+  const daysLeft = Math.max(0, Math.ceil(msLeft / (1000*60*60*24)));
+  const expired = daysLeft === 0;
+  // Daily usage
+  const today = now.toISOString().slice(0,10);
+  const dailyKey = 'daily_' + S.user.id + '_' + today;
+  const examsToday = DB.g(dailyKey, 0);
+  const dailyLimit = plan.analysesPerDay || 10;
+  const canUse = !expired && examsToday < dailyLimit;
+  return {active:true, expired, daysLeft, examsToday, dailyLimit, canUse};
+}
+function incrementDailyUsage(){
+  const today = new Date().toISOString().slice(0,10);
+  const key = 'daily_' + S.user.id + '_' + today;
+  DB.s(key, DB.g(key, 0) + 1);
 }
 function canAnalyze(){
   const plan = getUserPlan();
+  if(plan.id === 'trial'){
+    return getTrialStatus().canUse;
+  }
   const usage = getUsage();
   return usage.count < plan.analysesPerMonth;
 }
@@ -1253,6 +1586,8 @@ function canAddPatient(){
 
 /* ── DEMO DATA ── */
 function seedDemo(){
+  // Only seed demo data for the demo account — new users start completely empty
+  if(!S.user || S.user.email !== DEMO_EMAIL) return;
   if(S.patients.length) return;
   S.patients = [
     {id:'p1',name:'Florzinha',species:'Felino',breed:'SRD',sex:'Fêmea',age:'4 anos',weight:'3,8 kg',owner:'Maria das Dores',history:'Uso prévio de acetato de megestrol. Diarreia crônica há 3 semanas.'},
@@ -1279,44 +1614,98 @@ function authTab(t){
 }
 function showErr(m){ const e=document.getElementById('auth-err'); e.textContent=m; e.classList.remove('hidden'); }
 
-function doLogin(){
-  const email=document.getElementById('a-email').value.trim();
-  const pass=document.getElementById('a-pass').value;
+// ── Password hashing (SHA-256 via Web Crypto API — no dependencies)
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function doLogin(){
+  const email = document.getElementById('a-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('a-pass').value;
   if(!email||!pass){showErr('Preencha e-mail e senha.');return;}
-  const accs=DB.g('accounts',[]);
-  const acc=accs.find(a=>a.email===email&&a.pass===pass);
+
+  // Demo credentials checked directly (plaintext — demo account is not a real user)
+  if(email === DEMO_EMAIL.toLowerCase() && pass === DEMO_PASS){
+    demoLogin(); return;
+  }
+
+  const accs = DB.g('accounts',[]);
+  const hashedInput = await hashPassword(pass);
+
+  // Support legacy plaintext passwords (accounts created before this fix)
+  // Try hashed first, fall back to plaintext, then migrate on success
+  let acc = accs.find(a => a.email.toLowerCase() === email && a.pass === hashedInput);
+  if(!acc){
+    // Legacy plaintext match → migrate to hashed automatically
+    const legacy = accs.find(a => a.email.toLowerCase() === email && a.pass === pass);
+    if(legacy){
+      legacy.pass = hashedInput; // migrate in-place
+      DB.s('accounts', accs);
+      acc = legacy;
+    }
+  }
+
   if(!acc){showErr('E-mail ou senha incorretos.');return;}
   enter(acc);
 }
-function doRegister(){
-  const title=document.getElementById('r-title').value;
-  const name=document.getElementById('r-name').value.trim();
-  const crmv=document.getElementById('r-crmv').value.trim();
-  const spec=document.getElementById('r-spec').value.trim();
-  const email=document.getElementById('r-email').value.trim();
-  const pass=document.getElementById('r-pass').value;
+
+async function doRegister(){
+  const title = document.getElementById('r-title').value;
+  const name  = document.getElementById('r-name').value.trim();
+  const crmv  = document.getElementById('r-crmv').value.trim();
+  const spec  = document.getElementById('r-spec').value.trim();
+  const email = document.getElementById('r-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('r-pass').value;
   if(!name||!email||!pass){showErr('Preencha todos os campos.');return;}
   if(pass.length<6){showErr('Senha mínima de 6 caracteres.');return;}
-  const accs=DB.g('accounts',[]);
-  if(accs.find(a=>a.email===email)){showErr('E-mail já cadastrado.');return;}
-  const acc={id:'u'+Date.now(),title,name:`${title} ${name}`,crmv,specialty:spec,email,pass,plan:'basico',planExpiry:null};
+  if(!email.includes('@')||!email.includes('.')){showErr('E-mail inválido.');return;}
+  if(!crmv.trim()){showErr('Informe o CRMV.');return;}
+  const accs = DB.g('accounts',[]);
+  if(accs.find(a=>a.email.toLowerCase()===email)){showErr('E-mail já cadastrado.');return;}
+
+  const hashedPass = await hashPassword(pass);
+  const acc = {
+    id: 'u'+Date.now(),
+    title, name:`${title} ${name}`,
+    crmv, specialty:spec,
+    email, pass: hashedPass,  // ← stored as hash, never plaintext
+    plan:'trial', planExpiry: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
+    createdAt: new Date().toISOString(),
+  };
   accs.push(acc); DB.s('accounts',accs);
   enter(acc);
 }
 function demoLogin(){
   const accs=DB.g('accounts',[]);
-  let acc=accs.find(a=>a.email==='demo@diagnovet.com');
-  if(!acc){ acc={id:'demo',title:'Dra.',name:'Dra. Leylla Patrick',crmv:'CRMV-PB 03245',specialty:'Clínica Geral',email:'demo@diagnovet.com',pass:'demo',plan:'pro',planExpiry:null}; accs.push(acc); DB.s('accounts',accs); }
+  let acc=accs.find(a=>a.email===DEMO_EMAIL);
+  if(!acc){
+    acc={id:'demo',title:'Dra.',name:DEMO_NAME,crmv:DEMO_CRMV,
+         specialty:'Clínica Geral',email:DEMO_EMAIL,pass:DEMO_PASS,
+         plan:'pro',planExpiry:null,isDemo:true};
+    accs.push(acc); DB.s('accounts',accs);
+  }
   enter(acc);
 }
 function enter(acc){
-  S.user=acc; seedDemo();
+  S.user=acc;
+  // Load this user's data (isolated per user ID)
+  S.patients = DB.g('patients_'+acc.id, []);
+  S.exams    = DB.g('exams_'+acc.id, []);
+  seedDemo(); // only populates demo account
+  // Reset nav history for fresh session
+  _navHistory = [];
+  try { history.replaceState({screen:'dashboard'},'','#dashboard'); } catch(e) {}
   document.getElementById('auth').style.display='none';
   document.getElementById('app').style.display='block';
   updateUserUI(); updateKeyUI(); updatePlanUI(); nav('dashboard');
 }
 function doLogout(){
   S.user=null;
+  S.patients=[]; S.exams=[]; S.currentResult=null;
   document.getElementById('app').style.display='none';
   document.getElementById('auth').style.display='flex';
   document.getElementById('a-email').value='';
@@ -1325,14 +1714,39 @@ function doLogout(){
 }
 function updateUserUI(){
   if(!S.user) return;
-  const nm=S.user.name||'Veterinário';
-  document.getElementById('sb-av').textContent=nm.split(' ').filter(w=>w.length>1).map(w=>w[0]).slice(0,2).join('').toUpperCase()||'DV';
-  document.getElementById('sb-nm').textContent=nm.length>22?nm.slice(0,22)+'…':nm;
-  document.getElementById('sb-rl').textContent=S.user.crmv||S.user.specialty||'Veterinário(a)';
-  if(document.getElementById('s-name')) document.getElementById('s-name').value=S.user.name||'';
-  if(document.getElementById('s-crmv')) document.getElementById('s-crmv').value=S.user.crmv||'';
-  if(document.getElementById('s-spec')) document.getElementById('s-spec').value=S.user.specialty||'';
-  if(document.getElementById('s-email')) document.getElementById('s-email').value=S.user.email||'';
+  const nm = S.user.name || 'Veterinário';
+  const isDemo = S.user.isDemo || S.user.email === DEMO_EMAIL;
+
+  // Sidebar
+  document.getElementById('sb-av').textContent = nm.split(' ').filter(w=>w.length>1).map(w=>w[0]).slice(0,2).join('').toUpperCase()||'DV';
+  document.getElementById('sb-nm').textContent = nm.length>22 ? nm.slice(0,22)+'…' : nm;
+  document.getElementById('sb-rl').textContent = S.user.crmv || S.user.specialty || 'Veterinário(a)';
+  const demoBadge = document.getElementById('sb-demo-badge');
+  if(demoBadge) demoBadge.style.display = isDemo ? 'block' : 'none';
+
+  // Sidebar API pill: visible only for demo
+  const apiPill = document.querySelector('.sb-api-pill');
+  if(apiPill) apiPill.style.display = isDemo ? 'flex' : 'none';
+
+  // Settings: API tab visible only for demo
+  const aiTab = document.getElementById('sn-ai-tab');
+  if(aiTab) aiTab.style.display = isDemo ? 'flex' : 'none';
+
+  // Profile form
+  if(document.getElementById('s-name'))  document.getElementById('s-name').value  = S.user.name || '';
+  if(document.getElementById('s-crmv'))  document.getElementById('s-crmv').value  = S.user.crmv || '';
+  if(document.getElementById('s-spec'))  document.getElementById('s-spec').value  = S.user.specialty || '';
+  if(document.getElementById('s-clinic'))document.getElementById('s-clinic').value = S.user.clinic || '';
+  if(document.getElementById('s-email')) document.getElementById('s-email').value  = S.user.email || '';
+
+  // Profile header in settings
+  const sAvatar = document.getElementById('s-avatar');
+  const sDisplayName = document.getElementById('s-display-name');
+  const sDisplayCrmv = document.getElementById('s-display-crmv');
+  const initials = nm.split(' ').filter(w=>w.length>1).map(w=>w[0]).slice(0,2).join('').toUpperCase()||'DV';
+  if(sAvatar) sAvatar.textContent = initials;
+  if(sDisplayName) sDisplayName.textContent = nm;
+  if(sDisplayCrmv) sDisplayCrmv.textContent = (S.user.crmv||'') + (S.user.specialty ? ' · '+S.user.specialty : '');
 }
 function updateKeyUI(){
   const hasProxy=!!S.proxyUrl;
@@ -1355,23 +1769,104 @@ function updateKeyUI(){
     'Modo offline — configure o proxy em Configurações → Claude AI';
 }
 
+function toggleSidebar(){
+  const sb = document.getElementById('sidebar');
+  const bd = document.getElementById('sb-backdrop');
+  const open = sb.classList.toggle('open');
+  if(bd) bd.classList.toggle('on', open);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  const bd = document.getElementById('sb-backdrop');
+  if(bd) bd.classList.remove('on');
+}
+
 /* ══════════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════════ */
-const TITLES={dashboard:'Dashboard',import:'Importar exame',exams:'Exames',patients:'Pacientes',result:'Resultado da análise',settings:'Configurações'};
-function nav(sc){
+const TITLES={dashboard:'Dashboard',import:'Importar exame',exams:'Exames',patients:'Pacientes',result:'Resultado da análise',settings:'Configurações',plans:'Planos'};
+/* ── NAV HISTORY STACK ── */
+let _navHistory = [];
+let _navIgnorePopstate = false;
+
+function nav(sc, addToHistory=true){
+  const prev = _navHistory[_navHistory.length-1];
+  if(addToHistory && prev !== sc){
+    _navHistory.push(sc);
+    try { history.pushState({screen:sc}, '', '#'+sc); } catch(e) {}
+    updateBackBtn();
+  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
   document.getElementById('sc-'+sc)?.classList.add('on');
   document.querySelector(`.sb-btn[data-sc="${sc}"]`)?.classList.add('on');
   document.getElementById('page-title').textContent=TITLES[sc]||sc;
-  document.getElementById('sidebar').classList.remove('open');
+  closeSidebar();
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>{
+    b.classList.toggle('on', b.dataset.sc===sc);
+  });
   if(sc==='dashboard') renderDashboard();
   if(sc==='exams') renderExams();
   if(sc==='patients') renderPatients();
   if(sc==='result') renderResult();
   if(sc==='import'){ populatePatientDropdown(); updateKeyUI(); }
+  if(sc==='plans') renderPlansScreen();
 }
+
+function navBack(){
+  if(_navHistory.length > 1){
+    _navHistory.pop();
+    const prev = _navHistory[_navHistory.length-1];
+    nav(prev, false);
+    try { history.replaceState({screen:prev},'','#'+prev); } catch(e) {}
+    updateBackBtn();
+  }
+}
+
+function updateBackBtn(){
+  const btn = document.getElementById('back-btn');
+  if(!btn) return;
+  btn.style.display = _navHistory.length > 1 ? 'flex' : 'none';
+}
+
+// Handle browser/device back button
+try {
+  window.addEventListener('popstate', function(e){
+    if(_navIgnorePopstate) return;
+    if(_navHistory.length > 1){
+      _navHistory.pop();
+      const prev = _navHistory[_navHistory.length-1] || 'dashboard';
+      nav(prev, false);
+      updateBackBtn();
+    }
+  });
+} catch(e) {}
+
+// ── SWIPE TO GO BACK (touch devices) ──
+(function(){
+  let _tx = 0, _ty = 0, _swiping = false;
+  const EDGE = 40;    // px from left edge to start swipe
+  const MIN_X = 80;   // min horizontal distance
+  const MAX_Y = 60;   // max vertical drift
+
+  document.addEventListener('touchstart', function(e){
+    const t = e.touches[0];
+    _tx = t.clientX;
+    _ty = t.clientY;
+    _swiping = _tx <= EDGE;
+  }, {passive:true});
+
+  document.addEventListener('touchend', function(e){
+    if(!_swiping) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - _tx;
+    const dy = Math.abs(t.clientY - _ty);
+    if(dx >= MIN_X && dy <= MAX_Y && _navHistory.length > 1){
+      navBack();
+    }
+    _swiping = false;
+  }, {passive:true});
+})();
 
 /* ══════════════════════════════════════════════
    REFERENCE RANGES
@@ -2245,7 +2740,8 @@ async function runImport() {
 
   // ── PLAN QUOTA CHECK
   if (!canAnalyze()) {
-    openUpgradeModal('analyses');
+    const ts = getTrialStatus();
+    openUpgradeModal(ts.active ? 'trial' : 'analyses');
     return;
   }
 
@@ -2372,6 +2868,7 @@ async function runImport() {
   S.exams.unshift(exam);
   persist();
   incrementUsage(); // ← track usage against plan quota
+  if(getUserPlan().id === 'trial') incrementDailyUsage();
 
   S.currentResult = {
     patient, exam,
@@ -2631,6 +3128,7 @@ function renderPatternChips(patterns) {
 
 function renderResult(){
   const el = document.getElementById('result-area');
+  if(!el) return;
   if (!S.currentResult) {
     el.innerHTML = `<div class="empty-state"><div class="es-icon">🔬</div><div class="es-title">Nenhum resultado disponível</div><div class="es-sub">Importe um exame para ver a análise detalhada aqui.</div><button class="btn btn-primary btn-md" onclick="nav('import')">Importar exame</button></div>`;
     return;
@@ -2663,7 +3161,7 @@ function renderResult(){
     <div class="result-hero" style="margin-bottom:16px">
       <div style="flex:1">
         <div class="rh-eyebrow">📊 ANÁLISE CLÍNICA · ${exam.type} · ${exam.imported?'📥 Importado':'Manual'} · ${dateStr}</div>
-        <div class="rh-name">${patient.name}</div>
+        <div class="rh-name">${escapeHTML(patient.name)}</div>
         <div class="rh-meta">${patient.species} · ${patient.breed||'SRD'} · ${patient.age||'—'} · ${patient.weight||'—'}</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
           ${TAG[overall]||''}
@@ -2797,19 +3295,326 @@ function renderResult(){
 }
 
 /* ══════════════════════════════════════════════
+   USAGE STRIP (global topbar indicator)
+══════════════════════════════════════════════ */
+function updateUsageStrip(){
+  const plan = getUserPlan();
+  const usage = getUsage();
+  const pct = plan.analysesPerMonth >= 9999
+    ? 0
+    : Math.min(100, Math.round(usage.count / plan.analysesPerMonth * 100));
+  const color = pct >= 90 ? 'var(--ruby)' : pct >= 70 ? 'var(--amber)' : 'var(--leaf)';
+  const strip = document.getElementById('usage-strip');
+  if(!strip) return;
+  if(plan.analysesPerMonth >= 9999){
+    strip.style.background = 'var(--leaf-l)';
+    strip.innerHTML = `<div class="usage-strip-fill" style="width:100%;background:var(--leaf);opacity:.4"></div>`;
+  } else {
+    strip.innerHTML = `<div class="usage-strip-fill" style="width:${pct}%;background:${color}"></div>`;
+  }
+}
+
+let _usagePopupOpen = false;
+function toggleUsagePopup(){
+  const popup = document.getElementById('usage-popup');
+  if(!popup) return;
+  _usagePopupOpen = !_usagePopupOpen;
+  if(_usagePopupOpen){
+    const plan = getUserPlan();
+    const usage = getUsage();
+    const pct = plan.analysesPerMonth >= 9999 ? 100 : Math.min(100, Math.round(usage.count / plan.analysesPerMonth * 100));
+    const left = usageLeft();
+    const color = pct >= 90 ? 'var(--ruby)' : pct >= 70 ? 'var(--amber)' : 'var(--leaf)';
+    const month = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    popup.style.display = 'block';
+    popup.innerHTML = `
+      <div class="usage-popup">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:.08em;text-transform:uppercase">Uso · ${month}</span>
+          <span class="plan-badge" style="background:${plan.color};color:${plan.colorText};font-size:10px">${plan.badge}</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:8px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:${color};letter-spacing:-1px">${usage.count}</span>
+          ${plan.analysesPerMonth < 9999 ? `<span style="font-size:14px;color:rgba(255,255,255,.3)">/ ${plan.analysesPerMonth}</span>` : `<span style="font-size:12px;color:rgba(255,255,255,.35)">análises</span>`}
+        </div>
+        <div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-bottom:8px">
+          <div style="height:100%;width:${plan.analysesPerMonth>=9999?100:pct}%;background:${color};border-radius:3px;transition:width 1s ease"></div>
+        </div>
+        ${plan.analysesPerMonth < 9999
+          ? `<div style="font-size:12px;color:${pct>=90?'var(--ruby)':'rgba(255,255,255,.4)'}">
+              ${left===0 ? '⚠ Limite atingido' : `${left} análise${left!==1?'s':''} restante${left!==1?'s':''}`}
+             </div>`
+          : `<div style="font-size:12px;color:var(--leaf)">✓ Ilimitadas (Plano Pro)</div>`
+        }
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)">
+          <button onclick="nav('plans');toggleUsagePopup()" style="background:none;border:none;color:var(--leaf);font-size:12px;font-weight:600;cursor:pointer;padding:0;font-family:'Plus Jakarta Sans',sans-serif">Ver planos →</button>
+        </div>
+      </div>`;
+    // close on click outside
+    setTimeout(()=>{
+      document.addEventListener('click', function _close(e){
+        if(!popup.contains(e.target) && e.target.id!=='usage-strip'){
+          _usagePopupOpen=false; popup.style.display='none';
+          document.removeEventListener('click',_close);
+        }
+      });
+    }, 10);
+  } else {
+    popup.style.display = 'none';
+  }
+}
+
+/* ══════════════════════════════════════════════
+   PLANS SCREEN (mobile standalone)
+══════════════════════════════════════════════ */
+function renderPlansScreen(){
+  const el = document.getElementById('plans-screen-inner');
+  if(!el) return;
+
+  const plan   = getUserPlan();
+  const usage  = getUsage();
+  const ts     = getTrialStatus();
+  const month  = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const isTrial  = plan.id === 'trial';
+  const isBasico = plan.id === 'basico';
+  const isPro    = plan.id === 'pro';
+
+  // ── Hero card colors per plan
+  const heroGrad = isTrial
+    ? 'linear-gradient(160deg,#4A2800 0%,#2D1800 100%)'
+    : isPro
+    ? 'linear-gradient(160deg,#0D2118 0%,#091610 100%)'
+    : 'linear-gradient(160deg,#0D1A2E 0%,#091020 100%)';
+  const heroGlow = isTrial
+    ? 'rgba(232,145,26,.2)'
+    : 'rgba(22,168,126,.15)';
+  const heroAccent = isTrial ? 'var(--amber)' : 'var(--leaf)';
+
+  // ── Usage display
+  let usageBlock = '';
+  if(isTrial && !ts.expired){
+    const pct = Math.min(100, Math.round(ts.examsToday / ts.dailyLimit * 100));
+    const barC = pct >= 80 ? 'var(--ruby)' : 'var(--amber)';
+    usageBlock = `
+      <div style="background:rgba(255,255,255,.06);border-radius:var(--r8);padding:14px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6)">Exames hoje</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${barC}">${ts.examsToday}<span style="color:rgba(255,255,255,.3);font-weight:400"> / ${ts.dailyLimit}</span></span>
+        </div>
+        <div style="height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barC};border-radius:3px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px">
+          <span style="font-size:11px;color:rgba(255,255,255,.35)">${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} restante${ts.daysLeft!==1?'s':''} de trial</span>
+          <span style="font-size:11px;color:var(--amber)">Gratuito</span>
+        </div>
+      </div>`;
+  } else if(isTrial && ts.expired){
+    usageBlock = `<div style="background:rgba(220,53,69,.15);border-radius:var(--r8);padding:12px 14px;font-size:13px;font-weight:600;color:var(--ruby)">⚠ Trial expirado — escolha um plano para continuar</div>`;
+  } else if(!isPro){
+    const pct = Math.min(100, Math.round(usage.count / plan.analysesPerMonth * 100));
+    const barC = pct >= 90 ? 'var(--ruby)' : pct >= 70 ? 'var(--amber)' : 'var(--leaf)';
+    usageBlock = `
+      <div style="background:rgba(255,255,255,.06);border-radius:var(--r8);padding:14px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6)">Análises este mês</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${barC}">${usage.count}<span style="color:rgba(255,255,255,.3);font-weight:400"> / ${plan.analysesPerMonth}</span></span>
+        </div>
+        <div style="height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barC};border-radius:3px"></div>
+        </div>
+      </div>`;
+  } else {
+    usageBlock = `
+      <div style="display:flex;align-items:center;gap:8px;background:rgba(22,168,126,.12);border-radius:var(--r8);padding:12px 14px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span style="font-size:13px;font-weight:600;color:var(--leaf)">${usage.count} análises · Ilimitadas</span>
+      </div>`;
+  }
+
+  // ── Feature helper
+  const feat = (ok, text) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--fog)">
+      <div style="width:18px;height:18px;border-radius:4px;background:${ok?'var(--leaf-l)':'var(--fog)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="${ok?'var(--leaf-d)':'var(--mist)'}" stroke-width="3" stroke-linecap="round">
+          ${ok?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/>'}
+        </svg>
+      </div>
+      <span style="font-size:12px;color:${ok?'var(--ink2)':'var(--mist)'}">${text}</span>
+    </div>`;
+
+  // ── Plan card builder
+  const planCard = (pid, highlighted) => {
+    const p = PLANS[pid];
+    const isCurr = plan.id === pid;
+    const accentColor = isCurr ? 'var(--leaf)' : pid === 'pro' ? 'var(--leaf)' : 'var(--cobalt)';
+    const borderColor = isCurr ? 'var(--leaf)' : highlighted ? 'var(--leaf)' : 'var(--fog)';
+    const borderWidth = isCurr || highlighted ? '2px' : '1px';
+    const bg = isCurr ? 'var(--leaf-xl)' : 'var(--snow)';
+
+    // Upgrade CTA logic
+    let ctaHtml = '';
+    if(isCurr){
+      ctaHtml = `<div style="text-align:center;padding:10px 0;font-size:12px;font-weight:700;color:var(--leaf-d)">✓ Plano atual</div>`;
+    } else if(isTrial || (isBasico && pid === 'pro')){
+      ctaHtml = `<button class="btn-auth" onclick="openUpgradeModal('general')" style="border-radius:var(--r8);font-size:12px;padding:10px;margin-top:12px">
+        ${pid==='basico'?'Assinar Básico — R$&nbsp;67,90/mês':'Upgrade para Pro — R$&nbsp;97,90/mês'}
+      </button>`;
+    }
+
+    return `
+      <div style="border:${borderWidth} solid ${borderColor};border-radius:var(--r16);padding:16px;background:${bg};position:relative;flex:1;min-width:0">
+        ${isCurr?`<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 10px;border-radius:20px;white-space:nowrap;letter-spacing:.05em">PLANO ATUAL</div>`:''}
+        ${!isCurr&&pid==='pro'&&!isPro?`<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--night);color:var(--snow);font-size:9px;font-weight:800;padding:2px 10px;border-radius:20px;white-space:nowrap">⭐ RECOMENDADO</div>`:''}
+
+        <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px">${p.name}</div>
+        <div style="margin-bottom:10px">
+          <span style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:${isCurr?'var(--leaf)':accentColor};letter-spacing:-1px">R$&nbsp;${pid==='basico'?'67,90':'97,90'}</span>
+          <span style="font-size:11px;color:var(--mist)">/mês</span>
+        </div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:10px">ou ${pid==='basico'?'R$&nbsp;54,32':'R$&nbsp;67,90'}/mês no plano anual</div>
+        ${feat(true, pid==='basico'?'200 análises/mês':'Ilimitadas')}
+        ${feat(true,'PDF e JSON')}
+        ${feat(pid==='pro','Análises ilimitadas')}
+        ${feat(pid==='pro','Suporte prioritário')}
+        ${ctaHtml}
+      </div>`;
+  };
+
+  el.innerHTML = `
+    <!-- Hero plano atual -->
+    <div style="background:${heroGrad};border-radius:var(--r16);padding:22px 24px;margin-bottom:18px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,${heroGlow} 0%,transparent 70%)"></div>
+      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Plano atual · ${month}</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:var(--snow);letter-spacing:-1px">${plan.name}</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.45);margin-top:3px">${plan.price}</div>
+        </div>
+        <span class="plan-badge" style="background:${plan.color};color:${plan.colorText};border:1px solid ${isTrial?'rgba(232,145,26,.3)':'rgba(22,168,126,.3)'}">${plan.badge}</span>
+      </div>
+      ${usageBlock}
+    </div>
+
+    <!-- Plan comparison cards -->
+    <div style="display:flex;gap:10px;margin-bottom:18px">
+      ${planCard('basico', isBasico)}
+      ${planCard('pro', isPro || isTrial)}
+    </div>
+
+    <!-- Annual promo banner -->
+    <div style="background:var(--night);border:1px solid rgba(22,168,126,.15);border-radius:var(--r12);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openUpgradeModal('general')">
+      <div style="width:32px;height:32px;border-radius:8px;background:rgba(22,168,126,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">💰</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--snow);margin-bottom:2px">Economize com o plano anual</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Básico: 20% off · Pro: 30% off — assine anual e economize</div>
+      </div>
+      <span style="font-size:11px;font-weight:800;color:var(--leaf);white-space:nowrap">Ver oferta →</span>
+    </div>
+
+    ${S.user?.isAdmin ? `
+    <div style="margin-top:4px;padding-top:16px;border-top:1px solid var(--fog)">
+      <div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">🔧 Admin</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="admin-user-email2" class="fld-in" placeholder="E-mail" style="flex:1;min-width:140px"/>
+        <select id="admin-plan-sel2" class="fld-sel" style="width:110px">
+          <option value="trial">Trial</option>
+          <option value="basico">Básico</option>
+          <option value="pro">Pro</option>
+        </select>
+        <button class="btn btn-dark btn-sm" onclick="adminSetPlanFromScreen()">Aplicar</button>
+      </div>
+    </div>` : ''}
+  `;
+}
+
+function adminSetPlanFromScreen(){
+  const email = document.getElementById('admin-user-email2')?.value.trim();
+  const planId = document.getElementById('admin-plan-sel2')?.value;
+  if(!email||!planId){ toast('Preencha e-mail e plano.','warn'); return; }
+  const accs = DB.g('accounts',[]);
+  const idx = accs.findIndex(a=>a.email===email);
+  if(idx<0){ toast('Usuário não encontrado.','err'); return; }
+  accs[idx].plan = planId;
+  DB.s('accounts', accs);
+  if(S.user?.email === email){ S.user.plan = planId; updatePlanUI(); }
+  toast(`Plano ${PLANS[planId].name} atribuído.`, 'ok');
+  renderPlansScreen();
+}
+
+/* ══════════════════════════════════════════════
    DASHBOARD
 ══════════════════════════════════════════════ */
 const EMOJ={Felino:'🐱',Canino:'🐶',Equino:'🐴',Bovino:'🐄',Outro:'🐾'};
 const BG={normal:'var(--leaf-l)',attention:'var(--amber-l)',critical:'var(--ruby-l)'};
 
+function makePie(okV, warnV, critV) {
+  const total = okV + warnV + critV;
+  if (total === 0) return `<div style="text-align:center;font-size:12px;color:var(--mist);padding:20px 0">Sem exames ainda</div>`;
+  const cx = 64, cy = 64, r = 52, innerR = 32;
+  const slices = [
+    {val:critV, color:'#DC3545', label:'Crítico'},
+    {val:warnV, color:'#E8911A', label:'Atenção'},
+    {val:okV,   color:'#16A87E', label:'Normal'},
+  ].filter(s => s.val > 0);
+  let paths = '', angle = -Math.PI / 2;
+  slices.forEach(s => {
+    const sweep = (s.val / total) * 2 * Math.PI;
+    const x1 = cx + r * Math.cos(angle), y1 = cy + r * Math.sin(angle);
+    const x2 = cx + r * Math.cos(angle + sweep), y2 = cy + r * Math.sin(angle + sweep);
+    const xi1 = cx + innerR * Math.cos(angle + sweep), yi1 = cy + innerR * Math.sin(angle + sweep);
+    const xi2 = cx + innerR * Math.cos(angle), yi2 = cy + innerR * Math.sin(angle);
+    const large = sweep > Math.PI ? 1 : 0;
+    paths += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large} 1 ${x2.toFixed(1)},${y2.toFixed(1)} L${xi1.toFixed(1)},${yi1.toFixed(1)} A${innerR},${innerR} 0 ${large} 0 ${xi2.toFixed(1)},${yi2.toFixed(1)} Z" fill="${s.color}" opacity=".9"/>`;
+    angle += sweep;
+  });
+  const pctNorm = Math.round(okV / total * 100);
+  return `
+    <div style="display:flex;align-items:center;gap:16px">
+      <svg width="128" height="128" viewBox="0 0 128 128" style="flex-shrink:0">
+        ${paths}
+        <text x="64" y="60" text-anchor="middle" font-family="Sora,sans-serif" font-size="18" font-weight="800" fill="#0C1A14">${pctNorm}%</text>
+        <text x="64" y="75" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="9" fill="#8AADA0">NORMAIS</text>
+      </svg>
+      <div style="flex:1">
+        ${[
+          {label:'Normal',  val:okV,   color:'#16A87E'},
+          {label:'Atenção', val:warnV, color:'#E8911A'},
+          {label:'Crítico', val:critV, color:'#DC3545'},
+        ].filter(s=>s.val>0).map(s=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:7px">
+              <div style="width:8px;height:8px;border-radius:50%;background:${s.color}"></div>
+              <span style="font-size:12px;color:var(--ink2)">${s.label}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:60px;height:4px;background:var(--fog);border-radius:2px;overflow:hidden">
+                <div style="height:100%;width:${Math.round(s.val/total*100)}%;background:${s.color};border-radius:2px"></div>
+              </div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:${s.color};min-width:24px;text-align:right">${s.val}</span>
+            </div>
+          </div>`).join('')}
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--fog);display:flex;justify-content:space-between">
+          <span style="font-size:11px;color:var(--mist)">Total de exames</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ink)">${total}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
 function renderDashboard(){
   const total=S.exams.length, ok=S.exams.filter(e=>e.status==='normal').length,
         warn=S.exams.filter(e=>e.status==='attention').length, crit=S.exams.filter(e=>e.status==='critical').length;
+
   document.getElementById('kpi-grid').innerHTML=`
     <div class="card kpi-card kpi-c-ok"><div class="kpi-val">${total}</div><div class="kpi-lbl">Exames totais</div><div class="kpi-trend">${total?Math.round(ok/total*100)+'% normais':'Nenhum ainda'}</div></div>
     <div class="card kpi-card kpi-c-ok"><div class="kpi-val">${ok}</div><div class="kpi-lbl">Normais</div><div class="kpi-trend">✓ Dentro da referência</div></div>
     <div class="card kpi-card kpi-c-warn"><div class="kpi-val">${warn}</div><div class="kpi-lbl">Atenção</div><div class="kpi-trend">Acompanhamento indicado</div></div>
     <div class="card kpi-card kpi-c-crit"><div class="kpi-val">${crit}</div><div class="kpi-lbl">Críticos</div><div class="kpi-trend">Ação imediata</div></div>`;
+
+  // Pie chart
+  const pie = document.getElementById('dash-pie');
+  if(pie) pie.innerHTML = makePie(ok, warn, crit);
 
   const recent5=S.exams.slice(0,5);
   document.getElementById('dash-recent').innerHTML=recent5.length?recent5.map(e=>{
@@ -2817,7 +3622,7 @@ function renderDashboard(){
     const ds=e.date?new Date(e.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'—';
     return `<div class="exam-row" onclick="showExam('${e.id}')">
       <div class="er-icon" style="background:${BG[e.status]||'var(--fog)'}">${EMOJ[p.species]||'🐾'}</div>
-      <div class="er-body"><div class="er-name">${p.name}</div><div class="er-meta">${p.species} · ${e.type||'Hemograma'}</div></div>
+      <div class="er-body"><div class="er-name">${escapeHTML(p.name)}</div><div class="er-meta">${escapeHTML(p.species)} · ${escapeHTML(e.type||'Hemograma')}</div></div>
       <div class="er-right"><div class="er-date">${ds}</div>${TAG[e.status]||''}</div>
     </div>`;
   }).join(''):`<div class="empty-state" style="padding:32px 0"><div class="es-icon">📋</div><div class="es-title">Nenhum exame ainda</div><div class="es-sub">Importe o primeiro exame para começar.</div></div>`;
@@ -2827,14 +3632,10 @@ function renderDashboard(){
     const last=S.exams.find(e=>e.patientId===p.id);
     return `<div class="exam-row" onclick="nav('patients')">
       <div class="er-icon" style="background:var(--leaf-l)">${EMOJ[p.species]||'🐾'}</div>
-      <div class="er-body"><div class="er-name">${p.name}</div><div class="er-meta">${p.species} · ${p.age||'—'}</div></div>
+      <div class="er-body"><div class="er-name">${escapeHTML(p.name)}</div><div class="er-meta">${escapeHTML(p.species)} · ${escapeHTML(p.age||'—')}</div></div>
       <div class="er-right">${last?TAG[last.status]:'<span class="tag tag-neutral">Sem exames</span>'}</div>
     </div>`;
   }).join('')||'<div style="font-size:13px;color:var(--mist);padding:8px 0">Nenhum paciente ainda.</div>';
-
-  const cData=[{h:40,c:'ok'},{h:28,c:'warn'},{h:50,c:'ok'},{h:20,c:'critical'},{h:44,c:'ok'},{h:36,c:'warn'},{h:55,c:'ok'}];
-  const cC={ok:'var(--leaf)',warn:'var(--amber)',critical:'var(--ruby)'};
-  document.getElementById('dash-chart').innerHTML=cData.map(d=>`<div class="mbc-bar" style="height:${d.h}px;background:${cC[d.c]};opacity:.85;border-radius:3px 3px 0 0;flex:1"></div>`).join('');
 }
 
 /* ══════════════════════════════════════════════
@@ -3249,97 +4050,157 @@ function delPatient(id){
 /* ══════════════════════════════════════════════
    PLAN UI & UPGRADE
 ══════════════════════════════════════════════ */
+function updateTrialBanner(){
+  const banner = document.getElementById('trial-banner');
+  const text   = document.getElementById('trial-banner-text');
+  if(!banner || !text) return;
+  const ts = getTrialStatus();
+  if(!ts.active){ banner.classList.remove('on'); return; }
+  banner.classList.add('on');
+  if(ts.expired){
+    text.textContent = '⚠ Trial expirado — faça upgrade para continuar analisando';
+    banner.style.background = 'linear-gradient(90deg,#8B1A20 0%,#6B1015 100%)';
+  } else {
+    const dayWord = ts.daysLeft === 1 ? 'dia' : 'dias';
+    text.textContent = `Período trial ativo — ${ts.daysLeft} ${dayWord} restante${ts.daysLeft!==1?'s':''} · ${ts.examsToday}/${ts.dailyLimit} exames hoje`;
+    banner.style.background = '';
+  }
+}
+
 function updatePlanUI(){
   if(!S.user) return;
   const plan = getUserPlan();
   const usage = getUsage();
-  const pct = Math.min(100, Math.round(usage.count / plan.analysesPerMonth * 100));
-  const left = usageLeft();
-  const planIcons = {basico:'📋',pro:'⭐'};
+  const pct = Math.min(100, Math.round(usage.count / (plan.analysesPerMonth < 9999 ? plan.analysesPerMonth : 200) * 100));
+  const planIcons = {trial:'⏱', basico:'📋', pro:'⭐'};
 
   // Sidebar chip
   const sbPlanIcon = document.getElementById('sb-plan-icon');
   const sbPlanName = document.getElementById('sb-plan-name');
   const sbPlanUsage = document.getElementById('sb-plan-usage');
+  if(!sbPlanIcon && !sbPlanName) return;
   if(sbPlanIcon) sbPlanIcon.textContent = planIcons[plan.id]||'🔬';
   if(sbPlanName) sbPlanName.textContent = `Plano ${plan.name}`;
   if(sbPlanUsage){
-    if(plan.analysesPerMonth >= 9999){
+    const ts = getTrialStatus();
+    if(ts.active && !ts.expired){
+      sbPlanUsage.textContent = `${ts.daysLeft} dias · ${ts.examsToday}/${ts.dailyLimit} hoje`;
+      sbPlanUsage.style.color = ts.daysLeft <= 2 ? 'var(--ruby)' : 'var(--amber)';
+    } else if(plan.analysesPerMonth >= 9999){
       sbPlanUsage.textContent = `${usage.count} análises este mês`;
+      sbPlanUsage.style.color = 'rgba(255,255,255,.28)';
     } else {
       sbPlanUsage.textContent = `${usage.count} / ${plan.analysesPerMonth} análises`;
       sbPlanUsage.style.color = pct >= 90 ? 'var(--ruby)' : pct >= 70 ? 'var(--amber)' : 'rgba(255,255,255,.28)';
     }
   }
+  updateUsageStrip();
+  updateTrialBanner();
 }
 
 function renderPlanPanel(){
-  const plan = getUserPlan();
-  const usage = getUsage();
-  const pct = Math.min(100, Math.round(usage.count / (plan.analysesPerMonth < 9999 ? plan.analysesPerMonth : 200) * 100));
-  const left = usageLeft();
-  const barColor = pct >= 90 ? 'var(--ruby)' : pct >= 70 ? 'var(--amber)' : 'var(--leaf)';
-  const month = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const _ppc = document.getElementById('plan-panel-content');
+  if(!_ppc) return;
+  const plan   = getUserPlan();
+  const usage  = getUsage();
+  const ts     = getTrialStatus();
+  const month  = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const isTrial  = plan.id === 'trial';
+  const isBasico = plan.id === 'basico';
+  const isPro    = plan.id === 'pro';
 
-  const featureRow = (ok, text) => `
-    <div class="plan-feat">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${ok?'var(--leaf)':'var(--fog)'}" stroke-width="2.5" stroke-linecap="round">
-        ${ok ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}
-      </svg>
-      <span style="color:${ok?'var(--ink2)':'var(--mist)'}">${text}</span>
+  const feat = (ok, text) => `
+    <div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--fog)">
+      <div style="width:18px;height:18px;border-radius:4px;background:${ok?'var(--leaf-l)':'var(--fog)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="${ok?'var(--leaf-d)':'var(--mist)'}" stroke-width="3" stroke-linecap="round">
+          ${ok?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/>'}
+        </svg>
+      </div>
+      <span style="font-size:13px;color:${ok?'var(--ink2)':'var(--mist)'}">${text}</span>
     </div>`;
 
-  document.getElementById('plan-panel-content').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+  let usageBlock = '';
+  if(isTrial && !ts.expired){
+    usageBlock = `
+      <div style="background:var(--paper);border-radius:var(--r12);padding:14px 16px;border:1px solid rgba(232,145,26,.2);margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">Trial · exames hoje</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--amber)">${ts.examsToday} / ${ts.dailyLimit}</span>
+        </div>
+        <div style="height:5px;background:var(--fog);border-radius:3px;overflow:hidden;margin-bottom:6px">
+          <div style="height:100%;width:${Math.min(100,Math.round(ts.examsToday/ts.dailyLimit*100))}%;background:var(--amber);border-radius:3px"></div>
+        </div>
+        <div style="font-size:11px;color:var(--mist)">${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} restante${ts.daysLeft!==1?'s':''} · Expira ${new Date(S.user.planExpiry).toLocaleDateString('pt-BR')}</div>
+      </div>`;
+  } else if(!isPro && !isTrial){
+    const pct2 = Math.min(100,Math.round(usage.count/plan.analysesPerMonth*100));
+    const barC = pct2>=90?'var(--ruby)':pct2>=70?'var(--amber)':'var(--leaf)';
+    usageBlock = `
+      <div style="background:var(--paper);border-radius:var(--r12);padding:14px 16px;border:1px solid var(--fog);margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">Análises · ${month}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${barC}">${usage.count} / ${plan.analysesPerMonth}</span>
+        </div>
+        <div style="height:5px;background:var(--fog);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${pct2}%;background:${barC};border-radius:3px"></div>
+        </div>
+      </div>`;
+  }
+
+  _ppc.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div>
-        <div class="card-title">Seu plano atual</div>
+        <div class="card-title">Seu plano</div>
         <div style="font-size:12px;color:var(--mist);margin-top:2px">${month}</div>
       </div>
       <span class="plan-badge" style="background:${plan.color};color:${plan.colorText}">${plan.badge}</span>
     </div>
 
-    <!-- Usage meter -->
-    <div style="background:var(--paper);border-radius:var(--r12);padding:16px 18px;border:1px solid var(--fog);margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:600;color:var(--ink)">Análises com IA</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${barColor}">
-          ${plan.analysesPerMonth >= 9999 ? `${usage.count} usadas` : `${usage.count} / ${plan.analysesPerMonth}`}
-        </span>
+    ${usageBlock}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+      <div style="border:${isBasico?'2px solid var(--leaf)':'1px solid var(--fog)'};border-radius:var(--r12);padding:14px;background:${isBasico?'var(--leaf-xl)':'var(--paper)'};position:relative">
+        ${isBasico?`<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">ATUAL</div>`:''}
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px">Básico</div>
+        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isBasico?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;67,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;54,32/mês anual</div>
+        ${feat(true,'200 análises/mês')}
+        ${feat(true,'PDF e JSON')}
+        ${feat(false,'Ilimitadas')}
+        ${feat(false,'Suporte priority')}
+        ${isTrial?`<button class="btn btn-primary btn-xs" style="width:100%;justify-content:center;margin-top:10px" onclick="openUpgradeModal('general')">Assinar →</button>`:''}
       </div>
-      ${plan.analysesPerMonth < 9999 ? `
-      <div class="usage-bar">
-        <div class="usage-fill" style="width:${pct}%;background:${barColor}"></div>
+      <div style="border:${isPro?'2px solid var(--leaf)':'1.5px solid var(--leaf)'};border-radius:var(--r12);padding:14px;background:${isPro?'var(--leaf-xl)':'var(--snow)'};position:relative">
+        <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:${isPro?'var(--leaf)':'var(--night)'};color:var(--snow);font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">${isPro?'ATUAL':'⭐ PRO'}</div>
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px">Pro</div>
+        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;97,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;67,90/mês anual</div>
+        ${feat(true,'Ilimitadas')}
+        ${feat(true,'PDF e JSON')}
+        ${feat(true,'Análises ilimitadas')}
+        ${feat(true,'Suporte prioritário')}
+        ${!isPro?`<button class="btn btn-primary btn-xs" style="width:100%;justify-content:center;margin-top:10px" onclick="openUpgradeModal('general')">${isBasico?'Upgrade →':'Assinar →'}</button>`:''}
       </div>
-      <div style="font-size:11px;color:${pct>=90?'var(--ruby)':'var(--mist)'};margin-top:6px">
-        ${left === 0 ? '⚠ Limite atingido — faça upgrade para continuar' : `${left} análise${left!==1?'s':''} restante${left!==1?'s':''} este mês`}
-      </div>` : `<div style="font-size:11px;color:var(--leaf);margin-top:4px">✓ Análises ilimitadas</div>`}
     </div>
 
-    <!-- Current plan features -->
-    <div style="margin-bottom:20px">
-      <div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">O que está incluído</div>
-      ${featureRow(true, plan.analysesPerMonth >= 9999 ? 'Análises ilimitadas' : `${plan.analysesPerMonth} análises por mês`)}
-      ${featureRow(true, `Até ${plan.patients >= 999 ? 'ilimitados' : plan.patients} pacientes`)}
-      ${featureRow(true, 'Exportação de laudos em PDF e JSON')}
-      ${featureRow(true, 'Histórico completo de exames')}
-      ${featureRow(true, 'Citologia e exames avançados')}
-      ${featureRow(plan.id === 'pro', 'Análises ilimitadas (sem cota mensal)')}
-      ${featureRow(plan.prioritySupport, 'Suporte prioritário')}
+    <div style="background:var(--night);border-radius:var(--r12);padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="openUpgradeModal('general')">
+      <span style="font-size:16px">💰</span>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--snow)">Economize com o plano anual</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Básico 20% off · Pro 30% off</div>
+      </div>
+      <span style="font-size:11px;font-weight:800;color:var(--leaf)">Ver →</span>
     </div>
-
-    ${plan.id !== 'pro' ? `
-    <button class="btn btn-primary btn-md" style="width:100%;justify-content:center" onclick="openUpgradeModal('general')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      Fazer upgrade do plano
-    </button>` : `<div style="font-size:13px;color:var(--leaf);text-align:center;font-weight:600">✓ Você está no plano máximo — análises ilimitadas</div>`}
 
     ${S.user?.isAdmin ? `
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--fog)">
-      <div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">Administrador — atribuir plano</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="admin-user-email" class="fld-in" placeholder="E-mail do usuário" style="flex:1"/>
-        <select id="admin-plan-sel" class="fld-sel" style="width:120px">
-          <option value="basico">Básico</option><option value="pro">Pro</option>
+    <div style="padding-top:14px;border-top:1px solid var(--fog)">
+      <div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">🔧 Admin</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="admin-user-email" class="fld-in" placeholder="E-mail" style="flex:1"/>
+        <select id="admin-plan-sel" class="fld-sel" style="width:110px">
+          <option value="trial">Trial</option>
+          <option value="basico">Básico</option>
+          <option value="pro">Pro</option>
         </select>
         <button class="btn btn-dark btn-sm" onclick="adminSetPlan()">Aplicar</button>
       </div>
@@ -3347,56 +4208,139 @@ function renderPlanPanel(){
   `;
 }
 
+let _billingMode = 'monthly'; // 'monthly' | 'annual'
+
 function openUpgradeModal(reason){
   const plan = getUserPlan();
+  const ts = getTrialStatus();
+  _billingMode = 'monthly';
+
   const reasons = {
-    analyses: `Você atingiu o limite de ${plan.analysesPerMonth} análises/mês do plano Básico. Faça upgrade para o Pro e tenha análises ilimitadas.`,
-    export: 'Exportação de laudos disponível — faça upgrade para o Pro para ter acesso completo.',
-    patients: `Você atingiu o limite de pacientes do plano Básico.`,
-    general: 'Escolha o plano ideal para sua clínica.',
+    trial:    'Seu período trial está ativo. Escolha um plano para continuar após os 7 dias.',
+    analyses: 'Você atingiu o limite de análises do período.',
+    export:   'Exportação de laudos disponível nos planos pagos.',
+    general:  'Escolha o plano ideal para sua clínica.',
   };
 
-  const planOrder = ['basico','pro'];
-  const currentIdx = planOrder.indexOf(plan.id);
+  function buildCards(mode){
+    return ['basico','pro'].map(pid => {
+      const p = PLANS[pid];
+      const isCurrent = plan.id === pid;
+      const isPro = pid === 'pro';
+      const monthlyPrice = p.priceMonthly;
+      const annualPerMonth = p.priceAnnual;
+      const annualTotal = p.priceAnnualTotal;
+      const displayPrice = mode === 'annual' ? annualPerMonth : monthlyPrice;
+      const formattedPrice = displayPrice.toFixed(2).replace('.',',');
+      const formattedAnnualTotal = annualTotal.toFixed(2).replace('.',',');
+
+      return `
+        <div style="border:${isPro?'2px':'1.5px'} solid ${isPro?'var(--leaf)':'var(--fog)'};border-radius:var(--r16);padding:20px;background:${isCurrent?'var(--leaf-xl)':isPro?'var(--snow)':'var(--snow)'};position:relative;flex:1;min-width:0">
+          ${isCurrent?`<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 10px;border-radius:20px;white-space:nowrap">PLANO ATUAL</div>`:''}
+          ${!isCurrent&&isPro?`<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--night);color:var(--snow);font-size:9px;font-weight:800;padding:2px 10px;border-radius:20px;white-space:nowrap">⭐ RECOMENDADO</div>`:''}
+
+          <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin-bottom:6px">${p.name}</div>
+
+          <!-- Price display -->
+          <div style="margin-bottom:${mode==='annual'?'4':'12'}px">
+            <span style="font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:${isCurrent?'var(--leaf)':isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-1.5px">R$&nbsp;${formattedPrice}</span>
+            <span style="font-size:11px;color:var(--mist);font-weight:400">/mês</span>
+          </div>
+          ${mode==='annual'?`
+          <div style="font-size:11px;color:var(--mist);margin-bottom:10px">
+            R$&nbsp;${formattedAnnualTotal} à vista em 12 meses
+            <span style="background:rgba(22,168,126,.12);color:var(--leaf-d);font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px">20% OFF</span>
+          </div>`:''}
+
+          <div style="font-size:11px;color:var(--mist);margin-bottom:12px">${p.description}</div>
+
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+            ${[
+              [true, pid==='basico'?'200 análises/mês':'Ilimitadas'],
+              [true, 'Todos os tipos de exame'],
+              [true, 'Exportar PDF'],
+              [pid==='pro', 'Exportar JSON'],
+              [pid==='pro', 'Suporte prioritário'],
+            ].map(([ok,txt])=>`
+              <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:${ok?'var(--ink2)':'var(--mist)'}">
+                <div style="width:16px;height:16px;border-radius:4px;background:${ok?'var(--leaf-l)':'var(--fog)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="${ok?'var(--leaf-d)':'var(--mist)'}" stroke-width="3" stroke-linecap="round">
+                    ${ok?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/>'}
+                  </svg>
+                </div>
+                ${txt}
+              </div>`).join('')}
+          </div>
+
+          ${!isCurrent?`
+          <button class="btn-auth" onclick="selectPlan('${pid}','${mode}')" style="border-radius:var(--r8);font-size:13px;padding:11px;margin-top:0">
+            ${mode==='annual'?`Assinar anual — R$&nbsp;${formattedAnnualTotal}`:`Assinar por R$&nbsp;${formattedPrice}/mês`}
+          </button>`:
+          `<div style="text-align:center;font-size:12px;color:var(--leaf-d);font-weight:700;padding:10px 0">✓ Seu plano atual</div>`}
+        </div>`;
+    }).join('');
+  }
 
   document.getElementById('upgrade-content').innerHTML = `
-    <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:32px;margin-bottom:10px">🚀</div>
-      <div class="modal-title">Fazer upgrade</div>
-      <div class="modal-sub">${reasons[reason]||reasons.general}</div>
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-1px;margin-bottom:6px">
+        ${ts.active && !ts.expired ? `⏱ ${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} de trial restante${ts.daysLeft!==1?'s':''}` : 'Escolha seu plano'}
+      </div>
+      <div style="font-size:13px;color:var(--mist)">${reasons[reason]||reasons.general}</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px;max-width:320px;margin-left:auto;margin-right:auto">
-      ${['pro'].map(pid => {
-        const p = PLANS[pid];
-        const isCurrent = plan.id === pid;
-        const isPopular = pid === 'pro';
-        return `
-        <div class="plan-card ${isCurrent?'current':''} ${isPopular?'popular':''}" onclick="${isCurrent?'':'selectPlan(\''+pid+'\')'}">
-          ${isPopular?`<div style="font-size:10px;font-weight:800;color:var(--leaf-d);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Mais popular</div>`:''}
-          ${isCurrent?`<div style="font-size:10px;font-weight:800;color:var(--leaf-d);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Plano atual</div>`:''}
-          <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.5px;margin-bottom:2px">${p.name}</div>
-          <div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:${isCurrent?'var(--leaf)':'var(--ink)'};letter-spacing:-1px;margin-bottom:8px">${p.price}</div>
-          <div style="font-size:11px;color:var(--mist);margin-bottom:12px">${p.description}</div>
-          <div class="plan-feat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>${p.analysesPerMonth >= 9999 ? 'Ilimitado' : p.analysesPerMonth + '/mês'}</span></div>
-          <div class="plan-feat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${p.exportPDF?'var(--leaf)':'var(--fog)'}" stroke-width="2.5" stroke-linecap="round">${p.exportPDF?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/>'}</svg><span style="color:${p.exportPDF?'var(--ink2)':'var(--mist)'}">Exportar PDF</span></div>
-          <div class="plan-feat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${p.advancedCytology?'var(--leaf)':'var(--fog)'}" stroke-width="2.5" stroke-linecap="round">${p.advancedCytology?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/>'}
-          </svg><span style="color:${p.advancedCytology?'var(--ink2)':'var(--mist)'}">Citologia avançada</span></div>
-          ${!isCurrent?`<button class="btn btn-primary btn-sm" style="width:100%;justify-content:center;margin-top:10px" onclick="event.stopPropagation();selectPlan('${pid}')">Selecionar</button>`:''}
-        </div>`;
-      }).join('')}
+
+    <!-- Billing toggle -->
+    <div style="display:flex;justify-content:center;margin-bottom:20px">
+      <div class="billing-toggle" id="billing-toggle">
+        <button class="billing-opt on" id="btn-monthly" onclick="switchBilling('monthly')">Mensal</button>
+        <button class="billing-opt" id="btn-annual" onclick="switchBilling('annual')">
+          Anual <span class="annual-badge">20% OFF</span>
+        </button>
+      </div>
     </div>
+
+    <!-- Plan cards -->
+    <div id="plan-cards" style="display:flex;gap:12px;margin-bottom:16px">
+      ${buildCards('monthly')}
+    </div>
+
+    <!-- Trial info box -->
+    ${ts.active && !ts.expired ? `
+    <div style="background:#FEF5E7;border:1px solid rgba(232,145,26,.25);border-radius:var(--r12);padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0">⏱</span>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#7A4800;margin-bottom:2px">Período trial — ${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} restante${ts.daysLeft!==1?'s':''}</div>
+        <div style="font-size:11px;color:#7A4800;opacity:.8">${ts.dailyLimit} exames por dia · Exportação não disponível · Assine para desbloquear tudo</div>
+      </div>
+    </div>` : ''}
+
     <div style="text-align:center;font-size:12px;color:var(--mist)">
-      Para fazer upgrade, entre em contato: <strong style="color:var(--leaf-d)">contato@diagnovet.com.br</strong>
+      Para assinar entre em contato: <strong style="color:var(--leaf-d)">contato@diagnovet.com.br</strong>
     </div>
   `;
+
+  // Store buildCards for re-render on toggle
+  window._buildUpgradeCards = buildCards;
   openM('m-upgrade');
 }
 
-function selectPlan(planId){
-  // In production this would redirect to payment
-  // For now, show contact message
+function switchBilling(mode){
+  _billingMode = mode;
+  document.getElementById('btn-monthly')?.classList.toggle('on', mode==='monthly');
+  document.getElementById('btn-annual')?.classList.toggle('on', mode==='annual');
+  const cards = document.getElementById('plan-cards');
+  if(cards && window._buildUpgradeCards) cards.innerHTML = window._buildUpgradeCards(mode);
+}
+
+function selectPlan(planId, billingMode){
   closeM('m-upgrade');
-  toast(`Para assinar o plano Pro, entre em contato: contato@diagnovet.com.br`, 'ok');
+  const p = PLANS[planId];
+  const mode = billingMode || _billingMode;
+  const price = mode === 'annual'
+    ? `R$ ${p.priceAnnualTotal.toFixed(2).replace('.',',')} /ano`
+    : `R$ ${p.priceMonthly.toFixed(2).replace('.',',')} /mês`;
+  toast(`Para assinar o plano ${p.name} (${price}), entre em contato: contato@diagnovet.com.br`, 'ok');
 }
 
 /* ── ADMIN: assign plan to any user ── */
@@ -3428,12 +4372,13 @@ function stTab(t,el){
 ══════════════════════════════════════════════ */
 function saveProfile(){
   if(!S.user) return;
-  S.user.name=document.getElementById('s-name').value||S.user.name;
-  S.user.crmv=document.getElementById('s-crmv').value||S.user.crmv;
-  S.user.specialty=document.getElementById('s-spec').value||S.user.specialty;
-  const accs=DB.g('accounts',[]); const idx=accs.findIndex(a=>a.id===S.user.id);
-  if(idx>=0){accs[idx]={...accs[idx],...S.user};DB.s('accounts',accs);}
-  updateUserUI(); toast('Perfil atualizado.','ok');
+  S.user.name      = document.getElementById('s-name')?.value   || S.user.name;
+  S.user.crmv      = document.getElementById('s-crmv')?.value   || S.user.crmv;
+  S.user.specialty = document.getElementById('s-spec')?.value   || S.user.specialty;
+  S.user.clinic    = document.getElementById('s-clinic')?.value || S.user.clinic;
+  const accs = DB.g('accounts',[]); const idx = accs.findIndex(a=>a.id===S.user.id);
+  if(idx>=0){ accs[idx]={...accs[idx],...S.user}; DB.s('accounts',accs); }
+  updateUserUI(); toast('Perfil atualizado com sucesso.','ok');
 }
 function saveKey(){
   const k=document.getElementById('s-key')?.value.trim()||'';
@@ -3573,7 +4518,7 @@ function exportOneExam(id){
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Laudo DiagnoVet — ${patient.name} — ${dateStr}</title>
+<title>Laudo DiagnoVet — ${escapeHTML(patient.name)} — ${dateStr}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -3817,7 +4762,7 @@ body{
   <div class="patient-hero">
     <div class="ph-left">
       <div class="ph-eyebrow">Resultado da análise · ${exam.type}</div>
-      <div class="ph-name">${patient.name}</div>
+      <div class="ph-name">${escapeHTML(patient.name)}</div>
       <div class="ph-meta">${patient.species}${patient.breed&&patient.breed!=='—'?' · '+patient.breed:''} · ${patient.sex||'—'} · ${patient.age||'—'} · ${patient.weight||'—'}</div>
       <div class="ph-badges">
         <span class="ph-badge badge-status">${overallLabel}</span>
