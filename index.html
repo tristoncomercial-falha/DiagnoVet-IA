@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.workers.dev https://api.anthropic.com; img-src 'self' data: blob:; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.workers.dev https://api.anthropic.com https://*.supabase.co https://*.supabase.io; img-src 'self' data: blob:; object-src 'none'; base-uri 'self';">
 <meta name="description" content="DiagnoVet IA — Diagnóstico veterinário com inteligência artificial."/>
 <meta name="theme-color" content="#091610"/>
 <title>DiagnoVet — Diagnóstico Veterinário com IA</title>
@@ -1461,18 +1461,22 @@ function initSupabase(){
     // ── Auth
     auth: {
       async signUp({ email, password, options }){
-        const r = await supaFetch('POST', '/auth/v1/signup', {
-          email, password,
-          data: options?.data || {}
-        }, true);
+        const body = {
+          email,
+          password,
+          data: options?.data || {},
+        };
+        if(options?.emailRedirectTo) body.redirect_to = options.emailRedirectTo;
+        const r = await supaFetch('POST', '/auth/v1/signup', body, true);
         if(r.code || r.error) return { data: null, error: r.error || r };
         if(r.access_token){ _supaSession = r.access_token; DB.s('supa_session', r); }
         return { data: { user: r.user || r, session: r.access_token ? r : null }, error: null };
       },
 
       async signInWithPassword({ email, password }){
-        const r = await supaFetch('POST', '/auth/v1/token?grant_type=password', { email, password }, true);
-        if(r.error) return { data: null, error: r };
+        const r = await supaFetch('POST', '/auth/v1/token?grant_type=password',
+          { email, password }, true);
+        if(r.error || r.code) return { data: null, error: r.error || r };
         _supaSession = r.access_token;
         DB.s('supa_session', r);
         return { data: { user: r.user, session: r }, error: null };
@@ -1998,7 +2002,13 @@ async function doRegister(){
           emailRedirectTo: window.location.href.split('#')[0]
         }
       });
-      if(error){ showErr(error.message || error.msg || JSON.stringify(error)); return; }
+      if(error){
+        const msg = error.message || error.msg || error.error_description
+          || (typeof error === 'string' ? error : 'Erro ao criar conta. Tente novamente.');
+        showErr(msg);
+        if(btn){ btn.disabled=false; btn.textContent='Criar conta gratuita'; }
+        return;
+      }
 
       // Update profile with extra fields immediately after signup
       if(data.user){
