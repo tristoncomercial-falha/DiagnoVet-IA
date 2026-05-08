@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.workers.dev https://api.anthropic.com; img-src 'self' data: blob:; object-src 'none'; base-uri 'self';">
-<meta name="description" content="DiagnoVet — Diagnóstico veterinário com IA."/>
+<meta name="description" content="DiagnoVet IA — Diagnóstico veterinário com inteligência artificial."/>
 <meta name="theme-color" content="#091610"/>
 <title>DiagnoVet — Diagnóstico Veterinário com IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -854,7 +854,7 @@ function showErr(m){
             <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width="1" opacity=".6"/>
           </svg>
         </div>
-        <div class="auth-logotype-name">Diagno<em>Vet</em></div>
+        <div class="auth-logotype-name">Diagno<em>Vet IA</em></div>
       </div>
 
       <!-- Animated paw hero -->
@@ -881,7 +881,7 @@ function showErr(m){
         <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Histórico e comparação entre exames</div>
         <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Exportação de laudos profissionais</div>
       </div>
-      <div class="auth-stamp">DiagnoVet v3.0 · AI Veterinary Platform</div>
+      <div class="auth-stamp">DiagnoVet IA · Beta · VitaHub Solutions</div>
     </div>
 
     <div class="auth-panel-r">
@@ -964,7 +964,7 @@ function showErr(m){
               <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width=".9" opacity=".6"/>
             </svg>
           </div>
-          <div class="sb-brand-name">Diagno<em>Vet</em></div>
+          <div class="sb-brand-name">Diagno<em>Vet IA</em></div>
         </div>
       </div>
       <div class="sb-user">
@@ -1934,7 +1934,14 @@ async function doLogin(){
     try {
       const { data, error } = await _supa.auth.signInWithPassword({ email, password: pass });
       if(error){
-        // Fallback: try local accounts (beta users created before Supabase)
+        const msg = error.message || error.error_description || '';
+        // Only fall back to local if user doesn't exist in Supabase
+        if(msg.includes('Invalid login') || msg.includes('Email not confirmed')){
+          showErr('E-mail ou senha incorretos. Verifique seus dados.');
+          if(btn){ btn.disabled=false; btn.textContent='Entrar'; }
+          return;
+        }
+        // Fallback for beta local accounts
         await loginLocal(email, pass);
         return;
       }
@@ -1986,7 +1993,10 @@ async function doRegister(){
     try {
       const { data, error } = await _supa.auth.signUp({
         email, password: pass,
-        options: { data: { name:`${title} ${name}`, crmv, specialty: spec } }
+        options: {
+          data: { name:`${title} ${name}`, crmv, specialty: spec },
+          emailRedirectTo: window.location.href.split('#')[0]
+        }
       });
       if(error){ showErr(error.message || error.msg || JSON.stringify(error)); return; }
 
@@ -2003,11 +2013,13 @@ async function doRegister(){
 
       // Check if email confirmation required
       if(!data.session){
-        showErr(''); // clear error
-        document.getElementById('auth-err').style.background='var(--leaf-l)';
-        document.getElementById('auth-err').style.color='var(--leaf-d)';
-        document.getElementById('auth-err').style.borderColor='rgba(22,168,126,.2)';
-        showErr('✓ Conta criada! Verifique seu e-mail para confirmar o cadastro.');
+        const e = document.getElementById('auth-err');
+        if(e){
+          e.style.cssText='background:var(--leaf-l);border-color:rgba(22,168,126,.2);color:var(--leaf-d);padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:block';
+          e.textContent='✓ Conta criada! Verifique seu e-mail e clique no link para acessar o DiagnoVet IA.';
+          e.classList.remove('hidden');
+        }
+        if(btn){ btn.disabled=false; btn.textContent='Criar conta gratuita'; }
         return;
       }
 
@@ -5271,7 +5283,7 @@ body{
         </svg>
       </div>
       <div>
-        <div class="brand-name">Diagno<em>Vet</em></div>
+        <div class="brand-name">Diagno<em>Vet IA</em></div>
         <div class="brand-sub">Diagnóstico Veterinário com IA · Laudo Clínico</div>
       </div>
     </div>
@@ -5436,7 +5448,7 @@ body{
   <div class="report-footer">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
       <div>
-        <div class="footer-brand">Diagno<em>Vet</em> · Diagnóstico Veterinário com IA</div>
+        <div class="footer-brand">DiagnoVet IA · Diagnóstico Veterinário</div>
         <div>${printedAt} · ${exam.usedAI?'Claude AI':'Motor local'}</div>
       </div>
       <div style="text-align:right;border-top:1px solid var(--fog);padding-top:10px;min-width:200px">
