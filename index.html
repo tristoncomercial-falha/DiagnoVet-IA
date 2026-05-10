@@ -176,6 +176,8 @@ input::placeholder, textarea::placeholder {
 .fld label { display:block; font-size:10px; font-weight:800; color:var(--mist); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
 .fld input, .fld select { width:100%; padding:11px 14px; border-radius:var(--r8); border:1px solid var(--ghost); background:var(--paper); font-size:14px; color:var(--ink); outline:none; transition:border-color var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out); }
 .fld input:focus, .fld select:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,168,126,.12); background:var(--snow); }
+textarea.fld-in { width:100%; padding:11px 14px; border-radius:var(--r8); border:1px solid var(--ghost); background:var(--paper); font-size:14px; color:var(--ink); outline:none; font-family:'Plus Jakarta Sans',sans-serif; transition:border-color var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out); }
+textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,168,126,.12); background:var(--snow); }
 .fld-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .auth-err { background:var(--ruby-l); border:1px solid rgba(220,53,69,.25); border-radius:var(--r8); padding:10px 14px; font-size:13px; color:#8B1A20; margin-bottom:14px; }
 .btn-auth { width:100%; padding:13px; background:var(--leaf); border:none; border-radius:var(--r12); font-size:14px; font-weight:800; color:var(--snow); cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:-.1px; margin-top:6px; transition:background var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out), transform var(--d-fast) var(--e-out); }
@@ -328,7 +330,7 @@ input::placeholder, textarea::placeholder {
 .billing-toggle { display:flex;align-items:center;gap:0;background:var(--paper);border-radius:var(--r999);padding:3px;border:1px solid var(--fog); }
 .billing-opt { padding:7px 18px;border-radius:var(--r999);font-size:12px;font-weight:700;color:var(--mist);cursor:pointer;transition:all var(--d-fast) var(--e-out);border:none;background:none;white-space:nowrap; }
 .billing-opt.on { background:var(--night);color:var(--snow); }
-.annual-badge { display:inline-flex;align-items:center;padding:2px 7px;border-radius:var(--r999);background:rgba(22,168,126,.15);color:var(--leaf-d);font-size:10px;font-weight:800;margin-left:5px;border:1px solid rgba(22,168,126,.25); }
+.quarterly-badge { display:inline-flex;align-items:center;padding:2px 7px;border-radius:var(--r999);background:rgba(22,168,126,.15);color:var(--leaf-d);font-size:10px;font-weight:800;margin-left:5px;border:1px solid rgba(22,168,126,.25); }
 
 /* ── PLAN CARDS ── */
 .plan-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r999);font-size:11px;font-weight:700;}
@@ -745,6 +747,20 @@ input::placeholder, textarea::placeholder {
     <div class="modal-title" id="mp-title">Novo paciente</div>
     <div class="modal-sub">Preencha os dados clínicos do paciente.</div>
     <input type="hidden" id="mp-id"/>
+
+    <!-- Toggle internado/ambulatorial -->
+    <div style="display:flex;gap:8px;margin-bottom:16px" id="mp-type-toggle">
+      <button id="mp-type-amb" onclick="setPatientType('ambulatorial')"
+        style="flex:1;padding:9px;border-radius:var(--r8);border:1.5px solid var(--leaf);background:var(--leaf);color:var(--snow);font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px">
+        👤 Ambulatorial
+      </button>
+      <button id="mp-type-int" onclick="setPatientType('internado')"
+        style="flex:1;padding:9px;border-radius:var(--r8);border:1.5px solid var(--fog);background:transparent;color:var(--mist);font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px">
+        🏥 Internado
+      </button>
+    </div>
+    <input type="hidden" id="mp-type" value="ambulatorial"/>
+
     <div class="fld-row">
       <div class="fld-grp"><label>Nome</label><input class="fld-in" id="mp-name" placeholder="ex: Florzinha"/></div>
       <div class="fld-grp"><label>Espécie</label>
@@ -760,10 +776,34 @@ input::placeholder, textarea::placeholder {
       <div class="fld-grp"><label>Peso</label><input class="fld-in" id="mp-weight" placeholder="ex: 3,8 kg"/></div>
     </div>
     <div class="fld-grp"><label>Tutor</label><input class="fld-in" id="mp-owner" placeholder="Nome do responsável"/></div>
-    <div class="fld-grp" style="margin-bottom:22px"><label>Histórico clínico</label><textarea class="fld-txt" id="mp-history" placeholder="Alergias, medicamentos, histórico..."></textarea></div>
-    <div style="display:flex;gap:10px">
+    <div class="fld-grp" style="margin-bottom:0"><label>Histórico clínico</label><textarea class="fld-txt" id="mp-history" placeholder="Alergias, medicamentos, histórico..."></textarea></div>
+
+    <!-- Campos extras para internação (aparecem quando tipo=internado) -->
+    <div id="mp-intern-fields" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--fog)">
+      <div style="font-size:11px;font-weight:800;color:var(--ruby);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">🏥 Dados da Internação</div>
+      <div class="fld-row">
+        <div class="fld-grp">
+          <label>Status clínico</label>
+          <select class="fld-sel" id="mp-intern-status">
+            <option value="critical">🔴 Crítico</option>
+            <option value="attention">🟡 Atenção</option>
+            <option value="normal">🟢 Estável</option>
+          </select>
+        </div>
+        <div class="fld-grp">
+          <label>Data de entrada</label>
+          <input class="fld-in" type="date" id="mp-intern-date"/>
+        </div>
+      </div>
+      <div class="fld-grp" style="margin-bottom:0">
+        <label>Motivo da internação</label>
+        <input class="fld-in" id="mp-intern-reason" placeholder="Ex: Pós-cirúrgico, insuficiência renal..."/>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px">
       <button class="btn btn-ghost btn-md" style="flex:1;justify-content:center" onclick="closeM('m-patient')">Cancelar</button>
-      <button class="btn btn-primary btn-md" style="flex:2;justify-content:center" onclick="savePatient()">Salvar paciente</button>
+      <button class="btn btn-primary btn-md" style="flex:2;justify-content:center" onclick="savePatient()" id="mp-save-btn">Salvar paciente</button>
     </div>
   </div>
 </div>
@@ -994,6 +1034,11 @@ function showErr(m){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a7 7 0 0114 0v2"/><circle cx="19" cy="7" r="3"/><path d="M22 21v-1.5a5 5 0 00-4-4.9"/></svg>
           Pacientes
         </button>
+        <button class="sb-btn" data-sc="intern" onclick="nav('intern')" style="position:relative">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+          Internações
+          <span id="sb-intern-badge" style="display:none;margin-left:auto;background:var(--ruby);color:var(--snow);font-size:9px;font-weight:800;border-radius:20px;padding:1px 6px;min-width:18px;text-align:center"></span>
+        </button>
         <button class="sb-btn" data-sc="result" onclick="nav('result')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
           Último resultado
@@ -1041,7 +1086,7 @@ function showErr(m){
           <div class="topbar-title" id="page-title">Dashboard</div>
         </div>
         <div class="topbar-r">
-          <button class="btn btn-ghost btn-sm" onclick="openM('m-patient');document.getElementById('mp-id').value='';document.getElementById('mp-title').textContent='Novo paciente'">
+          <button class="btn btn-ghost btn-sm" onclick="openPatientModal()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             <span>Paciente</span>
           </button>
@@ -1062,6 +1107,20 @@ function showErr(m){
       <!-- Usage strip (all screens) -->
       <div class="usage-strip" id="usage-strip" onclick="toggleUsagePopup()" title="Uso do plano"></div>
       <div id="usage-popup" style="display:none;position:fixed;top:calc(var(--th) + 3px);right:20px;z-index:100"></div>
+
+      <!-- ── ONBOARDING — plan selection ── -->
+      <div class="screen" id="sc-onboarding">
+        <div class="screen-inner" style="max-width:680px;margin:0 auto;padding:32px 20px">
+          <div id="onboarding-content"></div>
+        </div>
+      </div>
+
+      <!-- ── TRIAL EXPIRED — forced upgrade ── -->
+      <div class="screen" id="sc-trial-expired">
+        <div class="screen-inner" style="max-width:540px;margin:0 auto;padding:40px 20px">
+          <div id="trial-expired-content"></div>
+        </div>
+      </div>
 
       <!-- ── DASHBOARD ── -->
       <div class="screen on" id="sc-dashboard">
@@ -1144,7 +1203,7 @@ function showErr(m){
                   <option value="">— Selecione —</option>
                 </select>
               </div>
-              <div style="text-align:center;margin:-4px 0 12px;font-size:12px;color:var(--mist)">ou <span class="auth-link" onclick="openM('m-patient');document.getElementById('mp-id').value=''">cadastre um novo paciente</span></div>
+              <div style="text-align:center;margin:-4px 0 12px;font-size:12px;color:var(--mist)">ou <span class="auth-link" onclick="openPatientModal()">cadastre um novo paciente</span></div>
               <div class="fld-row">
                 <div class="fld-grp"><label>Tipo de exame</label>
                   <select class="fld-sel" id="imp-type">
@@ -1270,7 +1329,7 @@ function showErr(m){
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input class="search-in" id="pt-q" placeholder="Buscar paciente..." oninput="renderPatients()"/>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="openM('m-patient');document.getElementById('mp-id').value=''">
+            <button class="btn btn-primary btn-sm" onclick="openPatientModal()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Novo paciente
             </button>
@@ -1282,6 +1341,40 @@ function showErr(m){
       <!-- ── RESULT ── -->
       <div class="screen" id="sc-result">
         <div class="screen-inner"><div id="result-area" class="fade-in"></div></div>
+      </div>
+
+      <!-- ── INTERNAÇÃO ── -->
+      <div class="screen" id="sc-intern">
+        <div class="screen-inner">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-1px">Internações</div>
+              <div style="font-size:13px;color:var(--mist);margin-top:2px" id="intern-summary">—</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-md" onclick="openNewInternModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2"/></svg>
+                Internar existente
+              </button>
+              <button class="btn btn-primary btn-md" onclick="openPatientModal(true)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Novo paciente
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+            <button class="btn btn-sm" id="ifl-all" onclick="filterIntern('all',this)" style="background:var(--night);color:var(--snow);border-color:var(--night)">Todos</button>
+            <button class="btn btn-ghost btn-sm" id="ifl-critical" onclick="filterIntern('critical',this)">🔴 Crítico</button>
+            <button class="btn btn-ghost btn-sm" id="ifl-attention" onclick="filterIntern('attention',this)">🟡 Atenção</button>
+            <button class="btn btn-ghost btn-sm" id="ifl-normal" onclick="filterIntern('normal',this)">🟢 Estável</button>
+            <button class="btn btn-ghost btn-sm" id="ifl-discharged" onclick="filterIntern('discharged',this)">✓ Alta</button>
+          </div>
+
+          <!-- Lista de internações -->
+          <div id="intern-list"></div>
+        </div>
       </div>
 
       <!-- ── PLANS (mobile standalone) ── -->
@@ -1388,7 +1481,7 @@ function showErr(m){
                 <div class="card-title" style="margin-bottom:6px">Chave da API Claude</div>
                 <div style="font-size:13px;color:var(--ink3);line-height:1.65;margin-bottom:16px">Configure sua chave para ativar a análise com <strong style="color:var(--leaf)">Claude AI real</strong>. Obtenha em <strong style="color:var(--leaf)">console.anthropic.com</strong></div>
                 <div class="api-row">
-                  <input type="password" id="s-key" placeholder="sk-ant-api03-..."/>
+                  <input type="password" id="s-key" placeholder="USE_WORKER_PROXY..."/>
                   <button class="btn btn-dark btn-sm" onclick="saveKey()">Salvar chave</button>
                 </div>
                 <div id="key-status" style="font-size:12px;margin-top:10px;color:var(--mist)"></div>
@@ -1419,6 +1512,11 @@ function showErr(m){
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     <span>Importar</span>
   </button>
+  <button class="mob-nav-btn" data-sc="intern" onclick="nav('intern')" id="mob-intern-btn" style="position:relative">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    <span>Internados</span>
+    <span id="intern-badge" style="display:none;position:absolute;top:4px;right:12px;background:var(--ruby);color:var(--snow);font-size:9px;font-weight:800;border-radius:20px;padding:1px 5px;min-width:16px;text-align:center"></span>
+  </button>
   <button class="mob-nav-btn" data-sc="exams" onclick="nav('exams')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
     <span>Exames</span>
@@ -1432,6 +1530,86 @@ function showErr(m){
     <span>Planos</span>
   </button>
 </nav>
+
+<!-- ── MODAL NOVA INTERNAÇÃO ── -->
+<div class="overlay hidden" id="ov-intern" onclick="closeM('m-intern')">
+  <div class="modal" id="m-intern" onclick="event.stopPropagation()" style="max-width:500px">
+    <div class="modal-head">
+      <div class="modal-title" id="intern-modal-title">Nova Internação</div>
+      <button class="modal-close" onclick="closeM('m-intern')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fld-grp" style="margin-bottom:12px">
+        <label>Selecionar paciente <span style="font-size:10px;color:var(--mist);font-weight:400">— todos os pacientes cadastrados aparecem aqui</span></label>
+        <select class="fld-sel" id="intern-patient-sel" style="width:100%" onchange="checkNewPatientOption(this.value)">
+          <option value="">— Selecionar paciente —</option>
+          <option value="__new__" style="color:var(--leaf-d);font-weight:700">➕ Cadastrar novo paciente</option>
+        </select>
+      </div>
+      <div style="text-align:right;margin-top:-6px;margin-bottom:4px">
+        <span style="font-size:12px;color:var(--leaf-d);cursor:pointer;font-weight:600" onclick="closeM('m-intern');openPatientModal(true)">
+          + Criar e internar novo paciente
+        </span>
+      </div>
+
+      <!-- Mini formulário para novo paciente (aparece ao selecionar ➕) -->
+      <div id="intern-new-patient-form" style="display:none;background:var(--paper);border-radius:var(--r12);padding:14px;border:1px solid rgba(22,168,126,.2);margin-bottom:12px">
+        <div style="font-size:11px;font-weight:800;color:var(--leaf-d);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Novo paciente</div>
+        <div class="fld-row" style="margin-bottom:10px">
+          <div class="fld-grp" style="margin-bottom:0"><label>Nome *</label><input class="fld-in" id="inp-name" placeholder="ex: Florzinha"/></div>
+          <div class="fld-grp" style="margin-bottom:0"><label>Espécie</label>
+            <select class="fld-sel" id="inp-species">
+              <option value="Felino">🐱 Felino</option><option value="Canino">🐶 Canino</option>
+              <option value="Equino">🐴 Equino</option><option value="Bovino">🐄 Bovino</option><option value="Outro">🐾 Outro</option>
+            </select>
+          </div>
+        </div>
+        <div class="fld-row">
+          <div class="fld-grp" style="margin-bottom:0"><label>Raça</label><input class="fld-in" id="inp-breed" placeholder="ex: SRD"/></div>
+          <div class="fld-grp" style="margin-bottom:0"><label>Tutor</label><input class="fld-in" id="inp-owner" placeholder="Nome do tutor"/></div>
+        </div>
+      </div>
+      <div class="fld-row" style="margin-bottom:12px">
+        <div class="fld-grp">
+          <label>Data de entrada</label>
+          <input class="fld-in" type="date" id="intern-date-in"/>
+        </div>
+        <div class="fld-grp">
+          <label>Status clínico</label>
+          <select class="fld-sel" id="intern-status">
+            <option value="critical">🔴 Crítico</option>
+            <option value="attention">🟡 Atenção</option>
+            <option value="normal">🟢 Estável</option>
+          </select>
+        </div>
+      </div>
+      <div class="fld-grp" style="margin-bottom:12px">
+        <label>Motivo da internação</label>
+        <input class="fld-in" id="intern-reason" placeholder="Ex: Pós-cirúrgico, insuficiência renal aguda..."/>
+      </div>
+      <div class="fld-grp" style="margin-bottom:12px">
+        <label>Médico responsável</label>
+        <input class="fld-in" id="intern-vet" placeholder="Nome do veterinário responsável"/>
+      </div>
+      <div class="fld-grp" style="margin-bottom:20px">
+        <label>Observações iniciais</label>
+        <textarea class="fld-in" id="intern-obs" rows="3" placeholder="Estado geral, medicações em uso, notas..." style="resize:vertical"></textarea>
+      </div>
+      <button class="btn btn-primary btn-md" style="width:100%;justify-content:center" onclick="saveIntern()">Salvar internação</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL DETALHE INTERNAÇÃO ── -->
+<div class="overlay hidden" id="ov-intern-detail" onclick="closeM('m-intern-detail')">
+  <div class="modal" id="m-intern-detail" onclick="event.stopPropagation()" style="max-width:560px;max-height:88vh;overflow-y:auto">
+    <div class="modal-head">
+      <div class="modal-title" id="intern-detail-title">Internação</div>
+      <button class="modal-close" onclick="closeM('m-intern-detail')">✕</button>
+    </div>
+    <div class="modal-body" id="intern-detail-content"></div>
+  </div>
+</div>
 
 <!-- ── MODAL UPGRADE DE PLANO ── -->
 <div class="overlay" id="m-upgrade">
@@ -1563,8 +1741,12 @@ class SupaQuery {
     qs = `select=${this._select}` + (qs ? '&'+qs : '');
     if(this._order) qs += `&order=${this._order}`;
     const r = await supaFetch('GET', `/rest/v1/${this._table}?${qs}`);
-    if(r?.code) return { data: null, error: r };
-    const data = this._single ? (Array.isArray(r) ? r[0]||null : r) : r;
+    if(r?.code) return { data: this._single ? null : [], error: r };
+    // Guarantee array for list queries, object/null for single
+    const raw = r ?? [];
+    const data = this._single
+      ? (Array.isArray(raw) ? raw[0]||null : raw)
+      : (Array.isArray(raw) ? raw : []);
     return { data, error: null };
   }
 
@@ -1668,6 +1850,7 @@ async function persist(){
   // Sempre salva local como fallback
   DB.s('patients_'+S.user.id, S.patients);
   DB.s('exams_'+S.user.id, S.exams);
+  DB.s('interns_'+S.user.id, S.interns);
   // Cloud sync (não bloqueia UI)
   if(DATA_MODE === 'cloud' && _supa) {
     // Patients e exams são salvos individualmente em savePatient/saveExam
@@ -1683,8 +1866,11 @@ async function loadUserData(userId){
         _supa.from('patients').select('*').eq('user_id', userId).order('created_at', {ascending:false}),
         _supa.from('exams').select('*').eq('user_id', userId).order('date', {ascending:false}),
       ]);
-      if(!pRes.error) S.patients = pRes.data.map(supaPatientToLocal);
-      if(!eRes.error) S.exams    = eRes.data.map(supaExamToLocal);
+      // Guard: only use cloud data if response is a valid array
+      if(!pRes.error && Array.isArray(pRes.data)) S.patients = pRes.data.map(supaPatientToLocal);
+      else S.patients = DB.g('patients_'+userId, []);
+      if(!eRes.error && Array.isArray(eRes.data)) S.exams = eRes.data.map(supaExamToLocal);
+      else S.exams = DB.g('exams_'+userId, []);
       // Cache locally
       DB.s('patients_'+userId, S.patients);
       DB.s('exams_'+userId, S.exams);
@@ -1696,6 +1882,7 @@ async function loadUserData(userId){
   // Local fallback
   S.patients = DB.g('patients_'+userId, []);
   S.exams    = DB.g('exams_'+userId, []);
+  S.interns  = DB.g('interns_'+userId, []);
 }
 
 // ── Converters: Supabase ↔ local format
@@ -1774,7 +1961,7 @@ const PLANS = {
     badge: '⏱ Trial',
     color: '#FEF5E7',
     colorText: '#7A4800',
-    analysesPerMonth: 9999,   // no monthly cap — daily cap instead
+    analysesPerMonth: 9999,
     analysesPerDay: 10,
     trialDays: 7,
     patients: 9999,
@@ -1786,8 +1973,9 @@ const PLANS = {
     description: '7 dias gratuitos',
     price: 'Grátis',
     priceMonthly: 0,
-    priceAnnual: 0,
-    priceAnnualTotal: 0,
+    priceQuarterly: 0,
+    priceQuarterlyTotal: 0,
+    discount: 0,
   },
   basico: {
     id: 'basico',
@@ -1806,9 +1994,9 @@ const PLANS = {
     description: 'Para clínicas veterinárias',
     price: 'R$ 67,90/mês',
     priceMonthly: 67.90,
-    priceAnnual: 54.32,           // per month when billed annually
-    priceAnnualTotal: 651.84,     // total annual (20% off)
-    discount: 20,
+    priceQuarterly: 61.11,       // por mês no plano trimestral
+    priceQuarterlyTotal: 183.33,   // total do trimestre (10% off)
+    discount: 10,
   },
   pro: {
     id: 'pro',
@@ -1816,7 +2004,7 @@ const PLANS = {
     badge: '⭐ Pro',
     color: 'var(--leaf-l)',
     colorText: 'var(--leaf-d)',
-    analysesPerMonth: 9999,
+    analysesPerMonth: 500,
     analysesPerDay: 9999,
     patients: 9999,
     exportPDF: true,
@@ -1827,9 +2015,9 @@ const PLANS = {
     description: 'Para clínicas com alto volume',
     price: 'R$ 97,90/mês',
     priceMonthly: 97.90,
-    priceAnnual: 68.53,           // per month when billed annually (30% off)
-    priceAnnualTotal: 822.36,     // total annual (30% off)
-    discount: 30,
+    priceQuarterly: 78.32,       // por mês no plano trimestral
+    priceQuarterlyTotal: 234.96,   // total do trimestre (20% off)
+    discount: 20,
   },
 };
 
@@ -1903,6 +2091,30 @@ function seedDemo(){
     {id:'e1',patientId:'p1',type:'Hemograma completo',date:'2026-04-28',status:'attention',context:'Diarreia crônica, anti-cio, abdômen aumentado',imported:true,importedFileName:'hemograma_florzinha.pdf',markers:{hemaceas:'6,03',hemoglobina:'9,6',hematocrito:'29,8',leucocitos:'14900',neutrofilos:'11026',linfocitos:'3278',plaquetas:'109000',alt:'38',creatinina:'1,1',proteinas:'7,8'},result:{summary:'Trombocitopenia moderada. Investigar piometra.',insights:[{text:'Plaquetas 109.000/mm³ — 53% abaixo do mínimo. Verificar agregados plaquetários.',level:'critical'},{text:'Neutrofilia limítrofe — resposta inflamatória discreta possível.',level:'warn'},{text:'Progestágenos + abdômen aumentado: piometra é hipótese prioritária.',level:'warn'},{text:'Eritrograma dentro dos valores de referência felinos.',level:'ok'}],recommendations:['Ultrassonografia abdominal urgente','Repetir plaquetas com nova coleta','Dosagem de ureia e creatinina pré-cirúrgica']}},
     {id:'e2',patientId:'p2',type:'Bioquímica sérica',date:'2026-04-27',status:'critical',context:'Vômitos, icterícia',imported:true,importedFileName:'bioquimica_thor.jpg',markers:{alt:'410',creatinina:'1,4',glicose:'98',proteinas:'6,2'},result:{summary:'ALT criticamente elevada — hepatotoxicidade aguda.',insights:[{text:'ALT 410 U/L — 3,5× acima do limite. Lesão hepatocelular ativa.',level:'critical'},{text:'Proteínas levemente abaixo — possível comprometimento hepático.',level:'warn'},{text:'Glicose e creatinina dentro dos valores de referência caninos.',level:'ok'}],recommendations:['Suspender hepatotóxicos','Perfil hepático completo: AST, GGT, bilirrubinas','Fluidoterapia de suporte']}},
     {id:'e3',patientId:'p3',type:'Hemograma completo',date:'2026-04-25',status:'normal',context:'Check-up rotina',imported:false,markers:{hemaceas:'7,2',hemoglobina:'11,8',hematocrito:'35',leucocitos:'9200',neutrofilos:'6440',linfocitos:'1840',plaquetas:'380000'},result:{summary:'Hemograma dentro dos valores de referência felinos.',insights:[{text:'Eritrograma sem alterações. Sem anemia.',level:'ok'},{text:'Leucograma equilibrado. Sem processo inflamatório.',level:'ok'},{text:'Plaquetas em contagem normal.',level:'ok'}],recommendations:['Manter acompanhamento semestral','Vacinação em dia']}},
+  ];
+  // Internações demo
+  S.interns = [
+    {
+      id:'int1', patientId:'p1', dateIn:'2026-05-01', status:'critical',
+      reason:'Suspeita de piometra — aguardando cirurgia', vet:'Dra. Leylla Patrick',
+      obs:'Abdômen aumentado, letargia, histórico de anti-cio.',
+      examIds:['e1'],
+      updates:[
+        {text:'Paciente estável. Aguardando resultado de ultrassom.', status:'critical', at:'2026-05-02T09:00:00Z'},
+        {text:'Ultrassom confirmou piometra. Cirurgia agendada para amanhã.', status:'critical', at:'2026-05-03T14:30:00Z'},
+      ],
+      createdAt:'2026-05-01T10:00:00Z',
+    },
+    {
+      id:'int2', patientId:'p2', dateIn:'2026-04-30', status:'attention',
+      reason:'Hepatotoxicidade aguda — ALT 410 U/L', vet:'Dra. Leylla Patrick',
+      obs:'Fluidoterapia em andamento. Suspensas medicações hepatotóxicas.',
+      examIds:['e2'],
+      updates:[
+        {text:'Iniciada fluidoterapia IV. ALT ainda elevada mas estável.', status:'attention', at:'2026-05-01T08:00:00Z'},
+      ],
+      createdAt:'2026-04-30T16:00:00Z',
+    },
   ];
   persist();
 }
@@ -2119,19 +2331,40 @@ async function enter(acc, isNew = false){
   try { history.replaceState({screen:'dashboard'},'','#dashboard'); } catch(e){}
   document.getElementById('auth').style.display='none';
   document.getElementById('app').style.display='block';
-  updateUserUI(); updateKeyUI(); updatePlanUI(); nav('dashboard');
+  updateUserUI(); updateKeyUI(); updatePlanUI();
+
+  // ── New user: show plan selection onboarding
+  const isNewUser = isNew || (!acc.onboardingDone && !acc.isDemo);
+  if(isNewUser && !acc.isDemo){
+    // Small delay so UI renders first
+    setTimeout(()=>{
+      nav('onboarding');
+      renderOnboarding();
+    }, 100);
+    return;
+  }
+
+  // ── Trial expired: show wall immediately
+  if(checkTrialWall()) return;
+
+  nav('dashboard');
 
   // Show personalized welcome message
   const name = acc.name || acc.email || '';
   if(!acc.isDemo){
     setTimeout(() => showWelcome(name, isNew ? 'new' : 'returning'), 600);
+    // Inicia lembretes de internação
+    startInternReminders();
+    // Atualiza badge
+    updateInternBadge();
   }
 }
 
 function doLogout(){
   if(_supa && DATA_MODE === 'cloud') _supa.auth.signOut();
   S.user=null;
-  S.patients=[]; S.exams=[]; S.currentResult=null;
+  S.patients=[]; S.exams=[]; S.currentResult=null; S.interns=[];
+  if(_internReminderTimer){ clearInterval(_internReminderTimer); _internReminderTimer=null; }
   DATA_MODE = 'local';
   document.getElementById('app').style.display='none';
   document.getElementById('auth').style.display='flex';
@@ -2310,14 +2543,824 @@ function showWelcomeToast(msg){
 }
 
 /* ══════════════════════════════════════════════
+   ONBOARDING — plan selection (first login)
+══════════════════════════════════════════════ */
+function renderOnboarding(){
+  const el = document.getElementById('onboarding-content');
+  if(!el) return;
+
+  el.innerHTML = `
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:48px;margin-bottom:12px">🐾</div>
+      <div style="font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-1.5px;margin-bottom:8px">
+        Bem-vindo ao <em style="color:var(--leaf);font-style:normal">DiagnoVet IA</em>!
+      </div>
+      <div style="font-size:14px;color:var(--mist);max-width:400px;margin:0 auto;line-height:1.7">
+        Escolha o plano ideal para começar. Você pode mudar de plano a qualquer momento.
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px" id="ob-cards">
+
+      <!-- Trial -->
+      <div style="border:1.5px solid var(--fog);border-radius:var(--r16);padding:20px;background:var(--snow);position:relative;cursor:pointer;transition:border-color var(--d-fast) var(--e-out),box-shadow var(--d-fast) var(--e-out)"
+           onclick="selectOnboardingPlan('trial')"
+           onmouseover="this.style.borderColor='var(--amber)';this.style.boxShadow='0 4px 20px rgba(232,145,26,.15)'"
+           onmouseout="this.style.borderColor='var(--fog)';this.style.boxShadow='none'">
+        <div style="font-size:24px;margin-bottom:8px">⏱</div>
+        <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Trial</div>
+        <div style="font-size:22px;font-weight:800;color:var(--amber);font-family:'Sora',sans-serif;letter-spacing:-1px;margin-bottom:8px">Grátis</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">7 dias · 10 exames/dia<br/>Sem cartão de crédito</div>
+        <div style="font-size:11px;color:var(--mist);display:flex;flex-direction:column;gap:5px">
+          <div>✓ Todos os tipos de exame</div>
+          <div>✓ 4 espécies animais</div>
+          <div style="color:var(--fog)">✗ Exportar PDF</div>
+          <div style="color:var(--fog)">✗ Análises ilimitadas</div>
+        </div>
+        <button style="width:100%;margin-top:16px;padding:10px;background:#FEF5E7;border:1.5px solid rgba(232,145,26,.3);border-radius:var(--r8);font-size:13px;font-weight:800;color:#7A4800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+          Começar trial grátis
+        </button>
+      </div>
+
+      <!-- Básico -->
+      <div style="border:1.5px solid var(--fog);border-radius:var(--r16);padding:20px;background:var(--snow);position:relative;cursor:pointer;transition:border-color var(--d-fast) var(--e-out),box-shadow var(--d-fast) var(--e-out)"
+           onclick="selectOnboardingPlan('basico')"
+           onmouseover="this.style.borderColor='var(--leaf)';this.style.boxShadow='0 4px 20px rgba(22,168,126,.15)'"
+           onmouseout="this.style.borderColor='var(--fog)';this.style.boxShadow='none'">
+        <div style="font-size:24px;margin-bottom:8px">📋</div>
+        <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Básico</div>
+        <div style="margin-bottom:8px">
+          <span style="font-size:22px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;67,900</span>
+          <span style="font-size:11px;color:var(--mist)">/mês</span>
+        </div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">200 análises/mês<br/>ou R$&nbsp;54,32/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);display:flex;flex-direction:column;gap:5px">
+          <div>✓ 200 análises/mês</div>
+          <div>✓ Exportar PDF</div>
+          <div>✓ Pacientes ilimitados</div>
+          <div style="color:var(--fog)">✗ Análises ilimitadas</div>
+        </div>
+        <button style="width:100%;margin-top:16px;padding:10px;background:var(--leaf-l);border:1.5px solid rgba(22,168,126,.3);border-radius:var(--r8);font-size:13px;font-weight:800;color:var(--leaf-d);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+          Escolher Básico
+        </button>
+      </div>
+
+      <!-- Pro -->
+      <div style="border:2px solid var(--leaf);border-radius:var(--r16);padding:20px;background:var(--leaf-xl);position:relative;cursor:pointer;transition:box-shadow var(--d-fast) var(--e-out)"
+           onclick="selectOnboardingPlan('pro')"
+           onmouseover="this.style.boxShadow='0 8px 32px rgba(22,168,126,.25)'"
+           onmouseout="this.style.boxShadow='none'">
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--night);color:var(--snow);font-size:10px;font-weight:800;padding:3px 12px;border-radius:20px;white-space:nowrap;letter-spacing:.04em">⭐ MAIS POPULAR</div>
+        <div style="font-size:24px;margin-bottom:8px">⚡</div>
+        <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Pro</div>
+        <div style="margin-bottom:8px">
+          <span style="font-size:22px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,900</span>
+          <span style="font-size:11px;color:var(--mist)">/mês</span>
+        </div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">Ilimitadas/mês<br/>ou R$&nbsp;68,53/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--ink2);display:flex;flex-direction:column;gap:5px">
+          <div>✓ Análises ilimitadas</div>
+          <div>✓ Exportar PDF e JSON</div>
+          <div>✓ Suporte prioritário</div>
+          <div>✓ Pacientes ilimitados</div>
+        </div>
+        <button style="width:100%;margin-top:16px;padding:10px;background:var(--leaf);border:none;border-radius:var(--r8);font-size:13px;font-weight:800;color:var(--snow);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+          Escolher Pro
+        </button>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:12px;color:var(--mist)">
+      Para assinar Básico ou Pro entre em contato: <strong style="color:var(--leaf-d)">contato@diagnovet.com.br</strong>
+    </div>
+
+    <!-- Responsive: stack on mobile -->
+    <style>
+      @media(max-width:600px){
+        #ob-cards { grid-template-columns: 1fr !important; }
+      }
+    </style>
+  `;
+}
+
+function selectOnboardingPlan(planId){
+  if(!S.user) return;
+
+  if(planId === 'trial'){
+    // Mark onboarding done and go to dashboard
+    S.user.plan = 'trial';
+    S.user.planExpiry = new Date(Date.now() + 7*24*60*60*1000).toISOString();
+    S.user.onboardingDone = true;
+    _saveUserPlan(planId);
+    updatePlanUI();
+    nav('dashboard');
+    setTimeout(()=>showWelcome(S.user.name||'', 'new'), 400);
+    return;
+  }
+
+  // Paid plan — show upgrade modal then go to dashboard
+  S.user.onboardingDone = true;
+  _saveUserPlan('trial'); // keep trial while payment is pending
+  nav('dashboard');
+  setTimeout(()=>{ openUpgradeModal('general'); }, 500);
+}
+
+function _saveUserPlan(planId){
+  // Save to localStorage
+  const accs = DB.g('accounts',[]);
+  const idx = accs.findIndex(a=>a.id===S.user.id);
+  if(idx>=0){ accs[idx].plan=planId; accs[idx].onboardingDone=true;
+    accs[idx].planExpiry=S.user.planExpiry; DB.s('accounts',accs); }
+  // Save to Supabase
+  if(DATA_MODE==='cloud'&&_supa&&S.user.id){
+    _supa.from('profiles').update({plan:planId, onboarding_done:true})
+      .eq('id',S.user.id).then(()=>{});
+  }
+}
+
+/* ══════════════════════════════════════════════
+   TRIAL WALL — blocks app after trial expires
+══════════════════════════════════════════════ */
+function renderTrialExpired(){
+  const el = document.getElementById('trial-expired-content');
+  if(!el) return;
+
+  el.innerHTML = `
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--ruby-l);border:2px solid rgba(220,53,69,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px">⏱</div>
+      <div style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-1px;margin-bottom:8px">
+        Seu trial expirou
+      </div>
+      <div style="font-size:14px;color:var(--mist);line-height:1.7;max-width:380px;margin:0 auto">
+        Seus 7 dias de teste chegaram ao fim. Escolha um plano para continuar usando o <strong style="color:var(--leaf-d)">DiagnoVet IA</strong> e nunca perder seus diagnósticos.
+      </div>
+    </div>
+
+    <!-- Plan cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+
+      <!-- Básico -->
+      <div style="border:1.5px solid var(--fog);border-radius:var(--r16);padding:20px;background:var(--snow)">
+        <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px">Básico</div>
+        <div style="margin-bottom:10px">
+          <span style="font-size:24px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;67,900</span>
+          <span style="font-size:11px;color:var(--mist)">/mês</span>
+        </div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;54,32/mês no trimestral</div>
+        <div style="background:#E8F5EE;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--leaf-d);font-weight:600;margin:10px 0">
+          💰 Economize 20% no plano trimestral<br/>R$&nbsp;651,84/ano
+        </div>
+        <div style="font-size:11px;color:var(--mist);line-height:1.8;margin-bottom:14px">
+          ✓ 200 análises/mês<br/>
+          ✓ PDF e JSON<br/>
+          ✓ Pacientes ilimitados
+        </div>
+        <button class="btn-auth" onclick="selectExpiredPlan('basico')" style="border-radius:var(--r8);font-size:13px;padding:11px;background:var(--ink)">
+          Assinar Básico
+        </button>
+      </div>
+
+      <!-- Pro -->
+      <div style="border:2px solid var(--leaf);border-radius:var(--r16);padding:20px;background:var(--leaf-xl);position:relative">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 10px;border-radius:20px;white-space:nowrap">⭐ RECOMENDADO</div>
+        <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px">Pro</div>
+        <div style="margin-bottom:10px">
+          <span style="font-size:24px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,900</span>
+          <span style="font-size:11px;color:var(--mist)">/mês</span>
+        </div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;68,53/mês no trimestral</div>
+        <div style="background:rgba(22,168,126,.1);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--leaf-d);font-weight:600;margin:10px 0">
+          💰 Economize 30% no plano trimestral<br/>R$&nbsp;822,36/ano
+        </div>
+        <div style="font-size:11px;color:var(--ink2);line-height:1.8;margin-bottom:14px">
+          ✓ Análises ilimitadas<br/>
+          ✓ PDF e JSON<br/>
+          ✓ Suporte prioritário
+        </div>
+        <button class="btn-auth" onclick="selectExpiredPlan('pro')" style="border-radius:var(--r8);font-size:13px;padding:11px">
+          Assinar Pro
+        </button>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:12px;color:var(--mist);line-height:1.7">
+      Para assinar entre em contato: <strong style="color:var(--leaf-d)">contato@diagnovet.com.br</strong><br/>
+      <span style="font-size:11px">Seus dados ficam salvos — nada é perdido ao assinar.</span>
+    </div>
+
+    <div style="margin-top:16px;text-align:center">
+      <button onclick="doLogout()" style="background:none;border:none;font-size:12px;color:var(--mist);cursor:pointer;text-decoration:underline">
+        Sair da conta
+      </button>
+    </div>
+  `;
+}
+
+function selectExpiredPlan(planId){
+  toast(`Para assinar o plano ${PLANS[planId].name}, entre em contato: contato@diagnovet.com.br`, 'ok');
+}
+
+// ── Check trial wall on every nav — blocks if expired
+function checkTrialWall(){
+  if(!S.user || S.user.isDemo) return false;
+  const ts = getTrialStatus();
+  if(ts.active && ts.expired){
+    // Force trial expired screen — no escape
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    document.getElementById('sc-trial-expired')?.classList.add('on');
+    renderTrialExpired();
+    return true; // blocked
+  }
+  return false;
+}
+
+/* ══════════════════════════════════════════════
+   INTERNAÇÃO — lógica completa
+══════════════════════════════════════════════ */
+
+const INTERN_STATUS = {
+  critical:   { label:'Crítico',  emoji:'🔴', color:'var(--ruby)',  bg:'var(--ruby-l)',  tagBg:'#FEF0F1', tagFg:'#8B1A20' },
+  attention:  { label:'Atenção',  emoji:'🟡', color:'var(--amber)', bg:'var(--amber-l)', tagBg:'#FEF5E7', tagFg:'#7A4800' },
+  normal:     { label:'Estável',  emoji:'🟢', color:'var(--leaf)',  bg:'var(--leaf-l)',  tagBg:'#E6F7F3', tagFg:'#0B6B52' },
+  discharged: { label:'Alta',     emoji:'✓',  color:'var(--mist)', bg:'var(--fog)',      tagBg:'#F5F7F6', tagFg:'#5A7A6E' },
+};
+
+function openNewInternModal(internId) {
+  document.getElementById('intern-modal-title').textContent = internId ? 'Editar Internação' : 'Internar Paciente';
+  document.getElementById('intern-date-in').value = new Date().toISOString().slice(0,10);
+  document.getElementById('intern-reason').value = '';
+  document.getElementById('intern-obs').value = '';
+  document.getElementById('intern-status').value = 'critical';
+  document.getElementById('intern-vet').value = S.user?.name || '';
+
+  // Populate patient dropdown — ALL patients, ambulatorial or not
+  const sel = document.getElementById('intern-patient-sel');
+  const activeIds = new Set(S.interns.filter(i=>i.status!=='discharged').map(i=>i.patientId));
+
+  // Group: available first, already interned after
+  const available   = S.patients.filter(p => !activeIds.has(p.id));
+  const alreadyInt  = S.patients.filter(p => activeIds.has(p.id) && !internId);
+
+  let options = '<option value="">— Selecionar paciente —</option>';
+  options += '<option value="__new__" style="color:var(--leaf-d);font-weight:700">➕ Novo paciente (cadastrar agora)</option>';
+
+  if(available.length) {
+    options += '<optgroup label="Pacientes disponíveis">';
+    options += available.map(p => {
+      const lastExam = S.exams.filter(e=>e.patientId===p.id).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+      const lastInfo = lastExam ? ` · último exame: ${new Date(lastExam.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}` : '';
+      return `<option value="${p.id}">${escapeHTML(p.name)} — ${escapeHTML(p.species)}${escapeHTML(p.breed?' ('+p.breed+')':'')}${lastInfo}</option>`;
+    }).join('');
+    options += '</optgroup>';
+  }
+
+  if(alreadyInt.length) {
+    options += '<optgroup label="Já internados (ativos)">';
+    options += alreadyInt.map(p =>
+      `<option value="${p.id}" disabled style="color:var(--mist)">${escapeHTML(p.name)} — ${escapeHTML(p.species)} (já internado)</option>`
+    ).join('');
+    options += '</optgroup>';
+  }
+
+  if(!S.patients.length) {
+    options += '<option value="" disabled>Nenhum paciente cadastrado ainda</option>';
+  }
+
+  sel.innerHTML = options;
+
+  if(internId) {
+    const intern = S.interns.find(i=>i.id===internId);
+    if(intern) {
+      sel.value = intern.patientId;
+      document.getElementById('intern-date-in').value = intern.dateIn;
+      document.getElementById('intern-status').value = intern.status;
+      document.getElementById('intern-reason').value = intern.reason || '';
+      document.getElementById('intern-obs').value = intern.obs || '';
+      document.getElementById('intern-vet').value = intern.vet || '';
+      document.getElementById('m-intern').dataset.editId = internId;
+    }
+  } else {
+    delete document.getElementById('m-intern').dataset.editId;
+  }
+
+  openM('m-intern');
+}
+
+function checkNewPatientOption(val) {
+  const form = document.getElementById('intern-new-patient-form');
+  if(form) form.style.display = val === '__new__' ? 'block' : 'none';
+}
+
+function saveIntern() {
+  let patientId = document.getElementById('intern-patient-sel').value;
+  const dateIn  = document.getElementById('intern-date-in').value;
+  const status  = document.getElementById('intern-status').value;
+  const reason  = document.getElementById('intern-reason').value.trim();
+  const obs     = document.getElementById('intern-obs').value.trim();
+  const vet     = document.getElementById('intern-vet').value.trim();
+
+  // Criar novo paciente inline
+  if(patientId === '__new__') {
+    const newName = document.getElementById('inp-name')?.value.trim();
+    if(!newName) { toast('Informe o nome do novo paciente.','warn'); return; }
+    const newPatient = {
+      id: 'p' + Date.now(),
+      name:    newName,
+      species: document.getElementById('inp-species')?.value || 'Canino',
+      breed:   document.getElementById('inp-breed')?.value.trim() || '',
+      owner:   document.getElementById('inp-owner')?.value.trim() || '',
+      sex: '', age: '', weight: '', history: '',
+      createdAt: new Date().toISOString().slice(0,10),
+    };
+    S.patients.unshift(newPatient);
+    patientId = newPatient.id;
+    populatePatientDropdown();
+    toast(`Paciente "${newPatient.name}" cadastrado.`, 'ok');
+  }
+
+  if(!patientId) { toast('Selecione um paciente.','warn'); return; }
+  if(!dateIn)    { toast('Informe a data de entrada.','warn'); return; }
+  if(!reason)    { toast('Informe o motivo da internação.','warn'); return; }
+
+  const editId = document.getElementById('m-intern').dataset.editId;
+
+  if(editId) {
+    const idx = S.interns.findIndex(i=>i.id===editId);
+    if(idx>=0) {
+      S.interns[idx] = { ...S.interns[idx], patientId, dateIn, status, reason, obs, vet, updatedAt: new Date().toISOString() };
+    }
+    toast('Internação atualizada.','ok');
+  } else {
+    S.interns.unshift({
+      id: 'int' + Date.now(),
+      patientId, dateIn, status, reason, obs, vet,
+      examIds: [],
+      updates: [],
+      createdAt: new Date().toISOString(),
+    });
+    toast('Paciente internado com sucesso.','ok');
+  }
+
+  persist();
+  closeM('m-intern');
+  // Reset new patient form
+  const npForm = document.getElementById('intern-new-patient-form');
+  if(npForm) npForm.style.display = 'none';
+  const npName = document.getElementById('inp-name');
+  if(npName) npName.value = '';
+  updateInternBadge();
+  renderInternList();
+}
+
+function filterIntern(filter, btn) {
+  S.internFilter = filter;
+  document.querySelectorAll('[id^="ifl-"]').forEach(b => {
+    b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+    b.className = 'btn btn-ghost btn-sm';
+  });
+  btn.style.background = 'var(--night)';
+  btn.style.color = 'var(--snow)';
+  btn.style.borderColor = 'var(--night)';
+  renderInternList();
+}
+
+function renderInternList() {
+  const el = document.getElementById('intern-list');
+  const summary = document.getElementById('intern-summary');
+  if(!el) return;
+
+  const active = S.interns.filter(i=>i.status!=='discharged');
+  const crit   = active.filter(i=>i.status==='critical').length;
+  const att    = active.filter(i=>i.status==='attention').length;
+
+  if(summary) {
+    summary.textContent = `${active.length} internado${active.length!==1?'s':''} · ${crit} crítico${crit!==1?'s':''} · ${att} em atenção`;
+  }
+
+  let list = [...S.interns];
+  if(S.internFilter && S.internFilter !== 'all') {
+    list = list.filter(i=>i.status===S.internFilter);
+  }
+
+  // Sort: critical first, then attention, then normal, then discharged
+  const order = {critical:0,attention:1,normal:2,discharged:3};
+  list.sort((a,b)=>(order[a.status]||0)-(order[b.status]||0));
+
+  if(!list.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:48px 0">
+      <div class="es-icon">🏥</div>
+      <div class="es-title">Nenhuma internação ${S.internFilter==='all'?'registrada':'neste filtro'}</div>
+      <div class="es-sub">Clique em "Novo paciente" para cadastrar e internar.</div>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(intern => {
+    const patient  = S.patients.find(p=>p.id===intern.patientId) || {name:'Paciente removido',species:'—'};
+    const st       = INTERN_STATUS[intern.status] || INTERN_STATUS.normal;
+    const dateIn   = intern.dateIn ? new Date(intern.dateIn+'T12:00:00') : null;
+    const today    = new Date();
+    const days     = dateIn ? Math.floor((today-dateIn)/(1000*60*60*24)) : 0;
+    const lastExam = (intern.examIds||[]).map(id=>S.exams.find(e=>e.id===id)).filter(Boolean).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    const lastUpd  = (intern.updates||[]).slice(-1)[0];
+
+    return `<div class="card cp" style="margin-bottom:12px;border-left:3px solid ${st.color};cursor:pointer" onclick="openInternDetail('${intern.id}')">
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="width:44px;height:44px;border-radius:50%;background:${st.bg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${EMOJ[patient.species]||'🐾'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+            <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.3px">${escapeHTML(patient.name)}</div>
+            <span style="background:${st.tagBg};color:${st.tagFg};font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:.04em">${st.emoji} ${st.label.toUpperCase()}</span>
+            ${intern.status!=='discharged' ? `<span style="background:var(--fog);color:var(--mist);font-size:10px;padding:2px 8px;border-radius:20px">${days}d internado</span>` : ''}
+          </div>
+          <div style="font-size:12px;color:var(--mist);margin-bottom:6px">${escapeHTML(patient.species)} · ${escapeHTML(patient.age||'—')} · Entrada: ${dateIn?dateIn.toLocaleDateString('pt-BR'):'—'}</div>
+          <div style="font-size:13px;color:var(--ink2);margin-bottom:6px"><strong>Motivo:</strong> ${escapeHTML(intern.reason||'—')}</div>
+          ${lastUpd ? `<div style="font-size:12px;color:var(--mist);font-style:italic">Última atualização: "${escapeHTML(lastUpd.text.slice(0,60))}${lastUpd.text.length>60?'…':''}"</div>` : ''}
+          ${lastExam ? `<div style="font-size:12px;color:var(--leaf-d);margin-top:4px">📋 Último exame: ${lastExam.type} — ${new Date(lastExam.date+'T12:00:00').toLocaleDateString('pt-BR')}</div>` : ''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openInternDetail('${intern.id}')" style="font-size:11px">Ver detalhes</button>
+          ${intern.status!=='discharged' ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();giveDischarge('${intern.id}')" style="font-size:11px;color:var(--leaf-d);border-color:rgba(22,168,126,.3)">Dar alta</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openInternDetail(internId) {
+  const intern  = S.interns.find(i=>i.id===internId);
+  if(!intern) return;
+  const patient = S.patients.find(p=>p.id===intern.patientId)||{name:'—',species:'—',breed:'—',age:'—',weight:'—'};
+  const st      = INTERN_STATUS[intern.status]||INTERN_STATUS.normal;
+  const dateIn  = intern.dateIn ? new Date(intern.dateIn+'T12:00:00') : null;
+  const today   = new Date();
+  const days    = dateIn ? Math.floor((today-dateIn)/(1000*60*60*1000*24)) : 0;
+  const exams   = (intern.examIds||[]).map(id=>S.exams.find(e=>e.id===id)).filter(Boolean).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const updates = intern.updates||[];
+
+  // ── Build merged timeline: updates + exams sorted by date
+  const tlEvents = [
+    // entrada
+    { type:'entry', at: intern.createdAt||intern.dateIn+'T00:00:00Z', status: intern.status,
+      text: `Internação iniciada — ${intern.reason||'motivo não informado'}` },
+    // atualizações clínicas
+    ...updates.map(u => ({ type:'update', at: u.at, status: u.status, text: u.text })),
+    // exames
+    ...exams.map(e => ({ type:'exam', at: e.date+'T12:00:00Z', status: e.status,
+      text: e.type||'Exame', examId: e.id })),
+    // alta (se tiver)
+    ...(intern.status==='discharged' && intern.dateOut
+      ? [{ type:'discharge', at: intern.dateOut+'T23:59:00Z', status:'discharged', text:'Alta médica concedida' }]
+      : []),
+  ].sort((a,b)=>new Date(a.at)-new Date(b.at));
+
+  // Navigate to study screen and render intern timeline there
+  nav('result'); // usa a sc-result que já tem study-content? não — usa sc-study
+  // Actually navigate to patients → use sc-study via openStudy path
+  // We'll render into study-content directly
+  const studyEl = document.getElementById('study-content');
+  if(!studyEl){ toast('Erro ao abrir detalhes.','err'); return; }
+
+  // Push to nav history
+  _navHistory.push('intern-detail');
+  try { history.pushState({screen:'intern-detail'},'','#intern-detail'); } catch(e){}
+  updateBackBtn();
+
+  // Show study screen
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('sc-study')?.classList.add('on');
+  document.getElementById('page-title').textContent = `Internação — ${patient.name}`;
+
+  studyEl.innerHTML = `
+    <!-- Hero dark -->
+    <div class="study-hero" style="margin-bottom:18px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:4px;letter-spacing:.04em">
+            INTERNAÇÃO · ${dateIn?dateIn.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'—'}
+          </div>
+          <div style="font-family:'Sora',sans-serif;font-size:22px;color:var(--snow);letter-spacing:-.5px;margin-bottom:5px">${escapeHTML(patient.name)}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:12px">${escapeHTML(patient.species)} · ${escapeHTML(patient.breed||'—')} · ${escapeHTML(patient.age||'—')} · ${escapeHTML(patient.weight||'—')}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span style="background:${st.tagBg};color:${st.tagFg};font-size:11px;font-weight:800;padding:3px 12px;border-radius:20px">${st.emoji} ${st.label}</span>
+            <span style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;padding:3px 10px;border-radius:20px">${days} dia${days!==1?'s':''} internado</span>
+            <span style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:11px;padding:3px 10px;border-radius:20px">👨‍⚕️ ${escapeHTML(intern.vet||S.user?.name||'—')}</span>
+          </div>
+          ${intern.reason?`<div style="margin-top:12px;padding-top:10px;border-top:0.5px solid rgba(255,255,255,.08);font-size:12px;color:rgba(255,255,255,.4)"><span style="color:rgba(255,255,255,.6);font-weight:600">Motivo: </span>${escapeHTML(intern.reason)}</div>`:''}
+        </div>
+        <div style="text-align:center;flex-shrink:0">
+          <div style="width:64px;height:64px;border-radius:50%;background:${st.tagBg};border:3px solid ${st.color};display:flex;align-items:center;justify-content:center;font-size:28px">${EMOJ[patient.species]||'🐾'}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;letter-spacing:.04em">${days}d</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Linha do tempo -->
+    <div class="card cp" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:4px">Linha do tempo da internação</div>
+      <div class="card-sub" style="margin-bottom:16px">${tlEvents.length} evento${tlEvents.length!==1?'s':''} registrado${tlEvents.length!==1?'s':''}</div>
+
+      <div style="position:relative;padding-left:28px">
+        <!-- Linha vertical -->
+        <div style="position:absolute;left:10px;top:8px;bottom:8px;width:2px;background:var(--fog);border-radius:1px"></div>
+
+        ${tlEvents.map((ev, i) => {
+          const evSt   = INTERN_STATUS[ev.status]||INTERN_STATUS.normal;
+          const isLast = i === tlEvents.length-1;
+          const evDate = new Date(ev.at);
+          const evDateStr = evDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+          const evTimeStr = evDate.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+          const icons = { entry:'🏥', update:'📝', exam:'🔬', discharge:'✅' };
+          const dotBg = ev.type==='discharge' ? 'var(--leaf)' : ev.type==='entry' ? 'var(--night)' : evSt.color;
+
+          return `<div style="position:relative;display:flex;gap:12px;margin-bottom:${isLast?0:16}px;align-items:flex-start">
+            <!-- Dot -->
+            <div style="position:absolute;left:-22px;top:2px;width:16px;height:16px;border-radius:50%;background:${dotBg};border:2px solid var(--snow);display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;box-shadow:0 0 0 2px ${dotBg}22">${ev.type==='discharge'?'✓':''}</div>
+
+            <!-- Content -->
+            <div style="flex:1;background:var(--paper);border-radius:var(--r8);padding:10px 12px;border:1px solid var(--fog);border-left:2px solid ${dotBg}">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="font-size:13px">${icons[ev.type]||'📌'}</span>
+                  <span style="font-size:12px;font-weight:700;color:var(--ink)">${
+                    ev.type==='entry'    ? 'Entrada' :
+                    ev.type==='exam'     ? `Exame — ${escapeHTML(ev.text)}` :
+                    ev.type==='discharge'? 'Alta médica' :
+                    'Atualização clínica'
+                  }</span>
+                  <span style="background:${evSt.tagBg};color:${evSt.tagFg};font-size:9px;font-weight:800;padding:1px 7px;border-radius:20px">${evSt.emoji} ${evSt.label}</span>
+                </div>
+                <div style="font-size:10px;color:var(--mist);white-space:nowrap">${evDateStr} ${evTimeStr}</div>
+              </div>
+              ${ev.type!=='exam' ? `<div style="font-size:12px;color:var(--ink2);line-height:1.5">${escapeHTML(ev.text)}</div>` : ''}
+              ${ev.type==='exam' && ev.examId ? `
+                <button onclick="openStudy('${ev.examId}')"
+                  style="margin-top:6px;background:none;border:1px solid var(--fog);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--leaf-d);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+                  Ver resultado completo →
+                </button>` : ''}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Adicionar atualização -->
+    ${intern.status!=='discharged' ? `
+    <div class="card cp" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:12px">Registrar atualização</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        ${Object.entries(INTERN_STATUS).filter(([k])=>k!=='discharged').map(([k,v])=>`
+          <button onclick="updateInternStatus('${internId}','${k}');openInternDetail('${internId}')"
+            style="padding:7px 14px;border-radius:var(--r999);border:1.5px solid ${k===intern.status?v.color:'var(--fog)'};background:${k===intern.status?v.tagBg:'transparent'};color:${k===intern.status?v.tagFg:'var(--mist)'};font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+            ${v.emoji} ${v.label}
+          </button>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px">
+        <input class="fld-in" id="intern-upd-text" placeholder="Descreva a evolução clínica do paciente..." style="flex:1"/>
+        <button class="btn btn-primary btn-sm" onclick="addInternUpdateAndRefresh('${internId}')">Salvar</button>
+      </div>
+    </div>` : `
+    <div style="background:var(--leaf-l);border-radius:var(--r12);padding:14px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-size:20px">✅</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--leaf-d)">Alta concedida em ${intern.dateOut ? new Date(intern.dateOut+'T12:00:00').toLocaleDateString('pt-BR') : '—'}</div>
+        <div style="font-size:12px;color:var(--mist)">Internação encerrada</div>
+      </div>
+    </div>`}
+
+    <!-- Exames da internação -->
+    ${exams.length ? `
+    <div class="card cp" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:12px">Exames realizados (${exams.length})</div>
+      ${exams.map(e => {
+        const stE = INTERN_STATUS[e.status]||INTERN_STATUS.normal;
+        return `<div class="exam-row" onclick="openStudy('${e.id}')">
+          <div class="er-icon" style="background:${stE.tagBg};font-size:16px">🔬</div>
+          <div class="er-body">
+            <div class="er-name">${escapeHTML(e.type||'Exame')}</div>
+            <div class="er-meta">${new Date(e.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})}</div>
+          </div>
+          <div class="er-right">
+            <span style="background:${stE.tagBg};color:${stE.tagFg};font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px">${stE.emoji} ${stE.label}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+
+    <!-- Ações -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="nav('intern')">← Voltar para internações</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeM('m-intern-detail');openNewInternModal('${internId}')">✏ Editar dados</button>
+      ${intern.status!=='discharged' ? `
+      <button class="btn btn-ghost btn-sm" style="color:var(--leaf-d);border-color:rgba(22,168,126,.3)"
+        onclick="giveDischarge('${internId}');nav('intern')">✓ Dar alta</button>` : ''}
+    </div>
+  `;
+}
+
+function addInternUpdateAndRefresh(internId) {
+  addInternUpdate(internId);
+  // Re-render the timeline after update
+  setTimeout(() => openInternDetail(internId), 100);
+}
+
+function updateInternStatus(internId, newStatus) {
+  const idx = S.interns.findIndex(i=>i.id===internId);
+  if(idx<0) return;
+  S.interns[idx].status = newStatus;
+  persist();
+  updateInternBadge();
+  renderInternList();
+  openInternDetail(internId);
+}
+
+function addInternUpdate(internId) {
+  const text = document.getElementById('intern-upd-text')?.value.trim();
+  if(!text) { toast('Digite uma atualização.','warn'); return; }
+  const idx = S.interns.findIndex(i=>i.id===internId);
+  if(idx<0) return;
+  if(!S.interns[idx].updates) S.interns[idx].updates = [];
+  S.interns[idx].updates.push({
+    text,
+    status: S.interns[idx].status,
+    at: new Date().toISOString(),
+  });
+  persist();
+  document.getElementById('intern-upd-text').value = '';
+  openInternDetail(internId); // re-render
+  toast('Atualização salva.','ok');
+}
+
+function giveDischarge(internId) {
+  const intern  = S.interns.find(i=>i.id===internId);
+  const patient = S.patients.find(p=>p.id===intern?.patientId);
+  showConfirm(
+    `Confirmar alta de ${patient?.name||'paciente'}?`,
+    () => {
+      const idx = S.interns.findIndex(i=>i.id===internId);
+      if(idx<0) return;
+      S.interns[idx].status = 'discharged';
+      S.interns[idx].dateOut = new Date().toISOString().slice(0,10);
+      if(!S.interns[idx].updates) S.interns[idx].updates = [];
+      S.interns[idx].updates.push({
+        text: 'Alta médica concedida.',
+        status: 'discharged',
+        at: new Date().toISOString(),
+      });
+      persist();
+      updateInternBadge();
+      renderInternList();
+      toast(`Alta de ${patient?.name||'paciente'} registrada.`,'ok');
+    }
+  );
+}
+
+function confirmDeleteIntern(internId) {
+  const intern  = S.interns.find(i=>i.id===internId);
+  const patient = S.patients.find(p=>p.id===intern?.patientId);
+  showConfirm(
+    `Remover internação de ${patient?.name||'paciente'}? Esta ação não pode ser desfeita.`,
+    () => {
+      S.interns = S.interns.filter(i=>i.id!==internId);
+      persist();
+      updateInternBadge();
+      closeM('m-intern-detail');
+      renderInternList();
+      toast('Internação removida.','ok');
+    }
+  );
+}
+
+// Link exame importado à internação ativa do paciente
+function linkExamToIntern(examId, patientId) {
+  const activeIntern = S.interns.find(i=>i.patientId===patientId && i.status!=='discharged');
+  if(!activeIntern) return;
+  if(!activeIntern.examIds) activeIntern.examIds = [];
+  if(!activeIntern.examIds.includes(examId)) {
+    activeIntern.examIds.push(examId);
+    persist();
+  }
+}
+
+// Badge de internações críticas/atenção
+function updateInternBadge() {
+  const critical = S.interns.filter(i=>i.status==='critical').length;
+  const attention = S.interns.filter(i=>i.status==='attention').length;
+  const total = critical + attention;
+
+  const badge  = document.getElementById('sb-intern-badge');
+  const mBadge = document.getElementById('intern-badge');
+  if(badge)  { badge.style.display  = total>0?'inline':'none'; badge.textContent  = total; }
+  if(mBadge) { mBadge.style.display = total>0?'flex':'none';   mBadge.textContent = total; }
+}
+
+// ── Popup de lembrete para pacientes críticos/atenção
+let _internReminderTimer = null;
+function startInternReminders() {
+  if(_internReminderTimer) clearInterval(_internReminderTimer);
+  // Mostra lembrete a cada 5 minutos enquanto estiver logado
+  _internReminderTimer = setInterval(showInternReminder, 5 * 60 * 1000);
+  // Mostra o primeiro após 30 segundos do login
+  setTimeout(showInternReminder, 30 * 1000);
+}
+
+function showInternReminder() {
+  const urgent = S.interns.filter(i=>i.status==='critical'||i.status==='attention');
+  if(!urgent.length || S.user?.isDemo) return;
+
+  // Pega um paciente aleatório dos urgentes, priorizando críticos
+  const critical = urgent.filter(i=>i.status==='critical');
+  const pool = critical.length ? critical : urgent;
+  const intern = pool[Math.floor(Math.random()*pool.length)];
+  const patient = S.patients.find(p=>p.id===intern.patientId);
+  if(!patient) return;
+
+  const st = INTERN_STATUS[intern.status];
+  const dateIn = intern.dateIn ? new Date(intern.dateIn+'T12:00:00') : null;
+  const days = dateIn ? Math.floor((new Date()-dateIn)/(1000*60*60*24)) : 0;
+  const lastUpd = (intern.updates||[]).slice(-1)[0];
+
+  const msgs = intern.status==='critical' ? [
+    `${st.emoji} ${patient.name} está em estado crítico há ${days} dia${days!==1?'s':''}. Verificar agora?`,
+    `🚨 Atenção: ${patient.name} precisa de monitoramento — internado há ${days}d em estado crítico.`,
+    `${st.emoji} Não se esqueça de ${patient.name} — estado crítico, ${days} dia${days!==1?'s':''} internado.`,
+  ] : [
+    `${st.emoji} ${patient.name} está em atenção — ${days} dia${days!==1?'s':''} de internação.`,
+    `⚠ Lembrete: ${patient.name} aguarda acompanhamento. ${days}d internado.`,
+    `${st.emoji} ${patient.name} precisa de atenção — internado há ${days} dia${days!==1?'s':''}.`,
+  ];
+  const msg = msgs[Math.floor(Math.random()*msgs.length)];
+
+  showInternToast(msg, intern.id, intern.status);
+}
+
+function showInternToast(msg, internId, status) {
+  document.getElementById('intern-reminder-toast')?.remove();
+  const st = INTERN_STATUS[status]||INTERN_STATUS.attention;
+
+  const t = document.createElement('div');
+  t.id = 'intern-reminder-toast';
+  t.style.cssText = `
+    position:fixed; bottom:${window.innerWidth<600?'76px':'24px'}; right:16px;
+    background:var(--night); border-radius:var(--r12);
+    padding:12px 16px; max-width:300px; z-index:9998;
+    box-shadow:0 8px 32px rgba(9,22,16,.45), 0 0 0 1px ${st.color}33;
+    opacity:0; transform:translateY(8px);
+    transition:opacity .3s ease, transform .3s ease;
+    cursor:pointer; border-left:3px solid ${st.color};
+  `;
+  t.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:${st.color};margin-bottom:4px;letter-spacing:.03em">
+      INTERNAÇÃO — LEMBRETE
+    </div>
+    <div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.5;margin-bottom:8px">${msg}</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeInternToast();nav('intern');openInternDetail('${internId}')"
+        style="flex:1;background:${st.color};border:none;border-radius:6px;padding:6px;font-size:11px;font-weight:800;color:var(--snow);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+        Ver paciente
+      </button>
+      <button onclick="closeInternToast()"
+        style="background:rgba(255,255,255,.08);border:none;border-radius:6px;padding:6px 10px;font-size:11px;color:rgba(255,255,255,.5);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+        Fechar
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>{ requestAnimationFrame(()=>{
+    t.style.opacity='1'; t.style.transform='translateY(0)';
+  });});
+
+  // Auto-dismiss após 6s
+  setTimeout(closeInternToast, 6000);
+}
+
+function closeInternToast() {
+  const t = document.getElementById('intern-reminder-toast');
+  if(!t) return;
+  t.style.opacity='0'; t.style.transform='translateY(8px)';
+  setTimeout(()=>t.remove(), 300);
+}
+
+/* ══════════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════════ */
-const TITLES={dashboard:'Dashboard',import:'Importar exame',exams:'Exames',patients:'Pacientes',result:'Resultado da análise',settings:'Configurações',plans:'Planos'};
+const TITLES={dashboard:'Dashboard',onboarding:'Bem-vindo ao DiagnoVet IA',plans:'Planos',intern:'Internações',import:'Importar exame',exams:'Exames',patients:'Pacientes',result:'Resultado da análise',settings:'Configurações'};
 /* ── NAV HISTORY STACK ── */
 let _navHistory = [];
 let _navIgnorePopstate = false;
 
 function nav(sc, addToHistory=true){
+  // ── Trial wall — intercept all navigation if trial expired
+  if(S.user && !S.user.isDemo && sc !== 'trial-expired'){
+    const ts = getTrialStatus();
+    if(ts.active && ts.expired){
+      checkTrialWall();
+      return;
+    }
+  }
+
   const prev = _navHistory[_navHistory.length-1];
   if(addToHistory && prev !== sc){
     _navHistory.push(sc);
@@ -2339,6 +3382,7 @@ function nav(sc, addToHistory=true){
   if(sc==='result') renderResult();
   if(sc==='import'){ populatePatientDropdown(); updateKeyUI(); }
   if(sc==='plans') renderPlansScreen();
+  if(sc==='intern') renderInternList();
 }
 
 function navBack(){
@@ -3314,7 +4358,7 @@ async function runImport() {
 
   proc.classList.remove('on');
 
-  // Build markers: AI extraction has priority, then manually edited pre-extracted fields
+  // Build markers: AI extraction has priority, then mtrimestrally edited pre-extracted fields
   const markers = {};
 
   if (aiResult?.extractedValues) {
@@ -3395,9 +4439,11 @@ async function runImport() {
 
   S.exams.unshift(exam);
   persist();
-  incrementUsage(); // ← track usage against plan quota
+  incrementUsage();
   if(getUserPlan().id === 'trial') incrementDailyUsage();
-  saveExamCloud(exam); // ← sync to Supabase (non-blocking)
+  saveExamCloud(exam);
+  // Vincula exame à internação ativa do paciente (se houver)
+  if(exam.patientId) linkExamToIntern(exam.id, exam.patientId);
 
   S.currentResult = {
     patient, exam,
@@ -3689,7 +4735,7 @@ function renderResult(){
     <!-- ══ HERO HEADER ══ -->
     <div class="result-hero" style="margin-bottom:16px">
       <div style="flex:1">
-        <div class="rh-eyebrow">📊 ANÁLISE CLÍNICA · ${exam.type} · ${exam.imported?'📥 Importado':'Manual'} · ${dateStr}</div>
+        <div class="rh-eyebrow">📊 ANÁLISE CLÍNICA · ${exam.type} · ${exam.imported?'📥 Importado':'Mtrimestral'} · ${dateStr}</div>
         <div class="rh-name">${escapeHTML(patient.name)}</div>
         <div class="rh-meta">${patient.species} · ${patient.breed||'SRD'} · ${patient.age||'—'} · ${patient.weight||'—'}</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
@@ -3987,7 +5033,7 @@ function renderPlansScreen(){
       ctaHtml = `<div style="text-align:center;padding:10px 0;font-size:12px;font-weight:700;color:var(--leaf-d)">✓ Plano atual</div>`;
     } else if(isTrial || (isBasico && pid === 'pro')){
       ctaHtml = `<button class="btn-auth" onclick="openUpgradeModal('general')" style="border-radius:var(--r8);font-size:12px;padding:10px;margin-top:12px">
-        ${pid==='basico'?'Assinar Básico — R$&nbsp;67,90/mês':'Upgrade para Pro — R$&nbsp;97,90/mês'}
+        ${pid==='basico'?'Assinar Básico — R$&nbsp;67,900/mês':'Upgrade para Pro — R$&nbsp;97,900/mês'}
       </button>`;
     }
 
@@ -4001,7 +5047,7 @@ function renderPlansScreen(){
           <span style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:${isCurr?'var(--leaf)':accentColor};letter-spacing:-1px">R$&nbsp;${pid==='basico'?'67,90':'97,90'}</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:10px">ou ${pid==='basico'?'R$&nbsp;54,32':'R$&nbsp;67,90'}/mês no plano anual</div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:10px">ou ${pid==='basico'?'R$&nbsp;54,32':'R$&nbsp;67,900'}/mês no plano trimestral</div>
         ${feat(true, pid==='basico'?'200 análises/mês':'Ilimitadas')}
         ${feat(true,'PDF e JSON')}
         ${feat(pid==='pro','Análises ilimitadas')}
@@ -4035,8 +5081,8 @@ function renderPlansScreen(){
     <div style="background:var(--night);border:1px solid rgba(22,168,126,.15);border-radius:var(--r12);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openUpgradeModal('general')">
       <div style="width:32px;height:32px;border-radius:8px;background:rgba(22,168,126,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">💰</div>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:var(--snow);margin-bottom:2px">Economize com o plano anual</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.4)">Básico: 20% off · Pro: 30% off — assine anual e economize</div>
+        <div style="font-size:13px;font-weight:700;color:var(--snow);margin-bottom:2px">Economize com o plano trimestral</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Básico: 20% off · Pro: 30% off — assine trimestral e economize</div>
       </div>
       <span style="font-size:11px;font-weight:800;color:var(--leaf);white-space:nowrap">Ver oferta →</span>
     </div>
@@ -4204,7 +5250,7 @@ function renderExams(){
         </div>
         <div class="et-cell" style="font-size:12px;color:var(--mist)">${e.context?e.context.slice(0,44)+(e.context.length>44?'…':''):'—'}</div>
         <div class="et-cell">${ds}</div>
-        <div class="et-cell">${e.imported?`<span class="tag tag-info" style="font-size:10px">📥 ${e.importedFileName||'Importado'}</span>`:'<span class="tag tag-neutral" style="font-size:10px">Manual</span>'}</div>
+        <div class="et-cell">${e.imported?`<span class="tag tag-info" style="font-size:10px">📥 ${e.importedFileName||'Importado'}</span>`:'<span class="tag tag-neutral" style="font-size:10px">Mtrimestral</span>'}</div>
         <div class="et-cell">${TAG[e.status]||''}</div>
         <div class="et-cell et-acts" onclick="event.stopPropagation()">
           <button class="ico-btn" title="Estudar" onclick="openStudy('${e.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
@@ -4501,7 +5547,7 @@ function renderPatients(){
   const q=(document.getElementById('pt-q')?.value||'').toLowerCase();
   const data=S.patients.filter(p=>!q||p.name.toLowerCase().includes(q)||(p.owner||'').toLowerCase().includes(q)||(p.species||'').toLowerCase().includes(q));
   const grid=document.getElementById('pt-grid');
-  if(!data.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🐾</div><div class="es-title">Nenhum paciente encontrado</div><div class="es-sub">Cadastre o primeiro paciente para começar.</div><button class="btn btn-primary btn-md" onclick="openM('m-patient');document.getElementById('mp-id').value=''">Novo paciente</button></div>`;return;}
+  if(!data.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🐾</div><div class="es-title">Nenhum paciente encontrado</div><div class="es-sub">Cadastre o primeiro paciente para começar.</div><button class="btn btn-primary btn-md" onclick="openPatientModal()">Novo paciente</button></div>`;return;}
   grid.innerHTML=data.map(p=>{
     const exams=S.exams.filter(e=>e.patientId===p.id);
     const last=exams[0];
@@ -4530,24 +5576,138 @@ function openPatientDetail(id){
   nav('patients');
 }
 
-function savePatient(){
-  const id=document.getElementById('mp-id').value;
-  const name=document.getElementById('mp-name').value.trim();
-  if(!name){toast('Informe o nome do paciente.','warn');return;}
-  // Patient limit — both plans unlimited
-  const data={name,species:document.getElementById('mp-species').value,breed:document.getElementById('mp-breed').value.trim(),sex:document.getElementById('mp-sex').value,age:document.getElementById('mp-age').value.trim(),weight:document.getElementById('mp-weight').value.trim(),owner:document.getElementById('mp-owner').value.trim(),history:document.getElementById('mp-history').value.trim()};
-  if(id){
-    const idx=S.patients.findIndex(p=>p.id===id);
-    if(idx>=0) S.patients[idx]={...S.patients[idx],...data};
+function openPatientModal(fromIntern=false) {
+  document.getElementById('mp-id').value = '';
+  document.getElementById('mp-title').textContent = fromIntern ? 'Novo paciente para internação' : 'Novo paciente';
+  // Toggle visibility
+  const toggle = document.getElementById('mp-type-toggle');
+  if(toggle) toggle.style.display = fromIntern ? 'none' : 'flex';
+  // If from intern — pre-configure as internado
+  if(fromIntern) {
+    document.getElementById('mp-type').value = 'internado';
+    const fields = document.getElementById('mp-intern-fields');
+    if(fields) fields.style.display = 'block';
+    const dateEl = document.getElementById('mp-intern-date');
+    if(dateEl) dateEl.value = new Date().toISOString().slice(0,10);
+    const saveBtn = document.getElementById('mp-save-btn');
+    if(saveBtn) saveBtn.textContent = '🏥 Internar paciente';
   } else {
-    S.patients.unshift({id:'p'+Date.now(),...data,createdAt:new Date().toISOString().slice(0,10)});
+    setPatientType('ambulatorial');
   }
-  persist(); closeM('m-patient');
-  ['mp-name','mp-breed','mp-age','mp-weight','mp-owner','mp-history'].forEach(k=>{const el=document.getElementById(k);if(el)el.value='';});
+  openM('m-patient');
+}
+
+function editPatientModal(id) {
+  document.getElementById('mp-id').value = id;
+  document.getElementById('mp-title').textContent = 'Editar paciente';
+  // Always show toggle on edit
+  const toggle = document.getElementById('mp-type-toggle');
+  if(toggle) toggle.style.display = 'flex';
+  setPatientType('ambulatorial');
+  // Find and fill patient data
+  const p = S.patients.find(pt=>pt.id===id);
+  if(!p) return;
+  document.getElementById('mp-name').value    = p.name||'';
+  document.getElementById('mp-species').value = p.species||'Felino';
+  document.getElementById('mp-breed').value   = p.breed||'';
+  document.getElementById('mp-sex').value     = p.sex||'Fêmea';
+  document.getElementById('mp-age').value     = p.age||'';
+  document.getElementById('mp-weight').value  = p.weight||'';
+  document.getElementById('mp-owner').value   = p.owner||'';
+  document.getElementById('mp-history').value = p.history||'';
+  openM('m-patient');
+}
+
+function setPatientType(type) {
+  document.getElementById('mp-type').value = type;
+  const ambBtn  = document.getElementById('mp-type-amb');
+  const intBtn  = document.getElementById('mp-type-int');
+  const fields  = document.getElementById('mp-intern-fields');
+  const saveBtn = document.getElementById('mp-save-btn');
+  if(type === 'internado') {
+    ambBtn.style.background = 'transparent';
+    ambBtn.style.borderColor = 'var(--fog)';
+    ambBtn.style.color = 'var(--mist)';
+    intBtn.style.background = 'var(--ruby)';
+    intBtn.style.borderColor = 'var(--ruby)';
+    intBtn.style.color = 'var(--snow)';
+    fields.style.display = 'block';
+    saveBtn.textContent = '🏥 Salvar e internar';
+    document.getElementById('mp-intern-date').value = new Date().toISOString().slice(0,10);
+  } else {
+    ambBtn.style.background = 'var(--leaf)';
+    ambBtn.style.borderColor = 'var(--leaf)';
+    ambBtn.style.color = 'var(--snow)';
+    intBtn.style.background = 'transparent';
+    intBtn.style.borderColor = 'var(--fog)';
+    intBtn.style.color = 'var(--mist)';
+    fields.style.display = 'none';
+    saveBtn.textContent = 'Salvar paciente';
+  }
+}
+
+function savePatient(){
+  const id     = document.getElementById('mp-id').value;
+  const name   = document.getElementById('mp-name').value.trim();
+  const type   = document.getElementById('mp-type')?.value || 'ambulatorial';
+  if(!name){ toast('Informe o nome do paciente.','warn'); return; }
+
+  const data = {
+    name,
+    species:  document.getElementById('mp-species').value,
+    breed:    document.getElementById('mp-breed').value.trim(),
+    sex:      document.getElementById('mp-sex').value,
+    age:      document.getElementById('mp-age').value.trim(),
+    weight:   document.getElementById('mp-weight').value.trim(),
+    owner:    document.getElementById('mp-owner').value.trim(),
+    history:  document.getElementById('mp-history').value.trim(),
+  };
+
+  let patientId = id;
+  if(id){
+    const idx = S.patients.findIndex(p=>p.id===id);
+    if(idx>=0) S.patients[idx] = {...S.patients[idx],...data};
+  } else {
+    patientId = 'p' + Date.now();
+    S.patients.unshift({ id:patientId, ...data, createdAt: new Date().toISOString().slice(0,10) });
+  }
+
+  persist();
+  closeM('m-patient');
+  ['mp-name','mp-breed','mp-age','mp-weight','mp-owner','mp-history'].forEach(k=>{
+    const el=document.getElementById(k); if(el) el.value='';
+  });
+  // Reset toggle
+  setPatientType('ambulatorial');
+
   populatePatientDropdown();
   if(document.getElementById('sc-patients').classList.contains('on')) renderPatients();
   if(document.getElementById('sc-dashboard').classList.contains('on')) renderDashboard();
-  toast(`Paciente ${name} ${id?'atualizado':'cadastrado'}.`,'ok');
+
+  // Se tipo internado → criar internação automaticamente
+  if(type === 'internado' && !id) {
+    const reason = document.getElementById('mp-intern-reason')?.value.trim() || 'Internação';
+    const status = document.getElementById('mp-intern-status')?.value || 'critical';
+    const dateIn = document.getElementById('mp-intern-date')?.value || new Date().toISOString().slice(0,10);
+    S.interns.unshift({
+      id: 'int' + Date.now(),
+      patientId,
+      dateIn, status, reason,
+      vet: S.user?.name || '',
+      obs: data.history || '',
+      examIds: [],
+      updates: [],
+      createdAt: new Date().toISOString(),
+    });
+    persist();
+    updateInternBadge();
+    toast(`${name} cadastrado e internado com sucesso! 🏥`, 'ok');
+    // Navegar para internações
+    setTimeout(() => { nav('intern'); renderInternList(); }, 400);
+    return;
+  }
+
+  toast(`Paciente ${name} ${id?'atualizado':'cadastrado'}.`, 'ok');
 }
 
 function editPatient(id){
@@ -4691,8 +5851,8 @@ function renderPlanPanel(){
       <div style="border:${isBasico?'2px solid var(--leaf)':'1px solid var(--fog)'};border-radius:var(--r12);padding:14px;background:${isBasico?'var(--leaf-xl)':'var(--paper)'};position:relative">
         ${isBasico?`<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">ATUAL</div>`:''}
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px">Básico</div>
-        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isBasico?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;67,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;54,32/mês anual</div>
+        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isBasico?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;67,900<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;61,11/mês no trimestral</div>
         ${feat(true,'200 análises/mês')}
         ${feat(true,'PDF e JSON')}
         ${feat(false,'Ilimitadas')}
@@ -4702,8 +5862,8 @@ function renderPlanPanel(){
       <div style="border:${isPro?'2px solid var(--leaf)':'1.5px solid var(--leaf)'};border-radius:var(--r12);padding:14px;background:${isPro?'var(--leaf-xl)':'var(--snow)'};position:relative">
         <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:${isPro?'var(--leaf)':'var(--night)'};color:var(--snow);font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">${isPro?'ATUAL':'⭐ PRO'}</div>
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px">Pro</div>
-        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;97,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;67,90/mês anual</div>
+        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;97,900<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;67,900/mês trimestral</div>
         ${feat(true,'Ilimitadas')}
         ${feat(true,'PDF e JSON')}
         ${feat(true,'Análises ilimitadas')}
@@ -4715,8 +5875,8 @@ function renderPlanPanel(){
     <div style="background:var(--night);border-radius:var(--r12);padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="openUpgradeModal('general')">
       <span style="font-size:16px">💰</span>
       <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--snow)">Economize com o plano anual</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.4)">Básico 20% off · Pro 30% off</div>
+        <div style="font-size:12px;font-weight:700;color:var(--snow)">Economize com o plano trimestral</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Básico 10% off · Pro 20% off</div>
       </div>
       <span style="font-size:11px;font-weight:800;color:var(--leaf)">Ver →</span>
     </div>
@@ -4737,7 +5897,7 @@ function renderPlanPanel(){
   `;
 }
 
-let _billingMode = 'monthly'; // 'monthly' | 'annual'
+let _billingMode = 'monthly'; // 'monthly' | 'quarterly'
 
 function openUpgradeModal(reason){
   const plan = getUserPlan();
@@ -4757,11 +5917,11 @@ function openUpgradeModal(reason){
       const isCurrent = plan.id === pid;
       const isPro = pid === 'pro';
       const monthlyPrice = p.priceMonthly;
-      const annualPerMonth = p.priceAnnual;
-      const annualTotal = p.priceAnnualTotal;
-      const displayPrice = mode === 'annual' ? annualPerMonth : monthlyPrice;
+      const quarterlyPerMonth = p.priceQuarterly;
+      const quarterlyTotal = p.priceQuarterlyTotal;
+      const displayPrice = mode === 'quarterly' ? quarterlyPerMonth : monthlyPrice;
       const formattedPrice = displayPrice.toFixed(2).replace('.',',');
-      const formattedAnnualTotal = annualTotal.toFixed(2).replace('.',',');
+      const formattedAnnualTotal = quarterlyTotal.toFixed(2).replace('.',',');
 
       return `
         <div style="border:${isPro?'2px':'1.5px'} solid ${isPro?'var(--leaf)':'var(--fog)'};border-radius:var(--r16);padding:20px;background:${isCurrent?'var(--leaf-xl)':isPro?'var(--snow)':'var(--snow)'};position:relative;flex:1;min-width:0">
@@ -4771,14 +5931,14 @@ function openUpgradeModal(reason){
           <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin-bottom:6px">${p.name}</div>
 
           <!-- Price display -->
-          <div style="margin-bottom:${mode==='annual'?'4':'12'}px">
+          <div style="margin-bottom:${mode==='quarterly'?'4':'12'}px">
             <span style="font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:${isCurrent?'var(--leaf)':isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-1.5px">R$&nbsp;${formattedPrice}</span>
             <span style="font-size:11px;color:var(--mist);font-weight:400">/mês</span>
           </div>
-          ${mode==='annual'?`
+          ${mode==='quarterly'?`
           <div style="font-size:11px;color:var(--mist);margin-bottom:10px">
-            R$&nbsp;${formattedAnnualTotal} à vista em 12 meses
-            <span style="background:rgba(22,168,126,.12);color:var(--leaf-d);font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px">20% OFF</span>
+            R$&nbsp;${formattedAnnualTotal} à vista em 3 meses
+            <span style="background:rgba(22,168,126,.12);color:var(--leaf-d);font-size:10px;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:4px">${p.discount}% OFF</span>
           </div>`:''}
 
           <div style="font-size:11px;color:var(--mist);margin-bottom:12px">${p.description}</div>
@@ -4803,7 +5963,7 @@ function openUpgradeModal(reason){
 
           ${!isCurrent?`
           <button class="btn-auth" onclick="selectPlan('${pid}','${mode}')" style="border-radius:var(--r8);font-size:13px;padding:11px;margin-top:0">
-            ${mode==='annual'?`Assinar anual — R$&nbsp;${formattedAnnualTotal}`:`Assinar por R$&nbsp;${formattedPrice}/mês`}
+            ${mode==='quarterly'?`Assinar trimestral — R$&nbsp;${formattedAnnualTotal}`:`Assinar por R$&nbsp;${formattedPrice}/mês`}
           </button>`:
           `<div style="text-align:center;font-size:12px;color:var(--leaf-d);font-weight:700;padding:10px 0">✓ Seu plano atual</div>`}
         </div>`;
@@ -4823,8 +5983,8 @@ function openUpgradeModal(reason){
     <div style="display:flex;justify-content:center;margin-bottom:20px">
       <div class="billing-toggle" id="billing-toggle">
         <button class="billing-opt on" id="btn-monthly" onclick="switchBilling('monthly')">Mensal</button>
-        <button class="billing-opt" id="btn-annual" onclick="switchBilling('annual')">
-          Anual <span class="annual-badge">20% OFF</span>
+        <button class="billing-opt" id="btn-quarterly" onclick="switchBilling('quarterly')">
+          Trimestral <span class="quarterly-badge" style="background:rgba(22,168,126,.15);color:var(--leaf-d);font-size:10px;font-weight:800;padding:2px 7px;border-radius:var(--r999);margin-left:5px;border:1px solid rgba(22,168,126,.25)">10/20% OFF</span>
         </button>
       </div>
     </div>
@@ -4857,7 +6017,7 @@ function openUpgradeModal(reason){
 function switchBilling(mode){
   _billingMode = mode;
   document.getElementById('btn-monthly')?.classList.toggle('on', mode==='monthly');
-  document.getElementById('btn-annual')?.classList.toggle('on', mode==='annual');
+  document.getElementById('btn-quarterly')?.classList.toggle('on', mode==='quarterly');
   const cards = document.getElementById('plan-cards');
   if(cards && window._buildUpgradeCards) cards.innerHTML = window._buildUpgradeCards(mode);
 }
@@ -4866,8 +6026,8 @@ function selectPlan(planId, billingMode){
   closeM('m-upgrade');
   const p = PLANS[planId];
   const mode = billingMode || _billingMode;
-  const price = mode === 'annual'
-    ? `R$ ${p.priceAnnualTotal.toFixed(2).replace('.',',')} /ano`
+  const price = mode === 'quarterly'
+    ? `R$ ${p.priceQuarterlyTotal.toFixed(2).replace('.',',')} /trimestre (${p.discount}% off)`
     : `R$ ${p.priceMonthly.toFixed(2).replace('.',',')} /mês`;
   toast(`Para assinar o plano ${p.name} (${price}), entre em contato: contato@diagnovet.com.br`, 'ok');
 }
