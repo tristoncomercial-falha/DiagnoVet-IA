@@ -4,9 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.workers.dev https://api.anthropic.com https://*.supabase.co https://*.supabase.io; img-src 'self' data: blob:; object-src 'none'; base-uri 'self';">
-<meta name="description" content="DiagnoVet IA — Diagnóstico veterinário com inteligência artificial."/>
+<meta name="description" content="DiagnoVet IA — VitaHub Solutions · DiagnoVet IA."/>
 <meta name="theme-color" content="#091610"/>
-<title>DiagnoVet — Diagnóstico Veterinário com IA</title>
+<title>DiagnoVet — Diagnóstico Clínico Veterinário</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -725,6 +725,810 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
 /* Sidebar API pill */
 .sb-api-txt .lbl { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.65); letter-spacing: -.05px; }
 .sb-api-txt .sub { font-size: 10px; color: rgba(255,255,255,.28); margin-top: 1px; letter-spacing: .01em; }
+
+/* ══ PREMIUM UI REFINEMENTS ══════════════════ */
+
+/* Scrollbar customizada — detalhe de produto premium */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ghost); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--mist); }
+
+/* Seleção de texto com cor da marca */
+::selection { background: rgba(22,168,126,.18); color: var(--ink); }
+
+/* Focus ring premium */
+*:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Cards com hover mais refinado */
+.card.cp {
+  cursor: pointer;
+  transition: box-shadow var(--d-fast) var(--e-out), 
+              transform var(--d-fast) var(--e-out),
+              border-color var(--d-fast) var(--e-out);
+}
+.card.cp:hover {
+  box-shadow: 0 8px 32px rgba(9,22,16,.12), 0 2px 8px rgba(9,22,16,.06);
+  transform: translateY(-1px);
+  border-color: rgba(22,168,126,.18);
+}
+.card.cp:active { transform: translateY(0); }
+
+/* Botões com transições suaves */
+.btn {
+  transition: background var(--d-fast) var(--e-out),
+              box-shadow var(--d-fast) var(--e-out),
+              transform var(--d-fast) var(--e-out),
+              border-color var(--d-fast) var(--e-out),
+              color var(--d-fast) var(--e-out);
+}
+.btn-primary:hover { 
+  box-shadow: 0 4px 16px rgba(22,168,126,.35);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); box-shadow: none; }
+
+/* Sidebar com linha de separação mais sofisticada */
+.sb-section + .sb-section { 
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 0.5px solid rgba(255,255,255,.06);
+}
+
+/* Badge de status clínico mais preciso */
+.crit-badge {
+  animation: none;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+
+/* Inputs com refinamento */
+.fld-in, .fld-sel {
+  transition: border-color var(--d-fast) var(--e-out),
+              box-shadow var(--d-fast) var(--e-out);
+}
+
+/* Auth panel left — refinamento do gradiente */
+.auth-panel-l {
+  background: linear-gradient(155deg, #0E2318 0%, #091610 55%, #060F0B 100%);
+}
+
+/* Stamp na auth — mais discreto e refinado */
+.auth-stamp {
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.12);
+  text-transform: uppercase;
+}
+
+/* Proc (loading) — mais clínico */
+.proc-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -.2px;
+  color: rgba(255,255,255,.9);
+}
+.proc-step {
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .02em;
+}
+
+/* Result hero — mais clínico */
+.result-hero {
+  background: linear-gradient(160deg, var(--night) 0%, #091610 100%);
+}
+
+/* Exam row hover */
+.exam-row {
+  transition: background var(--d-fast) var(--e-out),
+              transform var(--d-fast) var(--e-out);
+}
+.exam-row:hover { 
+  background: var(--paper);
+  transform: translateX(2px);
+}
+
+/* Modal backdrop mais preciso */
+.overlay {
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+}
+
+/* Page title na topbar */
+#page-title {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.3px;
+}
+
+/* ══ FIM PREMIUM REFINEMENTS ══════════════════ */
+
+
+/* ══ AUTH PANEL LEFT — PREMIUM REBUILD ══════════════════════ */
+
+.auth-panel-l {
+  background: 
+    radial-gradient(ellipse at top left, rgba(22,168,126,.08) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(22,168,126,.05) 0%, transparent 60%),
+    linear-gradient(160deg, #0E2318 0%, #091610 55%, #060F0B 100%);
+  padding: clamp(28px,4vw,44px) clamp(28px,4vw,48px);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(22,168,126,.08);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Texture overlay sutil */
+.auth-panel-l::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0, transparent 2px, rgba(255,255,255,.005) 2px, rgba(255,255,255,.005) 4px);
+  pointer-events: none;
+}
+
+/* Glow orbe — top right */
+.auth-panel-l::after {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(22,168,126,.14) 0%, transparent 65%);
+  animation: glow 12s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Logotype */
+.auth-logotype {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: clamp(28px,4vh,40px);
+  animation: fadeUp .6s var(--e-out) both;
+  position: relative;
+  z-index: 2;
+}
+.auth-logotype-mark {
+  width: 38px; height: 38px;
+  background: var(--leaf);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 18px rgba(22,168,126,.4), inset 0 1px 0 rgba(255,255,255,.18);
+  animation: pawBeat 4s ease-in-out infinite;
+}
+.auth-logotype-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 21px;
+  color: var(--snow);
+  letter-spacing: -.7px;
+  font-weight: 800;
+}
+.auth-logotype-name em {
+  color: var(--leaf);
+  font-style: normal;
+}
+.auth-logotype-badge {
+  display: inline-block;
+  background: rgba(22,168,126,.12);
+  color: var(--leaf);
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 99px;
+  letter-spacing: .12em;
+  border: 1px solid rgba(22,168,126,.2);
+  margin-left: 6px;
+}
+
+/* Hero block */
+.auth-hero-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Eyebrow */
+.auth-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: rgba(255,255,255,.5);
+  letter-spacing: .14em;
+  margin-bottom: 22px;
+  font-family: 'JetBrains Mono', monospace;
+  animation: fadeUp .6s .15s var(--e-out) both;
+  width: fit-content;
+}
+.auth-eyebrow-dot {
+  width: 5px; height: 5px;
+  background: var(--leaf);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(22,168,126,.18), 0 0 10px rgba(22,168,126,.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Headline */
+.auth-headline {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(28px, 3.4vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+  font-weight: 800;
+  color: var(--snow);
+  margin-bottom: 22px;
+  animation: fadeUp .6s .3s var(--e-out) both;
+}
+.auth-headline i {
+  font-style: normal;
+  color: rgba(255,255,255,.5);
+  font-weight: 400;
+}
+.auth-headline-accent {
+  display: inline-block;
+  font-style: normal;
+  background: linear-gradient(110deg, var(--leaf) 0%, #4DD4A8 50%, var(--leaf) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+  font-weight: 800;
+}
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* Lead paragraph */
+.auth-lead {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: rgba(255,255,255,.55);
+  font-weight: 300;
+  margin-bottom: 28px;
+  max-width: 440px;
+  animation: fadeUp .6s .45s var(--e-out) both;
+}
+
+/* Stats row */
+.auth-stats {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  padding: 16px 0;
+  border-top: 0.5px solid rgba(255,255,255,.08);
+  border-bottom: 0.5px solid rgba(255,255,255,.08);
+  animation: fadeUp .6s .6s var(--e-out) both;
+}
+.auth-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.auth-stat-num {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--snow);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.auth-stat-num span {
+  font-size: .55em;
+  color: var(--leaf);
+  font-weight: 600;
+  margin-left: 1px;
+  vertical-align: top;
+}
+.auth-stat-label {
+  font-size: 10px;
+  color: rgba(255,255,255,.4);
+  margin-top: 6px;
+  line-height: 1.3;
+  letter-spacing: .03em;
+  font-weight: 500;
+}
+.auth-stat-divider {
+  width: 1px;
+  background: rgba(255,255,255,.08);
+  margin: 0 12px;
+}
+
+/* Features list */
+.auth-feats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeUp .6s .75s var(--e-out) both;
+}
+.auth-feat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,.6);
+  font-weight: 400;
+}
+.auth-feat-icon {
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  background: rgba(22,168,126,.1);
+  border: 1px solid rgba(22,168,126,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Footer stamp */
+.auth-stamp {
+  margin-top: clamp(24px, 4vh, 40px);
+  padding-top: 18px;
+  border-top: 0.5px solid rgba(255,255,255,.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: rgba(255,255,255,.25);
+  letter-spacing: .08em;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  animation: fadeUp .6s .9s var(--e-out) both;
+  position: relative;
+  z-index: 2;
+}
+.auth-stamp-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.auth-stamp-mark {
+  width: 14px; height: 14px;
+  border-radius: 4px;
+  background: rgba(22,168,126,.1);
+  border: 1px solid rgba(22,168,126,.18);
+  display: flex; align-items: center; justify-content: center;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .5; transform: scale(.85); }
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .55; transform: scale(1.15); }
+}
+
+/* Hide auth-paw-hero (substituido pelos stats) */
+.auth-paw-hero { display: none !important; }
+
+/* Mobile responsiveness */
+@media (max-width: 920px) {
+  .auth-panel-l { padding: 32px 28px; }
+  .auth-stats { padding: 14px 0; }
+  .auth-stat-num { font-size: 22px; }
+  .auth-stat-divider { margin: 0 6px; }
+  .auth-headline { font-size: 26px; }
+}
+
+/* ══ FIM AUTH PANEL LEFT PREMIUM ══════════════════════ */
+
+
+/* Btn auth — com ícone */
+.btn-auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 22px;
+  background: linear-gradient(135deg, var(--ink) 0%, #1a2e22 100%);
+  color: var(--snow);
+  border: none;
+  border-radius: var(--r10);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -.1px;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all var(--d-fast) var(--e-out);
+  box-shadow: 0 4px 14px rgba(9,22,16,.15), inset 0 1px 0 rgba(255,255,255,.08);
+  position: relative;
+  overflow: hidden;
+}
+.btn-auth::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--leaf) 0%, #0D7A5C 100%);
+  opacity: 0;
+  transition: opacity var(--d-fast) var(--e-out);
+  z-index: 0;
+}
+.btn-auth > * { position: relative; z-index: 1; }
+.btn-auth:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(22,168,126,.4), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.btn-auth:hover::before { opacity: 1; }
+.btn-auth:active { transform: translateY(0); }
+.btn-auth:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+.btn-auth svg {
+  transition: transform var(--d-fast) var(--e-out);
+}
+.btn-auth:hover svg {
+  transform: translateX(3px);
+}
+
+/* Tabs — refinamento */
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--paper);
+  padding: 4px;
+  border-radius: var(--r10);
+  margin-bottom: 22px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mist);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all var(--d-fast) var(--e-out);
+}
+.auth-tab.on {
+  background: var(--snow);
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(9,22,16,.08), 0 0 0 0.5px rgba(9,22,16,.04);
+}
+.auth-tab:hover:not(.on) {
+  color: var(--ink2);
+}
+
+/* Form fields — refinement */
+.fld {
+  margin-bottom: 14px;
+  position: relative;
+}
+.fld label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink2);
+  margin-bottom: 6px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.fld input, .fld select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--ghost);
+  border-radius: var(--r10);
+  background: var(--snow);
+  font-size: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--ink);
+  transition: border-color var(--d-fast) var(--e-out), box-shadow var(--d-fast) var(--e-out);
+}
+.fld input::placeholder {
+  color: var(--mist);
+}
+.fld input:focus, .fld select:focus {
+  border-color: var(--leaf);
+  box-shadow: 0 0 0 4px rgba(22,168,126,.12);
+}
+
+/* Form head */
+.auth-form-head {
+  margin-bottom: 22px;
+}
+.auth-form-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+}
+.auth-form-sub {
+  font-size: 13px;
+  color: var(--mist);
+  font-weight: 400;
+}
+
+/* Auth link */
+.auth-link {
+  color: var(--leaf-d);
+  cursor: pointer;
+  font-weight: 600;
+  transition: color var(--d-fast) var(--e-out);
+}
+.auth-link:hover {
+  color: var(--leaf);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Footer */
+.auth-footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--mist);
+}
+
+/* Auth error */
+.auth-err {
+  background: var(--ruby-l);
+  border: 1px solid rgba(220,53,69,.2);
+  color: #8B1A20;
+  padding: 11px 14px;
+  border-radius: var(--r10);
+  font-size: 13px;
+  margin-bottom: 16px;
+  font-weight: 500;
+  animation: shake .35s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-4px); }
+  75%      { transform: translateX(4px); }
+}
+
+/* Card animation refinement */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Background orbs with smoother animation */
+.auth-bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: .5;
+  animation: orbFloat 18s ease-in-out infinite;
+}
+.auth-bg-orb-1 { 
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(22,168,126,.35) 0%, transparent 70%);
+  top: -150px; left: -150px;
+  animation-duration: 22s;
+}
+.auth-bg-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,.15) 0%, transparent 70%);
+  bottom: -100px; right: -100px;
+  animation-duration: 26s;
+  animation-direction: reverse;
+}
+.auth-bg-orb-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(22,168,126,.18) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation-duration: 30s;
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(40px, -30px) scale(1.05); }
+  66%      { transform: translate(-30px, 40px) scale(.95); }
+}
+
+/* Auth grid pattern */
+.auth-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+/* Card box-shadow refinement */
+.auth-card {
+  box-shadow:
+    0 32px 80px rgba(0,0,0,.55),
+    0 0 0 1px rgba(22,168,126,.12),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+
+/* ══ AUTH CARD CENTERED — vertical layout ══════════════════ */
+.auth-card-centered {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center;
+  width: 100%;
+  max-width: 460px !important;
+  padding: clamp(28px,4vh,42px) clamp(28px,4vw,40px);
+  background: var(--snow);
+  border-radius: var(--r20);
+  box-shadow:
+    0 32px 80px rgba(0,0,0,.4),
+    0 8px 24px rgba(0,0,0,.12),
+    0 0 0 1px rgba(22,168,126,.08);
+  animation: cardIn .65s var(--e-out);
+  position: relative;
+  overflow: visible;
+}
+
+/* Brand no topo */
+.auth-brand-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: clamp(20px,3vh,28px);
+  animation: fadeUp .55s var(--e-out) both;
+}
+.auth-logo-circle {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--leaf) 0%, #0F8062 100%);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow:
+    0 8px 24px rgba(22,168,126,.35),
+    inset 0 1px 0 rgba(255,255,255,.2);
+  position: relative;
+}
+.auth-logo-circle::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(22,168,126,.4), transparent);
+  z-index: -1;
+  filter: blur(8px);
+  opacity: .6;
+}
+.auth-brand-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -.9px;
+}
+.auth-brand-name em {
+  color: var(--leaf);
+  font-style: normal;
+}
+
+/* Form block — centralizado */
+.auth-form-block {
+  width: 100%;
+  animation: fadeUp .55s .15s var(--e-out) both;
+}
+
+.auth-form-head {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.auth-form-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -.6px;
+  margin-bottom: 6px;
+}
+.auth-form-sub {
+  font-size: 13px;
+  color: var(--mist);
+  font-weight: 400;
+}
+
+/* Slogan no rodapé */
+.auth-slogan-bottom {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--fog);
+  text-align: center;
+  width: 100%;
+  animation: fadeUp .55s .3s var(--e-out) both;
+}
+.auth-slogan-line {
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.4px;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+.auth-slogan-accent {
+  background: linear-gradient(110deg, var(--leaf) 0%, #4DD4A8 50%, var(--leaf) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+.auth-slogan-sub {
+  font-size: 12px;
+  color: var(--mist);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Stamp centralizado embaixo */
+.auth-stamp-centered {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--mist);
+  letter-spacing: .14em;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: .55;
+}
+.auth-stamp-dot {
+  color: var(--ghost);
+}
+
+/* Esconder o painel split antigo se ainda existir */
+.auth-panel-l, .auth-panel-r {
+  display: none !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 520px) {
+  .auth-card-centered {
+    padding: 28px 22px;
+    max-width: 100% !important;
+    margin: 0 12px;
+    border-radius: 16px;
+  }
+  .auth-brand-top { gap: 10px; }
+  .auth-logo-circle { width: 48px; height: 48px; border-radius: 13px; }
+  .auth-brand-name { font-size: 21px; }
+  .auth-form-title { font-size: 20px; }
+}
+/* ══ FIM AUTH CARD CENTERED ══════════════════════════════ */
+
 </style>
 </head>
 <body>
@@ -732,7 +1536,7 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
 <!-- ── PROCESSING ── -->
 <div id="proc">
   <div class="proc-ring"></div>
-  <div class="proc-title">Analisando exame</div>
+  <div class="proc-title">Análise laboratorial em andamento</div>
   <div class="proc-step" id="proc-step">Iniciando...</div>
   <div class="proc-bar-wrap"><div class="proc-bar" id="proc-bar" style="width:0%"></div></div>
 </div>
@@ -744,7 +1548,7 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
 <div class="overlay" id="m-patient">
   <div class="modal">
     <button class="modal-close" onclick="closeM('m-patient')">✕</button>
-    <div class="modal-title" id="mp-title">Novo paciente</div>
+    <div class="modal-title" id="mp-title">Registrar paciente</div>
     <div class="modal-sub">Preencha os dados clínicos do paciente.</div>
     <input type="hidden" id="mp-id"/>
 
@@ -878,103 +1682,91 @@ function showErr(m){
     </div>
   </div>
 
-  <div class="auth-card">
-    <div class="auth-panel-l">
-      <div class="auth-logotype">
-        <div class="auth-logotype-mark">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
-            <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
-            <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".88"/>
-            <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".88"/>
-            <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".96"/>
-            <circle cx="2" cy="7" r="1.5" fill="#3B82F6" opacity=".85"/>
-            <circle cx="22" cy="7" r="1.5" fill="#3B82F6" opacity=".85"/>
-            <line x1="9.5" y1="5.2" x2="2" y2="7" stroke="#3B82F6" stroke-width="1" opacity=".6"/>
-            <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width="1" opacity=".6"/>
-          </svg>
-        </div>
-        <div class="auth-logotype-name">Diagno<em>Vet IA</em></div>
-      </div>
+  <div class="auth-card auth-card-centered">
 
-      <!-- Animated paw hero -->
-      <div class="auth-paw-hero">
-        <svg width="120" height="120" viewBox="0 0 24 24" fill="none">
-          <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".9"/>
-          <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".9"/>
-          <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".8"/>
-          <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".8"/>
-          <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".95"/>
-          <circle cx="2" cy="7" r="1.8" fill="#3B82F6" opacity=".9"/>
-          <circle cx="22" cy="7" r="1.8" fill="#3B82F6" opacity=".9"/>
-          <line x1="9.5" y1="5.2" x2="2" y2="7" stroke="#3B82F6" stroke-width="1.2" opacity=".7" stroke-dasharray="8" stroke-dashoffset="0"/>
-          <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width="1.2" opacity=".7" stroke-dasharray="8" stroke-dashoffset="0"/>
+    <!-- LOGO + BRAND no topo -->
+    <div class="auth-brand-top">
+      <div class="auth-logo-circle">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".98"/>
+          <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".98"/>
+          <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".92"/>
+          <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".92"/>
+          <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".98"/>
         </svg>
       </div>
-
-      <div class="auth-headline">Diagnóstico<br>veterinário<br><i>inteligente</i></div>
-      <div class="auth-lead">Importe o arquivo do exame — PDF, imagem ou texto — e receba análise clínica completa em segundos.</div>
-      <div class="auth-feats">
-        <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Importação de PDF, JPG, PNG e CSV</div>
-        <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Extração automática de valores por IA</div>
-        <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Interpretação clínica com Claude AI</div>
-        <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Histórico e comparação entre exames</div>
-        <div class="auth-feat"><div class="auth-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Exportação de laudos profissionais</div>
-      </div>
-      <div class="auth-stamp">DiagnoVet IA · Beta · VitaHub Solutions</div>
+      <div class="auth-brand-name">Diagno<em>Vet IA</em></div>
     </div>
 
-    <div class="auth-panel-r">
-      <!-- Mobile only brand (shown when left panel is hidden) -->
-      <div class="auth-mobile-brand">
-        <div class="auth-logotype-mark" style="width:36px;height:36px;border-radius:10px">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
-            <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
-            <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".88"/>
-            <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".88"/>
-            <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".96"/>
-            <circle cx="2" cy="7" r="1.5" fill="#3B82F6" opacity=".85"/>
-            <circle cx="22" cy="7" r="1.5" fill="#3B82F6" opacity=".85"/>
-            <line x1="9.5" y1="5.2" x2="2" y2="7" stroke="#3B82F6" stroke-width="1" opacity=".6"/>
-            <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width="1" opacity=".6"/>
-          </svg>
-        </div>
-        <span style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.8px">Diagno<em style="color:var(--leaf);font-style:normal">Vet</em></span>
+    <!-- FORMULÁRIO centralizado -->
+    <div class="auth-form-block">
+      <div class="auth-form-head">
+        <div class="auth-form-title" id="auth-title">Bem-vindo(a)</div>
+        <div class="auth-form-sub" id="auth-sub">Entre para acessar sua clínica digital</div>
       </div>
 
-      <div class="auth-form-head">
-        <div class="auth-form-title">Acesse sua conta</div>
-        <div class="auth-form-sub">Plataforma exclusiva para médicos-veterinários.</div>
-      </div>
       <div class="auth-tabs">
         <button class="auth-tab on" id="at-login" onclick="authTab('login')">Entrar</button>
         <button class="auth-tab" id="at-reg" onclick="authTab('register')">Criar conta</button>
       </div>
+
       <div id="auth-err" class="auth-err hidden"></div>
+
       <div id="f-login">
-        <div class="fld"><label>E-mail profissional</label><input id="a-email" type="email" placeholder="dra@clinica.com.br" autocomplete="email"/></div>
-        <div class="fld"><label>Senha</label><input id="a-pass" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
-        <button class="btn-auth" onclick="doLogin()">Entrar na plataforma</button>
-        <!-- Demo login hidden — use email + password form with demo credentials -->
+        <div class="fld">
+          <label>E-mail profissional</label>
+          <input id="a-email" type="email" placeholder="dra@clinica.com.br" autocomplete="email"/>
+        </div>
+        <div class="fld">
+          <label>Senha</label>
+          <input id="a-pass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+        </div>
+        <button class="btn-auth" onclick="doLogin()">
+          <span>Entrar na plataforma</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
         <div class="auth-footer" style="margin-top:14px">Sem conta? <span class="auth-link" onclick="authTab('register')">Cadastre-se</span></div>
-        <div style="text-align:center;margin-top:8px"><span class="auth-link" style="font-size:12px;color:var(--mist)" onclick="forgotPassword()">Esqueci minha senha</span></div>
+        <div style="text-align:center;margin-top:8px">
+          <span class="auth-link" style="font-size:12px;color:var(--mist)" onclick="forgotPassword()">Esqueci minha senha</span>
+        </div>
       </div>
+
       <div id="f-reg" class="hidden">
         <div class="fld-row">
-          <div class="fld"><label>Título</label><select id="r-title"><option>Dra.</option><option>Dr.</option></select></div>
-          <div class="fld"><label>Nome completo</label><input id="r-name" placeholder="Nome Sobrenome"/></div>
+          <div class="fld" style="flex:0 0 30%"><label>Título</label><select id="r-title"><option>Dr.</option><option>Dra.</option><option>Med. Vet.</option></select></div>
+          <div class="fld" style="flex:1"><label>Nome completo</label><input id="r-name" type="text" placeholder="Seu nome"/></div>
         </div>
         <div class="fld-row">
-          <div class="fld"><label>CRMV</label><input id="r-crmv" placeholder="CRMV-XX 00000"/></div>
-          <div class="fld"><label>Especialidade</label><input id="r-spec" value="Clínica Geral"/></div>
+          <div class="fld" style="flex:1"><label>CRMV</label><input id="r-crmv" type="text" placeholder="CRMV-XX 00000"/></div>
+          <div class="fld" style="flex:1"><label>Especialidade</label><input id="r-spec" type="text" placeholder="Ex: Clínica geral"/></div>
         </div>
-        <div class="fld"><label>E-mail</label><input id="r-email" type="email" placeholder="seu@email.com"/></div>
-        <div class="fld"><label>Senha</label><input id="r-pass" type="password" placeholder="Mín. 6 caracteres"/></div>
-        <button class="btn-auth" onclick="doRegister()">Criar conta gratuita</button>
+        <div class="fld"><label>E-mail profissional</label><input id="r-email" type="email" placeholder="dra@clinica.com.br" autocomplete="email"/></div>
+        <div class="fld"><label>Senha (mín. 6 caracteres)</label><input id="r-pass" type="password" placeholder="••••••••" autocomplete="new-password"/></div>
+        <button class="btn-auth" onclick="doRegister()">
+          <span>Criar minha conta</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
         <div class="auth-footer" style="margin-top:14px">Já tem conta? <span class="auth-link" onclick="authTab('login')">Entrar</span></div>
       </div>
     </div>
+
+    <!-- SLOGAN embaixo -->
+    <div class="auth-slogan-bottom">
+      <div class="auth-slogan-line">
+        Menos desgaste. <span class="auth-slogan-accent">Mais clareza clínica.</span>
+      </div>
+      <div class="auth-slogan-sub">
+        O software que devolve tempo ao médico-veterinário.
+      </div>
+    </div>
+
+    <!-- Stamp -->
+    <div class="auth-stamp-centered">
+      <span>VitaHub Solutions</span>
+      <span class="auth-stamp-dot">·</span>
+      <span>Brasil 2026</span>
+    </div>
+
   </div>
 </div>
 
@@ -1023,7 +1815,7 @@ function showErr(m){
         </button>
         <button class="sb-btn" data-sc="import" onclick="nav('import')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Importar exame
+          Importar exame laboratorial
         </button>
         <button class="sb-btn" data-sc="exams" onclick="nav('exams')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
@@ -1061,7 +1853,7 @@ function showErr(m){
         <div class="sb-api-pill" onclick="nav('settings')">
           <div class="api-led off" id="api-led"></div>
           <div class="sb-api-txt">
-            <div class="lbl" id="api-lbl">Modo offline</div>
+            <div class="lbl" id="api-lbl">Processamento local</div>
             <div class="sub">Clique para configurar</div>
           </div>
         </div>
@@ -1092,15 +1884,15 @@ function showErr(m){
           </button>
           <button class="btn btn-primary btn-sm" onclick="nav('import')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span>Importar exame</span>
+            <span>Importar exame laboratorial</span>
           </button>
         </div>
       </header>
 
-      <!-- Trial banner (shown only during trial) -->
+      <!-- Trial banner (shown only during avaliação) -->
       <div class="trial-banner" id="trial-banner" onclick="openUpgradeModal('trial')">
         <div class="trial-dot"></div>
-        <div class="trial-text" id="trial-banner-text">Período trial ativo — 7 dias restantes · 0/10 exames hoje</div>
+        <div class="trial-text" id="trial-banner-text">Período avaliação ativo — 7 dias restantes · 0/10 exames hoje</div>
         <div class="trial-cta">Ver planos →</div>
       </div>
 
@@ -1129,7 +1921,7 @@ function showErr(m){
           <div class="dash-grid">
             <div class="card cp fade-in">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-                <div><div class="card-title">Exames recentes</div><div class="card-sub">Últimas análises</div></div>
+                <div><div class="card-title">Laudos recentes</div><div class="card-sub">Últimas análises</div></div>
                 <button class="btn btn-ghost btn-xs" onclick="nav('exams')">Ver todos →</button>
               </div>
               <div id="dash-recent"></div>
@@ -1143,7 +1935,7 @@ function showErr(m){
                 <div id="dash-pie"></div>
               </div>
               <div class="card cp fade-in">
-                <div style="margin-bottom:14px"><div class="card-title">Pacientes recentes</div></div>
+                <div style="margin-bottom:14px"><div class="card-title">Últimos pacientes</div></div>
                 <div id="dash-pts"></div>
               </div>
             </div>
@@ -1287,7 +2079,7 @@ function showErr(m){
 
               <button class="run-btn" id="run-btn" onclick="runImport()" disabled>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                Analisar exame
+                Gerar laudo
               </button>
               <div id="run-notice" style="text-align:center;font-size:11px;color:var(--mist);margin-top:10px"></div>
             </div>
@@ -1331,7 +2123,7 @@ function showErr(m){
             </div>
             <button class="btn btn-primary btn-sm" onclick="openPatientModal()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Novo paciente
+              Registrar paciente
             </button>
           </div>
           <div id="pt-grid" class="pt-grid"></div>
@@ -1348,17 +2140,17 @@ function showErr(m){
         <div class="screen-inner">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
             <div>
-              <div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-1px">Internações</div>
+              <div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-1px">Admissões</div>
               <div style="font-size:13px;color:var(--mist);margin-top:2px" id="intern-summary">—</div>
             </div>
             <div style="display:flex;gap:8px">
               <button class="btn btn-ghost btn-md" onclick="openNewInternModal()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2"/></svg>
-                Internar existente
+                Admitir paciente existente
               </button>
               <button class="btn btn-primary btn-md" onclick="openPatientModal(true)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Novo paciente
+                Registrar paciente
               </button>
             </div>
           </div>
@@ -1514,7 +2306,7 @@ function showErr(m){
   </button>
   <button class="mob-nav-btn" data-sc="intern" onclick="nav('intern')" id="mob-intern-btn" style="position:relative">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-    <span>Internados</span>
+    <span>Admitidos</span>
     <span id="intern-badge" style="display:none;position:absolute;top:4px;right:12px;background:var(--ruby);color:var(--snow);font-size:9px;font-weight:800;border-radius:20px;padding:1px 5px;min-width:16px;text-align:center"></span>
   </button>
   <button class="mob-nav-btn" data-sc="exams" onclick="nav('exams')">
@@ -1554,7 +2346,7 @@ function showErr(m){
 
       <!-- Mini formulário para novo paciente (aparece ao selecionar ➕) -->
       <div id="intern-new-patient-form" style="display:none;background:var(--paper);border-radius:var(--r12);padding:14px;border:1px solid rgba(22,168,126,.2);margin-bottom:12px">
-        <div style="font-size:11px;font-weight:800;color:var(--leaf-d);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Novo paciente</div>
+        <div style="font-size:11px;font-weight:800;color:var(--leaf-d);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Registrar paciente</div>
         <div class="fld-row" style="margin-bottom:10px">
           <div class="fld-grp" style="margin-bottom:0"><label>Nome *</label><input class="fld-in" id="inp-name" placeholder="ex: Florzinha"/></div>
           <div class="fld-grp" style="margin-bottom:0"><label>Espécie</label>
@@ -1836,12 +2628,14 @@ const DEMO_CRMV  = 'CRMV-PB 03245';
 const S = {
   user: null,
   key: DB.g('key',''),
-  proxyUrl: DB.g('proxyUrl', DEFAULT_PROXY),
+  proxyUrl: DB.g('proxyUrl', DEFAULT_PROXY) || DEFAULT_PROXY,
   patients: [],
   exams: [],
+  interns: [],
   currentResult: null,
   pendingFile: null,
   examFilter: 'all',
+  internFilter: 'all',
 };
 
 // ── Persist — salva local E na nuvem se conectado
@@ -1860,6 +2654,9 @@ async function persist(){
 
 // ── Load data — local ou cloud
 async function loadUserData(userId){
+  // Internações sempre do cache local (ainda não sincronizadas com Supabase)
+  S.interns = DB.g('interns_'+userId, []);
+
   if(DATA_MODE === 'cloud' && _supa){
     try {
       const [pRes, eRes] = await Promise.all([
@@ -1882,7 +2679,6 @@ async function loadUserData(userId){
   // Local fallback
   S.patients = DB.g('patients_'+userId, []);
   S.exams    = DB.g('exams_'+userId, []);
-  S.interns  = DB.g('interns_'+userId, []);
 }
 
 // ── Converters: Supabase ↔ local format
@@ -1991,7 +2787,7 @@ const PLANS = {
     history: true,
     advancedCytology: true,
     prioritySupport: false,
-    description: 'Para clínicas veterinárias',
+    description: 'Para o vet que quer organização e agilidade',
     price: 'R$ 67,90/mês',
     priceMonthly: 67.90,
     priceQuarterly: 61.11,       // por mês no plano trimestral
@@ -2012,7 +2808,7 @@ const PLANS = {
     history: true,
     advancedCytology: true,
     prioritySupport: true,
-    description: 'Para clínicas com alto volume',
+    description: 'Para quem não pode perder tempo em nenhum momento',
     price: 'R$ 97,90/mês',
     priceMonthly: 97.90,
     priceQuarterly: 78.32,       // por mês no plano trimestral
@@ -2033,8 +2829,8 @@ function incrementUsage(){
   DB.s(u.key, u.count + 1);
 }
 function getUserPlan(){
-  if(!S.user) return PLANS.free;
-  return PLANS[S.user.plan || 'trial'];
+  if(!S.user) return PLANS.trial;
+  return PLANS[S.user.plan || 'trial'] || PLANS.trial;
 }
 function getTrialStatus(){
   if(!S.user) return {active:false, expired:false, daysLeft:0, examsToday:0, canUse:false};
@@ -2146,7 +2942,13 @@ async function doLogin(){
   // ── Supabase Auth (real users)
   if(_supa){
     const btn = document.querySelector('#f-login .btn-auth');
-    if(btn){ btn.disabled=true; btn.textContent='Entrando...'; }
+    const btnLabel = btn?.querySelector('span');
+    const setBtn = (text, disabled=false) => {
+      if(!btn) return;
+      btn.disabled = disabled;
+      if(btnLabel) btnLabel.textContent = text;
+    };
+    setBtn('Entrando...', true);
     try {
       const { data, error } = await _supa.auth.signInWithPassword({ email, password: pass });
       if(error){
@@ -2154,11 +2956,12 @@ async function doLogin(){
         // Only fall back to local if user doesn't exist in Supabase
         if(msg.includes('Invalid login') || msg.includes('Email not confirmed')){
           showErr('E-mail ou senha incorretos. Verifique seus dados.');
-          if(btn){ btn.disabled=false; btn.textContent='Entrar'; }
+          setBtn('Entrar na plataforma', false);
           return;
         }
         // Fallback for beta local accounts
         await loginLocal(email, pass);
+        setBtn('Entrar na plataforma', false);
         return;
       }
       // Supabase login success
@@ -2167,9 +2970,10 @@ async function doLogin(){
       await enter({ ...profile, id: data.user.id, email: data.user.email,
                     supaUser: data.user });
     } catch(e) {
+      console.error('Login error:', e);
       showErr('Erro ao conectar. Tente novamente.');
     } finally {
-      if(btn){ btn.disabled=false; btn.textContent='Entrar'; }
+      setBtn('Entrar na plataforma', false);
     }
     return;
   }
@@ -2205,7 +3009,13 @@ async function doRegister(){
   // ── Supabase Auth (real users)
   if(_supa){
     const btn = document.querySelector('#f-reg .btn-auth');
-    if(btn){ btn.disabled=true; btn.textContent='Criando conta...'; }
+    const btnLabel = btn?.querySelector('span');
+    const setBtn = (text, disabled=false) => {
+      if(!btn) return;
+      btn.disabled = disabled;
+      if(btnLabel) btnLabel.textContent = text;
+    };
+    setBtn('Criando conta...', true);
     try {
       const { data, error } = await _supa.auth.signUp({
         email, password: pass,
@@ -2218,7 +3028,7 @@ async function doRegister(){
         const msg = error.message || error.msg || error.error_description
           || (typeof error === 'string' ? error : 'Erro ao criar conta. Tente novamente.');
         showErr(msg);
-        if(btn){ btn.disabled=false; btn.textContent='Criar conta gratuita'; }
+        setBtn('Criar minha conta', false);
         return;
       }
 
@@ -2241,7 +3051,7 @@ async function doRegister(){
           e.textContent='✓ Conta criada! Verifique seu e-mail e clique no link para acessar o DiagnoVet IA.';
           e.classList.remove('hidden');
         }
-        if(btn){ btn.disabled=false; btn.textContent='Criar conta gratuita'; }
+        setBtn('Criar minha conta', false);
         return;
       }
 
@@ -2252,7 +3062,7 @@ async function doRegister(){
     } catch(e) {
       showErr('Erro ao criar conta. Tente novamente.');
     } finally {
-      if(btn){ btn.disabled=false; btn.textContent='Criar conta'; }
+      setBtn('Criar minha conta', false);
     }
     return;
   }
@@ -2413,7 +3223,7 @@ function updateKeyUI(){
   const hasKey=!!S.key;
   const active=hasProxy||hasKey;
   document.getElementById('api-led').className='api-led '+(active?'on':'off');
-  document.getElementById('api-lbl').textContent=hasProxy?'Proxy ativo':hasKey?'Claude AI ativo':'Modo offline';
+  document.getElementById('api-lbl').textContent=hasProxy?'Proxy ativo':hasKey?'Claude AI ativo':'Processamento local';
   if(document.getElementById('s-key')) document.getElementById('s-key').value=S.key;
   if(document.getElementById('s-proxy')) document.getElementById('s-proxy').value=S.proxyUrl||'';
   if(document.getElementById('key-status')) document.getElementById('key-status').innerHTML=
@@ -2426,7 +3236,7 @@ function updateKeyUI(){
   if(notice) notice.textContent=
     hasProxy?'✓ Proxy ativo — Claude AI via servidor seguro':
     hasKey?'✓ Chave direta configurada':
-    'Modo offline — configure o proxy em Configurações → Claude AI';
+    'Processamento local — configure o proxy em Configurações → Claude AI';
 }
 
 function toggleSidebar(){
@@ -2446,17 +3256,17 @@ function closeSidebar(){
 ══════════════════════════════════════════════ */
 const WELCOME_MSGS = {
   new: [
-    (n) => `Bem-vindo(a), ${n}! 🐾 Seu trial de 7 dias começa agora.`,
-    (n) => `Olá, ${n}! Estamos felizes em ter você aqui. Vamos fazer seu primeiro exame?`,
+    (n) => `Bem-vindo(a), ${n}! 🐾 Bem-vindo(a) ao DiagnoVet IA. Seu período de avaliação está ativo.`,
+    (n) => `Olá, ${n}! Estamos felizes em ter você aqui. Inicie sua primeira análise laboratorial.`,
     (n) => `${n}, seja bem-vindo(a) ao DiagnoVet! Sua conta está pronta.`,
   ],
   returning: [
-    (n) => `Olá de novo, ${n}! 👋 O que analisamos hoje?`,
+    (n) => `Olá de novo, ${n}! 👋 O que você precisa ver hoje?`,
     (n) => `Bem-vindo(a) de volta, ${n}! Pronto(a) para mais diagnósticos?`,
     (n) => `Oi, ${n}! Que bom ter você por aqui novamente.`,
     (n) => `${n}, que bom te ver! Vamos ver os exames de hoje?`,
-    (n) => `Olá, ${n}! Seus pacientes estão esperando. 🐱🐶`,
-    (n) => `De volta ao trabalho, ${n}? Vamos lá!`,
+    (n) => `Olá, ${n}! Seus pacientes te esperam. Vamos lá. 🐾`,
+    (n) => `De volta ao trabalho, ${n}? Pronto para começar.`,
   ],
   morning: [
     (n) => `Bom dia, ${n}! ☀️ Pronto(a) para começar o dia?`,
@@ -2556,7 +3366,7 @@ function renderOnboarding(){
         Bem-vindo ao <em style="color:var(--leaf);font-style:normal">DiagnoVet IA</em>!
       </div>
       <div style="font-size:14px;color:var(--mist);max-width:400px;margin:0 auto;line-height:1.7">
-        Escolha o plano ideal para começar. Você pode mudar de plano a qualquer momento.
+        Escolha como quer começar. Sem pegadinhas — você pode mudar quando quiser.
       </div>
     </div>
 
@@ -2572,13 +3382,13 @@ function renderOnboarding(){
         <div style="font-size:22px;font-weight:800;color:var(--amber);font-family:'Sora',sans-serif;letter-spacing:-1px;margin-bottom:8px">Grátis</div>
         <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">7 dias · 10 exames/dia<br/>Sem cartão de crédito</div>
         <div style="font-size:11px;color:var(--mist);display:flex;flex-direction:column;gap:5px">
-          <div>✓ Todos os tipos de exame</div>
-          <div>✓ 4 espécies animais</div>
-          <div style="color:var(--fog)">✗ Exportar PDF</div>
-          <div style="color:var(--fog)">✗ Análises ilimitadas</div>
+          <div>✓ Hemograma, bioquímica e citologia</div>
+          <div>✓ Cão, gato, equino e bovino</div>
+          <div style="color:var(--fog)">✗ Laudo para o tutor</div>
+          <div style="color:var(--fog)">✗ Histórico completo</div>
         </div>
         <button style="width:100%;margin-top:16px;padding:10px;background:#FEF5E7;border:1.5px solid rgba(232,145,26,.3);border-radius:var(--r8);font-size:13px;font-weight:800;color:#7A4800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
-          Começar trial grátis
+          Experimentar grátis
         </button>
       </div>
 
@@ -2590,15 +3400,15 @@ function renderOnboarding(){
         <div style="font-size:24px;margin-bottom:8px">📋</div>
         <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Básico</div>
         <div style="margin-bottom:8px">
-          <span style="font-size:22px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;67,900</span>
+          <span style="font-size:22px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;67,90</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">200 análises/mês<br/>ou R$&nbsp;54,32/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">200 análises/mês<br/>ou R$&nbsp;61,11/mês no trimestral</div>
         <div style="font-size:11px;color:var(--mist);display:flex;flex-direction:column;gap:5px">
-          <div>✓ 200 análises/mês</div>
-          <div>✓ Exportar PDF</div>
-          <div>✓ Pacientes ilimitados</div>
-          <div style="color:var(--fog)">✗ Análises ilimitadas</div>
+          <div>✓ Até 200 laudos por mês</div>
+          <div>✓ Laudo em PDF para o tutor</div>
+          <div>✓ Todos os seus pacientes</div>
+          <div style="color:var(--fog)">✗ Volume ilimitado</div>
         </div>
         <button style="width:100%;margin-top:16px;padding:10px;background:var(--leaf-l);border:1.5px solid rgba(22,168,126,.3);border-radius:var(--r8);font-size:13px;font-weight:800;color:var(--leaf-d);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
           Escolher Básico
@@ -2614,14 +3424,14 @@ function renderOnboarding(){
         <div style="font-size:24px;margin-bottom:8px">⚡</div>
         <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Pro</div>
         <div style="margin-bottom:8px">
-          <span style="font-size:22px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,900</span>
+          <span style="font-size:22px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,90</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">Ilimitadas/mês<br/>ou R$&nbsp;68,53/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">Ilimitadas/mês<br/>ou R$&nbsp;78,32/mês no trimestral</div>
         <div style="font-size:11px;color:var(--ink2);display:flex;flex-direction:column;gap:5px">
-          <div>✓ Análises ilimitadas</div>
+          <div>✓ Sem limite de laudos</div>
           <div>✓ Exportar PDF e JSON</div>
-          <div>✓ Suporte prioritário</div>
+          <div>✓ Suporte quando precisar</div>
           <div>✓ Pacientes ilimitados</div>
         </div>
         <button style="width:100%;margin-top:16px;padding:10px;background:var(--leaf);border:none;border-radius:var(--r8);font-size:13px;font-weight:800;color:var(--snow);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
@@ -2660,7 +3470,7 @@ function selectOnboardingPlan(planId){
 
   // Paid plan — show upgrade modal then go to dashboard
   S.user.onboardingDone = true;
-  _saveUserPlan('trial'); // keep trial while payment is pending
+  _saveUserPlan('trial'); // keep avaliação while payment is pending
   nav('dashboard');
   setTimeout(()=>{ openUpgradeModal('general'); }, 500);
 }
@@ -2679,7 +3489,7 @@ function _saveUserPlan(planId){
 }
 
 /* ══════════════════════════════════════════════
-   TRIAL WALL — blocks app after trial expires
+   TRIAL WALL — blocks app after avaliação expires
 ══════════════════════════════════════════════ */
 function renderTrialExpired(){
   const el = document.getElementById('trial-expired-content');
@@ -2689,10 +3499,10 @@ function renderTrialExpired(){
     <div style="text-align:center;margin-bottom:28px">
       <div style="width:72px;height:72px;border-radius:50%;background:var(--ruby-l);border:2px solid rgba(220,53,69,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px">⏱</div>
       <div style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-1px;margin-bottom:8px">
-        Seu trial expirou
+        Seu avaliação expirou
       </div>
       <div style="font-size:14px;color:var(--mist);line-height:1.7;max-width:380px;margin:0 auto">
-        Seus 7 dias de teste chegaram ao fim. Escolha um plano para continuar usando o <strong style="color:var(--leaf-d)">DiagnoVet IA</strong> e nunca perder seus diagnósticos.
+        Seu período gratuito encerrou. Você já viu como é trabalhar com mais agilidade — escolha um plano e continue sem perder seu histórico.
       </div>
     </div>
 
@@ -2703,16 +3513,16 @@ function renderTrialExpired(){
       <div style="border:1.5px solid var(--fog);border-radius:var(--r16);padding:20px;background:var(--snow)">
         <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px">Básico</div>
         <div style="margin-bottom:10px">
-          <span style="font-size:24px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;67,900</span>
+          <span style="font-size:24px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;67,90</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;54,32/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;61,11/mês no trimestral</div>
         <div style="background:#E8F5EE;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--leaf-d);font-weight:600;margin:10px 0">
-          💰 Economize 20% no plano trimestral<br/>R$&nbsp;651,84/ano
+          💰 Economize 20% no plano trimestral<br/>R$&nbsp;183,33/trimestre
         </div>
         <div style="font-size:11px;color:var(--mist);line-height:1.8;margin-bottom:14px">
           ✓ 200 análises/mês<br/>
-          ✓ PDF e JSON<br/>
+          ✓ Laudo PDF + exportação completa<br/>
           ✓ Pacientes ilimitados
         </div>
         <button class="btn-auth" onclick="selectExpiredPlan('basico')" style="border-radius:var(--r8);font-size:13px;padding:11px;background:var(--ink)">
@@ -2725,12 +3535,12 @@ function renderTrialExpired(){
         <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 10px;border-radius:20px;white-space:nowrap">⭐ RECOMENDADO</div>
         <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px">Pro</div>
         <div style="margin-bottom:10px">
-          <span style="font-size:24px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,900</span>
+          <span style="font-size:24px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,90</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;68,53/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;78,32/mês no trimestral</div>
         <div style="background:rgba(22,168,126,.1);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--leaf-d);font-weight:600;margin:10px 0">
-          💰 Economize 30% no plano trimestral<br/>R$&nbsp;822,36/ano
+          💰 Economize 30% no plano trimestral<br/>R$&nbsp;822,36/trimestre
         </div>
         <div style="font-size:11px;color:var(--ink2);line-height:1.8;margin-bottom:14px">
           ✓ Análises ilimitadas<br/>
@@ -2760,7 +3570,7 @@ function selectExpiredPlan(planId){
   toast(`Para assinar o plano ${PLANS[planId].name}, entre em contato: contato@diagnovet.com.br`, 'ok');
 }
 
-// ── Check trial wall on every nav — blocks if expired
+// ── Check avaliação wall on every nav — blocks if expired
 function checkTrialWall(){
   if(!S.user || S.user.isDemo) return false;
   const ts = getTrialStatus();
@@ -2802,7 +3612,7 @@ function openNewInternModal(internId) {
   const alreadyInt  = S.patients.filter(p => activeIds.has(p.id) && !internId);
 
   let options = '<option value="">— Selecionar paciente —</option>';
-  options += '<option value="__new__" style="color:var(--leaf-d);font-weight:700">➕ Novo paciente (cadastrar agora)</option>';
+  options += '<option value="__new__" style="color:var(--leaf-d);font-weight:700">➕ Registrar paciente (cadastrar agora)</option>';
 
   if(available.length) {
     options += '<optgroup label="Pacientes disponíveis">';
@@ -2889,7 +3699,7 @@ function saveIntern() {
     if(idx>=0) {
       S.interns[idx] = { ...S.interns[idx], patientId, dateIn, status, reason, obs, vet, updatedAt: new Date().toISOString() };
     }
-    toast('Internação atualizada.','ok');
+    toast('Registro de internação atualizado.','ok');
   } else {
     S.interns.unshift({
       id: 'int' + Date.now(),
@@ -2898,7 +3708,7 @@ function saveIntern() {
       updates: [],
       createdAt: new Date().toISOString(),
     });
-    toast('Paciente internado com sucesso.','ok');
+    toast('Paciente admitido com sucesso.','ok');
   }
 
   persist();
@@ -2950,7 +3760,7 @@ function renderInternList() {
     el.innerHTML = `<div class="empty-state" style="padding:48px 0">
       <div class="es-icon">🏥</div>
       <div class="es-title">Nenhuma internação ${S.internFilter==='all'?'registrada':'neste filtro'}</div>
-      <div class="es-sub">Clique em "Novo paciente" para cadastrar e internar.</div>
+      <div class="es-sub">Clique em "Registrar paciente" para cadastrar e internar.</div>
     </div>`;
     return;
   }
@@ -3018,8 +3828,10 @@ function openInternDetail(internId) {
   nav('result'); // usa a sc-result que já tem study-content? não — usa sc-study
   // Actually navigate to patients → use sc-study via openStudy path
   // We'll render into study-content directly
-  const studyEl = document.getElementById('study-content');
+  const studyEl = document.getElementById('result-area');
   if(!studyEl){ toast('Erro ao abrir detalhes.','err'); return; }
+  // Clear any previous result
+  S.currentResult = null;
 
   // Push to nav history
   _navHistory.push('intern-detail');
@@ -3028,7 +3840,7 @@ function openInternDetail(internId) {
 
   // Show study screen
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  document.getElementById('sc-study')?.classList.add('on');
+  document.getElementById('sc-result')?.classList.add('on');
   document.getElementById('page-title').textContent = `Internação — ${patient.name}`;
 
   studyEl.innerHTML = `
@@ -3125,7 +3937,7 @@ function openInternDetail(internId) {
       <span style="font-size:20px">✅</span>
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--leaf-d)">Alta concedida em ${intern.dateOut ? new Date(intern.dateOut+'T12:00:00').toLocaleDateString('pt-BR') : '—'}</div>
-        <div style="font-size:12px;color:var(--mist)">Internação encerrada</div>
+        <div style="font-size:12px;color:var(--mist)">Paciente com alta — internação encerrada</div>
       </div>
     </div>`}
 
@@ -3189,7 +4001,7 @@ function addInternUpdate(internId) {
   persist();
   document.getElementById('intern-upd-text').value = '';
   openInternDetail(internId); // re-render
-  toast('Atualização salva.','ok');
+  toast('Evolução registrada.','ok');
 }
 
 function giveDischarge(internId) {
@@ -3204,14 +4016,14 @@ function giveDischarge(internId) {
       S.interns[idx].dateOut = new Date().toISOString().slice(0,10);
       if(!S.interns[idx].updates) S.interns[idx].updates = [];
       S.interns[idx].updates.push({
-        text: 'Alta médica concedida.',
+        text: 'Alta registrada. Paciente liberado.',
         status: 'discharged',
         at: new Date().toISOString(),
       });
       persist();
       updateInternBadge();
       renderInternList();
-      toast(`Alta de ${patient?.name||'paciente'} registrada.`,'ok');
+      toast(`Alta concedida. ${patient?.name||'Paciente'} retorna ao atendimento ambulatorial.`,'ok');
     }
   );
 }
@@ -3283,8 +4095,8 @@ function showInternReminder() {
 
   const msgs = intern.status==='critical' ? [
     `${st.emoji} ${patient.name} está em estado crítico há ${days} dia${days!==1?'s':''}. Verificar agora?`,
-    `🚨 Atenção: ${patient.name} precisa de monitoramento — internado há ${days}d em estado crítico.`,
-    `${st.emoji} Não se esqueça de ${patient.name} — estado crítico, ${days} dia${days!==1?'s':''} internado.`,
+    `🚨 ${patient.name} aguarda monitoramento — ${days}d em estado crítico.`,
+    `${patient.name} — crítico há ${days} dia${days!==1?'s':''}. Evolução clínica pendente.`,
   ] : [
     `${st.emoji} ${patient.name} está em atenção — ${days} dia${days!==1?'s':''} de internação.`,
     `⚠ Lembrete: ${patient.name} aguarda acompanhamento. ${days}d internado.`,
@@ -3346,13 +4158,13 @@ function closeInternToast() {
 /* ══════════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════════ */
-const TITLES={dashboard:'Dashboard',onboarding:'Bem-vindo ao DiagnoVet IA',plans:'Planos',intern:'Internações',import:'Importar exame',exams:'Exames',patients:'Pacientes',result:'Resultado da análise',settings:'Configurações'};
+const TITLES={dashboard:'Dashboard',onboarding:'Bem-vindo ao DiagnoVet IA',plans:'Planos',intern:'Internações',import:'Importar exame laboratorial',exams:'Exames',patients:'Pacientes',result:'Laudo Clínico',settings:'Configurações'};
 /* ── NAV HISTORY STACK ── */
 let _navHistory = [];
 let _navIgnorePopstate = false;
 
 function nav(sc, addToHistory=true){
-  // ── Trial wall — intercept all navigation if trial expired
+  // ── Trial wall — intercept all navigation if avaliação expired
   if(S.user && !S.user.isDemo && sc !== 'trial-expired'){
     const ts = getTrialStatus();
     if(ts.active && ts.expired){
@@ -4276,6 +5088,35 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
       const errBody = await resp.json();
       errMsg = errBody.error?.message || errMsg;
     } catch(_) {}
+
+    // ── Se proxy retorna 403 (Worker desatualizado/bloqueado)
+    // tenta chamada direta com chave se disponível
+    if (resp.status === 403 && S.proxyUrl) {
+      if (S.key) {
+        console.warn('Proxy retornou 403 — tentando chamada direta com chave API...');
+        const directResp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': S.key,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-5-20250929',
+            max_tokens: 4096,
+            system: SYSTEM_PROMPT,
+            messages: [{ role: 'user', content: contentBlocks }]
+          })
+        });
+        if (directResp.ok) {
+          const directData = await directResp.json();
+          return parseClaudeResponse(directData);
+        }
+      }
+      throw new Error('Worker bloqueando requisições (403). Redeploye o Worker no Cloudflare ou adicione sua chave API em Configurações → Claude AI.');
+    }
+
     if (resp.status === 401) throw new Error('Chave API inválida ou expirada. Verifique em Configurações → Claude AI.');
     if (resp.status === 429) throw new Error('Limite de requisições atingido. Aguarde um momento e tente novamente.');
     if (resp.status === 400) throw new Error(`Requisição inválida: ${errMsg}`);
@@ -4283,7 +5124,11 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
   }
 
   const data = await resp.json();
+  return parseClaudeResponse(data);
+}
 
+// ── Parse Claude API response JSON
+function parseClaudeResponse(data) {
   if (!data.content || data.content.length === 0) {
     throw new Error('Claude retornou resposta vazia.');
   }
@@ -4327,38 +5172,40 @@ async function runImport() {
   const proc = document.getElementById('proc');
   const bar = document.getElementById('proc-bar');
   const stepEl = document.getElementById('proc-step');
-  proc.classList.add('on'); bar.style.width = '0%';
+  proc.classList.add('on');
+  bar.style.width = '0%';
 
-  const STEPS = [
-    'Lendo arquivo...',
-    (S.key || S.proxyUrl) ? 'Enviando para Claude AI...' : 'Executando análise local...',
-    'Extraindo valores laboratoriais...',
-    'Verificando intervalos de referência...',
-    'Gerando interpretação clínica...'
-  ];
+  const setStep = async (pct, msg, delay=250) => {
+    stepEl.textContent = msg;
+    bar.style.width = pct + '%';
+    await new Promise(r => setTimeout(r, delay));
+  };
 
   let aiResult = null;
   let aiError = null;
 
-  for (let i = 0; i < STEPS.length; i++) {
-    stepEl.textContent = STEPS[i];
-    bar.style.width = ((i + 1) / STEPS.length * 100) + '%';
+  await setStep(20, 'Lendo o exame...');
 
-    if (i === 1 && (S.key || S.proxyUrl)) {
-      try {
-        aiResult = await callClaudeWithFile(patient, context);
-      } catch (e) {
-        aiError = e.message;
-        console.error('Claude API error:', e);
-      }
-    } else {
-      await new Promise(r => setTimeout(r, 300 + Math.random() * 200));
+  // ── Call Claude AI
+  await setStep(40, (S.key || S.proxyUrl) ? 'Interpretando os parâmetros...' : 'Executando análise local...', 100);
+  if (!S.key && !S.proxyUrl) {
+    aiError = 'Proxy não configurado. Configure em Configurações → Claude AI.';
+  } else {
+    try {
+      aiResult = await callClaudeWithFile(patient, context);
+    } catch (e) {
+      aiError = e.message;
+      console.error('Claude API error:', e);
     }
   }
 
+  await setStep(65, 'Extraindo valores laboratoriais...');
+  await setStep(80, 'Verificando intervalos de referência...');
+  await setStep(100, 'Montando o laudo...');
+
   proc.classList.remove('on');
 
-  // Build markers: AI extraction has priority, then mtrimestrally edited pre-extracted fields
+  // Build markers: AI extraction has priority
   const markers = {};
 
   if (aiResult?.extractedValues) {
@@ -4393,7 +5240,7 @@ async function runImport() {
 
   let insights = loc.insights;
   let recommendations = loc.recommendations;
-  let summary = insights[0]?.text || 'Análise concluída.';
+  let summary = insights[0]?.text || 'Interpretação clínica concluída.';
   let patterns = [];
 
   if (aiResult) {
@@ -4439,25 +5286,35 @@ async function runImport() {
 
   S.exams.unshift(exam);
   persist();
-  incrementUsage();
-  if(getUserPlan().id === 'trial') incrementDailyUsage();
   saveExamCloud(exam);
   // Vincula exame à internação ativa do paciente (se houver)
   if(exam.patientId) linkExamToIntern(exam.id, exam.patientId);
 
   S.currentResult = {
-    patient, exam,
-    evalResults: results,
-    overall, insights, recommendations, summary,
-    usedAI: !!aiResult,
+    patient,
+    exam,
+    evalResults:     Array.isArray(results)       ? results       : [],
+    overall:         overall                       || 'normal',
+    insights:        Array.isArray(insights)       ? insights      : [],
+    recommendations: Array.isArray(recommendations)? recommendations: [],
+    summary:         summary                       || 'Interpretação clínica concluída.',
+    usedAI:          !!aiResult,
   };
 
+  // Conta o uso APÓS confirmar que há resultado para mostrar
+  incrementUsage();
+  if(getUserPlan().id === 'trial') incrementDailyUsage();
+
   updateCritBadge();
+  // Wait for browser to paint (ensures proc overlay is fully gone before navigating)
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   nav('result');
   clearFile();
 
   if (aiError && !aiResult) {
-    toast(`IA indisponível: ${aiError.slice(0, 80)} — análise local aplicada.`, 'warn');
+    console.error('AI analysis failed:', aiError);
+    const shortErr = aiError.length > 80 ? aiError.slice(0, 80) + '…' : aiError;
+    toast(`IA indisponível: ${shortErr}`, 'warn');
   } else if (aiResult) {
     const mCount = Object.keys(markers).length;
     toast(
@@ -4705,11 +5562,18 @@ function renderResult(){
   const el = document.getElementById('result-area');
   if(!el) return;
   if (!S.currentResult) {
-    el.innerHTML = `<div class="empty-state"><div class="es-icon">🔬</div><div class="es-title">Nenhum resultado disponível</div><div class="es-sub">Importe um exame para ver a análise detalhada aqui.</div><button class="btn btn-primary btn-md" onclick="nav('import')">Importar exame</button></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="es-icon">🔬</div><div class="es-title">Nenhum laudo clínico disponível</div><div class="es-sub">Importe o exame e receba a interpretação clínica em segundos.</div><button class="btn btn-primary btn-md" onclick="nav('import')">Importar exame laboratorial</button></div>`;
     return;
   }
 
-  const {patient, exam, evalResults, overall, insights, recommendations, summary, usedAI} = S.currentResult;
+  const {patient, exam, evalResults: rawEvalResults, overall: rawOverall, insights: rawInsights, recommendations: rawRecs, summary: rawSummary, usedAI} = S.currentResult;
+
+  // ── Null guards — nunca deixar undefined causar crash
+  const evalResults    = Array.isArray(rawEvalResults) ? rawEvalResults : [];
+  const insights       = Array.isArray(rawInsights)    ? rawInsights    : [];
+  const recommendations= Array.isArray(rawRecs)        ? rawRecs        : [];
+  const overall        = rawOverall || 'normal';
+  const summary        = rawSummary || 'Interpretação clínica concluída.';
   const score = overall==='normal' ? 92 : overall==='attention' ? 65 : 36;
   const scoreColor = overall==='critical' ? '#DC3545' : overall==='attention' ? '#E8911A' : '#16A87E';
   const circ = 2*Math.PI*30;
@@ -4735,7 +5599,7 @@ function renderResult(){
     <!-- ══ HERO HEADER ══ -->
     <div class="result-hero" style="margin-bottom:16px">
       <div style="flex:1">
-        <div class="rh-eyebrow">📊 ANÁLISE CLÍNICA · ${exam.type} · ${exam.imported?'📥 Importado':'Mtrimestral'} · ${dateStr}</div>
+        <div class="rh-eyebrow">📊 LAUDO CLÍNICO INTERPRETATIVO · ${exam.type} · ${exam.imported?'📥 Importado':'Mtrimestral'} · ${dateStr}</div>
         <div class="rh-name">${escapeHTML(patient.name)}</div>
         <div class="rh-meta">${patient.species} · ${patient.breed||'SRD'} · ${patient.age||'—'} · ${patient.weight||'—'}</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
@@ -4758,7 +5622,7 @@ function renderResult(){
           <text x="42" y="52" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="9" fill="rgba(255,255,255,.35)">SCORE IA</text>
         </svg>
         <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">Confiança diagnóstica</div>
-        ${exam.aiError ? '<div style="font-size:10px;color:var(--amber);margin-top:4px">⚠ Motor local</div>' : ''}
+        ${exam.aiError ? '<div style="font-size:10px;color:var(--amber);margin-top:4px">⚠ Análise clínica</div>' : ''}
       </div>
     </div>
 
@@ -4854,7 +5718,7 @@ function renderResult(){
 
     <!-- ══ ACTIONS ══ -->
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-primary btn-sm" onclick="nav('import')" style="flex:1;justify-content:center;min-width:120px">Novo exame</button>
+      <button class="btn btn-primary btn-sm" onclick="nav('import')" style="flex:1;justify-content:center;min-width:120px">Novo laudo</button>
       <button class="btn btn-ghost btn-sm" onclick="openStudy('${exam.id}')" style="flex:1;justify-content:center;min-width:120px">Estudo detalhado</button>
       <button class="btn btn-ghost btn-sm" onclick="exportOneExam('${exam.id}')" style="flex:1;justify-content:center;min-width:120px">Exportar laudo</button>
     </div>`;
@@ -4973,14 +5837,14 @@ function renderPlansScreen(){
     usageBlock = `
       <div style="background:rgba(255,255,255,.06);border-radius:var(--r8);padding:14px 16px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6)">Exames hoje</span>
+          <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6)">Laudos hoje</span>
           <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${barC}">${ts.examsToday}<span style="color:rgba(255,255,255,.3);font-weight:400"> / ${ts.dailyLimit}</span></span>
         </div>
         <div style="height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden">
           <div style="height:100%;width:${pct}%;background:${barC};border-radius:3px"></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:6px">
-          <span style="font-size:11px;color:rgba(255,255,255,.35)">${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} restante${ts.daysLeft!==1?'s':''} de trial</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.35)">${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} restante${ts.daysLeft!==1?'s':''} de avaliação</span>
           <span style="font-size:11px;color:var(--amber)">Gratuito</span>
         </div>
       </div>`;
@@ -5033,7 +5897,7 @@ function renderPlansScreen(){
       ctaHtml = `<div style="text-align:center;padding:10px 0;font-size:12px;font-weight:700;color:var(--leaf-d)">✓ Plano atual</div>`;
     } else if(isTrial || (isBasico && pid === 'pro')){
       ctaHtml = `<button class="btn-auth" onclick="openUpgradeModal('general')" style="border-radius:var(--r8);font-size:12px;padding:10px;margin-top:12px">
-        ${pid==='basico'?'Assinar Básico — R$&nbsp;67,900/mês':'Upgrade para Pro — R$&nbsp;97,900/mês'}
+        ${pid==='basico'?'Assinar Básico — R$&nbsp;67,90/mês':'Upgrade para Pro — R$&nbsp;97,90/mês'}
       </button>`;
     }
 
@@ -5047,7 +5911,7 @@ function renderPlansScreen(){
           <span style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:${isCurr?'var(--leaf)':accentColor};letter-spacing:-1px">R$&nbsp;${pid==='basico'?'67,90':'97,90'}</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:10px">ou ${pid==='basico'?'R$&nbsp;54,32':'R$&nbsp;67,900'}/mês no plano trimestral</div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:10px">ou ${pid==='basico'?'R$&nbsp;61,11':'R$&nbsp;67,90'}/mês no plano trimestral</div>
         ${feat(true, pid==='basico'?'200 análises/mês':'Ilimitadas')}
         ${feat(true,'PDF e JSON')}
         ${feat(pid==='pro','Análises ilimitadas')}
@@ -5170,7 +6034,7 @@ function makePie(okV, warnV, critV) {
             </div>
           </div>`).join('')}
         <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--fog);display:flex;justify-content:space-between">
-          <span style="font-size:11px;color:var(--mist)">Total de exames</span>
+          <span style="font-size:11px;color:var(--mist)">Total de laudos</span>
           <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ink)">${total}</span>
         </div>
       </div>
@@ -5200,7 +6064,7 @@ function renderDashboard(){
       <div class="er-body"><div class="er-name">${escapeHTML(p.name)}</div><div class="er-meta">${escapeHTML(p.species)} · ${escapeHTML(e.type||'Hemograma')}</div></div>
       <div class="er-right"><div class="er-date">${ds}</div>${TAG[e.status]||''}</div>
     </div>`;
-  }).join(''):`<div class="empty-state" style="padding:32px 0"><div class="es-icon">📋</div><div class="es-title">Nenhum exame ainda</div><div class="es-sub">Importe o primeiro exame para começar.</div></div>`;
+  }).join(''):`<div class="empty-state" style="padding:32px 0"><div class="es-icon">📋</div><div class="es-title">Nenhum exame ainda</div><div class="es-sub">Importe o primeiro exame e veja o quanto é rápido.</div></div>`;
 
   const pts3=S.patients.slice(0,3);
   document.getElementById('dash-pts').innerHTML=pts3.map(p=>{
@@ -5230,7 +6094,7 @@ function renderExams(){
   else if(efFilter!=='all') data=data.filter(e=>e.status===efFilter);
   if(q){ data=data.filter(e=>{ const p=S.patients.find(x=>x.id===e.patientId)||{name:''}; return p.name.toLowerCase().includes(q)||(e.type||'').toLowerCase().includes(q)||(e.context||'').toLowerCase().includes(q); }); }
   const tbl=document.getElementById('exams-tbl');
-  if(!data.length){tbl.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><div class="es-title">Nenhum exame encontrado</div><div class="es-sub">Ajuste os filtros ou importe um novo exame.</div></div>`;return;}
+  if(!data.length){tbl.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><div class="es-title">Nenhum laudo encontrado</div><div class="es-sub">Ajuste os filtros ou importe um novo exame.</div></div>`;return;}
   tbl.innerHTML=`
     <div class="et-head">
       <div class="et-th">Paciente · Tipo</div>
@@ -5411,7 +6275,7 @@ async function reanalyze(examId){
   const stepEl = document.getElementById('proc-step');
   proc.classList.add('on'); bar.style.width = '0%';
 
-  const STEPS = ['Carregando dados do exame...', 'Enviando para Claude AI...', 'Gerando interpretação avançada...', 'Identificando padrões clínicos...', 'Atualizando resultado...'];
+  const STEPS = ['Carregando dados do exame...', 'Interpretando os parâmetros...', 'Gerando interpretação avançada...', 'Identificando padrões clínicos...', 'Atualizando resultado...'];
   let aiResult = null;
   let aiError = null;
 
@@ -5530,7 +6394,9 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
   nav('result');
 
   if (aiError && !aiResult) {
-    toast(`IA indisponível: ${aiError.slice(0, 80)} — análise local aplicada.`, 'warn');
+    console.error('AI analysis failed:', aiError);
+    const shortErr = aiError.length > 80 ? aiError.slice(0, 80) + '…' : aiError;
+    toast(`IA indisponível: ${shortErr}`, 'warn');
   } else {
     toast(
       overall === 'critical' ? '⚠ Crítico detectado na re-análise' :
@@ -5547,7 +6413,7 @@ function renderPatients(){
   const q=(document.getElementById('pt-q')?.value||'').toLowerCase();
   const data=S.patients.filter(p=>!q||p.name.toLowerCase().includes(q)||(p.owner||'').toLowerCase().includes(q)||(p.species||'').toLowerCase().includes(q));
   const grid=document.getElementById('pt-grid');
-  if(!data.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🐾</div><div class="es-title">Nenhum paciente encontrado</div><div class="es-sub">Cadastre o primeiro paciente para começar.</div><button class="btn btn-primary btn-md" onclick="openPatientModal()">Novo paciente</button></div>`;return;}
+  if(!data.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🐾</div><div class="es-title">Nenhum paciente registrado</div><div class="es-sub">Nenhum paciente ainda. Registre o primeiro e o DiagnoVet cuida do histórico.</div><button class="btn btn-primary btn-md" onclick="openPatientModal()">Registrar paciente</button></div>`;return;}
   grid.innerHTML=data.map(p=>{
     const exams=S.exams.filter(e=>e.patientId===p.id);
     const last=exams[0];
@@ -5561,7 +6427,7 @@ function renderPatients(){
         ${p.owner?`<div class="pt-stat">Tutor: <strong>${p.owner}</strong></div>`:''}
       </div>
       <div style="display:flex;gap:6px;margin-top:12px" onclick="event.stopPropagation()">
-        <button class="btn btn-primary btn-xs" style="flex:1;justify-content:center" onclick="nav('import');setTimeout(()=>{const s=document.getElementById('imp-patient');if(s)s.value='${p.id}'},100)">Novo exame</button>
+        <button class="btn btn-primary btn-xs" style="flex:1;justify-content:center" onclick="nav('import');setTimeout(()=>{const s=document.getElementById('imp-patient');if(s)s.value='${p.id}'},100)">Novo laudo</button>
         <button class="btn btn-ghost btn-xs" style="flex:1;justify-content:center" onclick="editPatient('${p.id}')">Editar</button>
         <button class="btn btn-ruby btn-xs" onclick="delPatient('${p.id}')">✕</button>
       </div>
@@ -5578,7 +6444,7 @@ function openPatientDetail(id){
 
 function openPatientModal(fromIntern=false) {
   document.getElementById('mp-id').value = '';
-  document.getElementById('mp-title').textContent = fromIntern ? 'Novo paciente para internação' : 'Novo paciente';
+  document.getElementById('mp-title').textContent = fromIntern ? 'Registrar paciente para internação' : 'Registrar paciente';
   // Toggle visibility
   const toggle = document.getElementById('mp-type-toggle');
   if(toggle) toggle.style.display = fromIntern ? 'none' : 'flex';
@@ -5590,7 +6456,7 @@ function openPatientModal(fromIntern=false) {
     const dateEl = document.getElementById('mp-intern-date');
     if(dateEl) dateEl.value = new Date().toISOString().slice(0,10);
     const saveBtn = document.getElementById('mp-save-btn');
-    if(saveBtn) saveBtn.textContent = '🏥 Internar paciente';
+    if(saveBtn) saveBtn.textContent = '🏥 Admitir paciente';
   } else {
     setPatientType('ambulatorial');
   }
@@ -5751,7 +6617,7 @@ function updateTrialBanner(){
     banner.style.background = 'linear-gradient(90deg,#8B1A20 0%,#6B1015 100%)';
   } else {
     const dayWord = ts.daysLeft === 1 ? 'dia' : 'dias';
-    text.textContent = `Período trial ativo — ${ts.daysLeft} ${dayWord} restante${ts.daysLeft!==1?'s':''} · ${ts.examsToday}/${ts.dailyLimit} exames hoje`;
+    text.textContent = `Período avaliação ativo — ${ts.daysLeft} ${dayWord} restante${ts.daysLeft!==1?'s':''} · ${ts.examsToday}/${ts.dailyLimit} exames hoje`;
     banner.style.background = '';
   }
 }
@@ -5761,7 +6627,7 @@ function updatePlanUI(){
   const plan = getUserPlan();
   const usage = getUsage();
   const pct = Math.min(100, Math.round(usage.count / (plan.analysesPerMonth < 9999 ? plan.analysesPerMonth : 200) * 100));
-  const planIcons = {trial:'⏱', basico:'📋', pro:'⭐'};
+  const planIcons = {avaliação:'⏱', basico:'📋', pro:'⭐'};
 
   // Sidebar chip
   const sbPlanIcon = document.getElementById('sb-plan-icon');
@@ -5851,8 +6717,8 @@ function renderPlanPanel(){
       <div style="border:${isBasico?'2px solid var(--leaf)':'1px solid var(--fog)'};border-radius:var(--r12);padding:14px;background:${isBasico?'var(--leaf-xl)':'var(--paper)'};position:relative">
         ${isBasico?`<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">ATUAL</div>`:''}
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px">Básico</div>
-        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isBasico?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;67,900<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;61,11/mês no trimestral</div>
+        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isBasico?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;67,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;61,11/mês — trimestral</div>
         ${feat(true,'200 análises/mês')}
         ${feat(true,'PDF e JSON')}
         ${feat(false,'Ilimitadas')}
@@ -5862,8 +6728,8 @@ function renderPlanPanel(){
       <div style="border:${isPro?'2px solid var(--leaf)':'1.5px solid var(--leaf)'};border-radius:var(--r12);padding:14px;background:${isPro?'var(--leaf-xl)':'var(--snow)'};position:relative">
         <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:${isPro?'var(--leaf)':'var(--night)'};color:var(--snow);font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">${isPro?'ATUAL':'⭐ PRO'}</div>
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px">Pro</div>
-        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;97,900<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;67,900/mês trimestral</div>
+        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;97,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;67,90/mês trimestral</div>
         ${feat(true,'Ilimitadas')}
         ${feat(true,'PDF e JSON')}
         ${feat(true,'Análises ilimitadas')}
@@ -5905,7 +6771,7 @@ function openUpgradeModal(reason){
   _billingMode = 'monthly';
 
   const reasons = {
-    trial:    'Seu período trial está ativo. Escolha um plano para continuar após os 7 dias.',
+    avaliação:    'Seu período avaliação está ativo. Escolha um plano para continuar após os 7 dias.',
     analyses: 'Você atingiu o limite de análises do período.',
     export:   'Exportação de laudos disponível nos planos pagos.',
     general:  'Escolha o plano ideal para sua clínica.',
@@ -5974,7 +6840,7 @@ function openUpgradeModal(reason){
     <!-- Header -->
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-1px;margin-bottom:6px">
-        ${ts.active && !ts.expired ? `⏱ ${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} de trial restante${ts.daysLeft!==1?'s':''}` : 'Escolha seu plano'}
+        ${ts.active && !ts.expired ? `⏱ ${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} de avaliação restante${ts.daysLeft!==1?'s':''}` : 'Continue economizando tempo'}
       </div>
       <div style="font-size:13px;color:var(--mist)">${reasons[reason]||reasons.general}</div>
     </div>
@@ -5999,7 +6865,7 @@ function openUpgradeModal(reason){
     <div style="background:#FEF5E7;border:1px solid rgba(232,145,26,.25);border-radius:var(--r12);padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start">
       <span style="font-size:18px;flex-shrink:0">⏱</span>
       <div>
-        <div style="font-size:12px;font-weight:700;color:#7A4800;margin-bottom:2px">Período trial — ${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} restante${ts.daysLeft!==1?'s':''}</div>
+        <div style="font-size:12px;font-weight:700;color:#7A4800;margin-bottom:2px">Período avaliação — ${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} restante${ts.daysLeft!==1?'s':''}</div>
         <div style="font-size:11px;color:#7A4800;opacity:.8">${ts.dailyLimit} exames por dia · Exportação não disponível · Assine para desbloquear tudo</div>
       </div>
     </div>` : ''}
@@ -6085,18 +6951,21 @@ function saveProfile(){
   }
 
   updateUserUI();
-  toast('Perfil atualizado com sucesso.','ok');
+  toast('Perfil atualizado.','ok');
 }
 function saveKey(){
   const k=document.getElementById('s-key')?.value.trim()||'';
   if(k&&!k.startsWith('sk-ant-')){toast('Chave inválida — deve começar com sk-ant-','warn');return;}
   S.key=k; DB.s('key',k); updateKeyUI();
-  toast(k?'Chave salva — Claude AI ativo!':'Modo offline configurado.','ok');
+  toast(k?'Chave salva — Claude AI ativo!':'Processamento local configurado.','ok');
 }
 function saveProxy(){
   const url=(document.getElementById('s-proxy')?.value||'').trim();
   if(url&&!url.startsWith('https://')){toast('URL deve começar com https://','warn');return;}
-  S.proxyUrl=url; DB.s('proxyUrl',url); updateKeyUI();
+  // Never set proxyUrl to empty — always keep DEFAULT_PROXY as fallback
+  S.proxyUrl = url || DEFAULT_PROXY;
+  DB.s('proxyUrl', S.proxyUrl);
+  updateKeyUI();
   toast(url?'Proxy salvo — chamadas roteadas pelo Worker seguro.':'Proxy removido.','ok');
 }
 
@@ -6125,7 +6994,7 @@ function exportCSV(){
 function importBackup(input){
   const file=input.files[0]; if(!file) return;
   const statusEl=document.getElementById('backup-status');
-  statusEl.textContent='Lendo arquivo...'; statusEl.style.color='var(--mist)';
+  statusEl.textContent='Lendo o exame...'; statusEl.style.color='var(--mist)';
   const reader=new FileReader();
   reader.onload=e=>{
     try{
@@ -6454,7 +7323,7 @@ body{
       </div>
       <div>
         <div class="brand-name">Diagno<em>Vet IA</em></div>
-        <div class="brand-sub">Diagnóstico Veterinário com IA · Laudo Clínico</div>
+        <div class="brand-sub">Diagnóstico Clínico Veterinário · Laudo Clínico</div>
       </div>
     </div>
     <div class="report-meta">
@@ -6468,7 +7337,7 @@ body{
   <!-- PATIENT HERO -->
   <div class="patient-hero">
     <div class="ph-left">
-      <div class="ph-eyebrow">Resultado da análise · ${exam.type}</div>
+      <div class="ph-eyebrow">Laudo Clínico · ${exam.type}</div>
       <div class="ph-name">${escapeHTML(patient.name)}</div>
       <div class="ph-meta">${patient.species}${patient.breed&&patient.breed!=='—'?' · '+patient.breed:''} · ${patient.sex||'—'} · ${patient.age||'—'} · ${patient.weight||'—'}</div>
       <div class="ph-badges">
@@ -6619,7 +7488,7 @@ body{
     <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
       <div>
         <div class="footer-brand">DiagnoVet IA · Diagnóstico Veterinário</div>
-        <div>${printedAt} · ${exam.usedAI?'Claude AI':'Motor local'}</div>
+        <div>${printedAt} · ${exam.usedAI?'Claude AI':'Análise clínica'}</div>
       </div>
       <div style="text-align:right;border-top:1px solid var(--fog);padding-top:10px;min-width:200px">
         <div style="font-size:13px;font-weight:700;color:var(--ink)">${escapeHTML(S.user?.name||'Médico(a) Veterinário(a)')}</div>
