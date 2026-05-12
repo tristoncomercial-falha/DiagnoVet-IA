@@ -2,7 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="DiagnoVet IA"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="color-scheme" content="light"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.workers.dev https://api.anthropic.com https://*.supabase.co https://*.supabase.io; img-src 'self' data: blob:; object-src 'none'; base-uri 'self';">
 <meta name="description" content="DiagnoVet IA — VitaHub Solutions · DiagnoVet IA."/>
 <meta name="theme-color" content="#091610"/>
@@ -1528,6 +1534,326 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
   .auth-form-title { font-size: 20px; }
 }
 /* ══ FIM AUTH CARD CENTERED ══════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVIDADE UNIVERSAL — iOS, Android, Notebook, PC, TV
+   ══════════════════════════════════════════════════════════ */
+
+/* ── BASE — Safe areas iOS (notch e home indicator) */
+:root {
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+}
+
+* { -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
+}
+
+/* Touch targets — mínimo 44x44 em mobile (Apple HIG) */
+@media (pointer: coarse) {
+  button, .btn, .sb-btn, .auth-tab, .mob-nav-btn, .btn-auth,
+  input[type="checkbox"], input[type="radio"], select {
+    min-height: 44px;
+  }
+  .modal-close { min-width: 44px; min-height: 44px; }
+}
+
+/* iOS — prevent zoom on input focus (font-size >= 16px) */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  .fld-in, .fld-sel, .fld-txt {
+    font-size: 16px !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BREAKPOINT — Tablets pequenos e mobile landscape (≤768px)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Sidebar vira oculta, bottom-nav assume */
+  .sidebar { display: none !important; }
+  .layout { padding-left: 0 !important; }
+
+  /* Topbar com safe-area */
+  .topbar {
+    padding-top: calc(12px + var(--safe-top));
+    padding-left: calc(16px + var(--safe-left));
+    padding-right: calc(16px + var(--safe-right));
+  }
+
+  /* Bottom nav com safe-area */
+  .mob-nav {
+    padding-bottom: calc(8px + var(--safe-bottom));
+    padding-left: calc(8px + var(--safe-left));
+    padding-right: calc(8px + var(--safe-right));
+  }
+
+  /* Conteúdo respeita safe-areas */
+  .screen-inner {
+    padding-left: calc(14px + var(--safe-left));
+    padding-right: calc(14px + var(--safe-right));
+    padding-bottom: calc(80px + var(--safe-bottom));
+  }
+
+  /* Cards menores */
+  .card { padding: 14px 16px; border-radius: 12px; }
+  .card-title { font-size: 11px; }
+
+  /* Grids 1 coluna */
+  .stat-grid, .metric-grid, .plan-grid, .fld-row {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+
+  /* Modal full-height em mobile */
+  .modal {
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    padding: 22px 18px;
+  }
+  .overlay { align-items: flex-end; }
+
+  /* Auth — usar quase toda a tela */
+  .auth-card-centered {
+    margin: 12px;
+    max-width: calc(100% - 24px) !important;
+    padding: 26px 22px;
+  }
+
+  /* Hero do resultado — empilhar */
+  .result-hero,
+  .study-hero {
+    flex-direction: column !important;
+    text-align: center;
+    gap: 12px !important;
+  }
+  .result-hero > *,
+  .study-hero > * {
+    flex: 1 1 100% !important;
+    width: 100%;
+  }
+
+  /* Botões em row → wrap */
+  .btn-row, .action-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Texto reduzido em headlines */
+  h1, .h1 { font-size: clamp(20px, 5vw, 26px) !important; }
+  h2, .h2 { font-size: clamp(17px, 4.5vw, 22px) !important; }
+
+  /* Tabelas → scroll horizontal */
+  table { display: block; overflow-x: auto; }
+
+  /* Auth headline mais compacto */
+  .auth-form-title { font-size: 20px; }
+  .auth-form-sub   { font-size: 12px; }
+  .auth-slogan-line { font-size: 14px; }
+  .auth-slogan-sub  { font-size: 11px; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BREAKPOINT — Mobile portrait (≤480px)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .screen-inner { padding: 12px 14px 80px; }
+  .card { padding: 12px 14px; }
+  .auth-card-centered { padding: 22px 18px; }
+
+  /* Page title menor */
+  #page-title { font-size: 15px; }
+
+  /* Brand top — versão compacta */
+  .auth-brand-top { margin-bottom: 18px; gap: 10px; }
+  .auth-logo-circle { width: 44px; height: 44px; border-radius: 12px; }
+  .auth-logo-circle svg { width: 26px; height: 26px; }
+  .auth-brand-name { font-size: 19px; }
+
+  /* Bottom-nav mais compacto */
+  .mob-nav-btn {
+    padding: 6px 4px;
+    font-size: 9px;
+  }
+  .mob-nav-btn svg { width: 18px; height: 18px; }
+
+  /* Modal — full screen feel */
+  .modal {
+    border-radius: 14px 14px 0 0;
+    padding: 20px 16px;
+    max-height: 95vh;
+  }
+
+  /* Botões mais touch-friendly */
+  .btn-md { padding: 11px 16px; font-size: 13px; }
+  .btn-sm { padding: 8px 12px; font-size: 12px; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BREAKPOINT — Mobile pequeno (≤375px) — iPhone SE etc
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 375px) {
+  .auth-form-title { font-size: 18px; }
+  .auth-logo-circle { width: 40px; height: 40px; }
+  .auth-brand-name { font-size: 17px; }
+  .card-title { font-size: 10.5px; }
+  #page-title { font-size: 14px; }
+  .mob-nav-btn span { display: none; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BREAKPOINT — Tablet (769px - 1024px)
+   ────────────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar { width: 200px !important; }
+  .layout { padding-left: 200px; }
+
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .plan-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .screen-inner { padding: 20px 24px; max-width: 100%; }
+
+  .mob-nav { display: none; }
+  .modal { max-width: 540px; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BREAKPOINT — Notebook padrão (1025px - 1440px)
+   ────────────────────────────────────────────────────────── */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .sidebar { width: 220px; }
+  .layout { padding-left: 220px; }
+  .screen-inner { max-width: 1100px; padding: 24px 28px; }
+  .mob-nav { display: none; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BREAKPOINT — Desktop grande (1441px+)
+   ────────────────────────────────────────────────────────── */
+@media (min-width: 1441px) {
+  .sidebar { width: 240px; }
+  .layout { padding-left: 240px; }
+  .screen-inner { max-width: 1280px; padding: 28px 32px; }
+  .mob-nav { display: none; }
+
+  .stat-grid { grid-template-columns: repeat(4, 1fr); }
+  .plan-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BREAKPOINT — Telas ultra-largas (1920px+)
+   ────────────────────────────────────────────────────────── */
+@media (min-width: 1920px) {
+  .screen-inner { max-width: 1440px; }
+  body { font-size: 15px; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   ORIENTAÇÃO — Landscape em mobile
+   ────────────────────────────────────────────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .auth-card-centered {
+    flex-direction: row !important;
+    align-items: center;
+    gap: 24px;
+    max-width: 90% !important;
+    padding: 22px;
+  }
+  .auth-brand-top { margin-bottom: 0; flex-direction: column; gap: 6px; }
+  .auth-form-block { flex: 1; }
+  .auth-slogan-bottom { display: none; }
+  .auth-stamp-centered { display: none; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   ALTA DENSIDADE — Retina / Hi-DPI
+   ────────────────────────────────────────────────────────── */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   MODO ESCURO DO SO — respeitar preferência
+   ────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  /* Por enquanto mantém claro — app é otimizado para clínica */
+  /* Mas garante que campos não fiquem ilegíveis */
+  input, select, textarea {
+    color-scheme: light;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   ACESSIBILIDADE — Reduzir movimento se preferido
+   ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .auth-bg-orb { animation: none !important; }
+  .auth-slogan-accent { animation: none !important; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   IMPRESSÃO — laudo printável
+   ────────────────────────────────────────────────────────── */
+@media print {
+  .sidebar, .mob-nav, .topbar, .btn, .modal-close,
+  #proc, .overlay, .auth-bg { display: none !important; }
+  .layout { padding-left: 0 !important; }
+  .screen-inner { max-width: 100%; padding: 0; }
+  .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+  body { background: white; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   FIX — Bottom nav não cobre conteúdo
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .screen {
+    padding-bottom: calc(70px + var(--safe-bottom));
+  }
+  .mob-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--snow);
+    border-top: 1px solid var(--fog);
+    box-shadow: 0 -2px 12px rgba(9,22,16,.06);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   FIX — Body scroll quando modal está aberto
+   ────────────────────────────────────────────────────────── */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* ══ FIM RESPONSIVIDADE UNIVERSAL ════════════════════════ */
 
 </style>
 </head>
@@ -7093,7 +7419,13 @@ function exportOneExam(id){
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="DiagnoVet IA"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="color-scheme" content="light"/>
 <title>Laudo DiagnoVet — ${escapeHTML(patient.name)} — ${dateStr}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
