@@ -575,10 +575,11 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
 /* ══ TABLET/MOBILE ══ */
 @media (max-width: 900px) {
   .sidebar {
-    position: fixed; left: -280px; top: 0; bottom: 0; z-index: 300;
-    transition: left var(--d-slow) var(--e-out); width: 272px;
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 300;
+    transform: translateX(-100%);
+    transition: transform var(--d-slow) var(--e-out); width: 272px;
   }
-  .sidebar.open { left: 0; box-shadow: var(--shN); }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.25); }
   .hamburger { display: flex !important; }
   .dash-kpi { grid-template-columns: 1fr 1fr; }
   .dash-grid, .import-layout, .result-grid, .study-grid, .settings-layout { grid-template-columns: 1fr; }
@@ -1580,9 +1581,23 @@ html, body {
    BREAKPOINT — Tablets pequenos e mobile landscape (≤768px)
    ────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  /* Sidebar vira oculta, bottom-nav assume */
-  .sidebar { display: none !important; }
+  /* Sidebar fica off-screen, bottom-nav assume, hamburger abre quando necessário */
   .layout { padding-left: 0 !important; }
+  /* Sidebar abre via hamburger — usar position fixed + transform */
+  .sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    z-index: 300 !important;
+    transform: translateX(-100%);
+    transition: transform var(--d-slow) var(--e-out) !important;
+    width: 272px !important;
+  }
+  .sidebar.open {
+    transform: translateX(0) !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,.25) !important;
+  }
 
   /* Topbar com safe-area */
   .topbar {
@@ -5025,6 +5040,8 @@ function nav(sc, addToHistory=true){
     updateBackBtn();
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  // Fechar sidebar mobile ao navegar
+  if(window.innerWidth <= 768) closeSidebar();
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('on'));
   document.getElementById('sc-'+sc)?.classList.add('on');
   document.querySelector(`.sb-btn[data-sc="${sc}"]`)?.classList.add('on');
@@ -5200,43 +5217,74 @@ const REFS={
   },
 };
 const LABELS={
-  /* Eritrograma */
-  hemaceas:'Hemácias',hemoglobina:'Hemoglobina',hematocrito:'Hematócrito',
-  vcm:'VCM',hcm:'HCM',chcm:'CHCM',rdw:'RDW',mpv:'MPV (Plaquetário)',
-  /* Leucograma */
-  leucocitos:'Leucócitos Totais',
-  neutrofilos:'Neutrófilos Seg.',neutrofilos_bast:'Neutrófilos Bast.',
-  linfocitos:'Linfócitos',monocitos:'Monócitos',eosinofilos:'Eosinófilos',basofilos:'Basófilos',
-  /* Plaquetas */
-  plaquetas:'Plaquetas',
-  /* Bioquímica hepática */
-  alt:'ALT (TGP)',ast:'AST (TGO)',ggt:'GGT',fosfatase_alcalina:'Fosfatase Alcalina',
-  bilirrubina_total:'Bilirrubina Total',bilirrubina_direta:'Bilirrubina Direta',
-  bilirrubina_indireta:'Bilirrubina Indireta',acidos_biliares:'Ácidos Biliares',
-  /* Renal */
-  creatinina:'Creatinina',ureia:'Ureia',bun:'BUN',sdma:'SDMA',
-  /* Metabólica */
-  glicose:'Glicose',proteinas:'Proteínas Totais',albumina:'Albumina',
-  globulinas:'Globulinas',fibrinogeno:'Fibrinogênio',
-  triglicerideos:'Triglicerídeos',colesterol:'Colesterol',
-  amilase:'Amilase',lipase:'Lipase',ck:'CK (Creatinofosfoquinase)',ldh:'LDH',
-  /* Uroanálise */
-  densidade_urina:'Densidade Urinária',ph_urina:'pH Urinário',
-  proteina_urina:'Proteína Urinária',creatinina_urina:'Creatinina Urinária',
-  /* Eletrólitos */
-  sodio:'Sódio',potassio:'Potássio',cloro:'Cloreto',
-  calcio:'Cálcio',fosforo:'Fósforo',magnesio:'Magnésio',bicarbonato:'Bicarbonato',
-  /* Hormonal */
-  t4_total:'T4 Total',t4_livre:'T4 Livre',t3:'T3 Total',tsh:'TSH',
-  cortisol:'Cortisol',cortisol_pos_acth:'Cortisol pós-ACTH',
-  insulina:'Insulina',progesterona:'Progesterona',testosterona:'Testosterona',
-  /* Coagulação */
-  tp:'TP (Tempo de Protrombina)',ttpa:'TTPa',fibrinogenio:'Fibrinogênio',
-  /* Cardíaco */
-  troponina_i:'Troponina I',nt_probnp:'NT-proBNP',bnp:'BNP',
-  /* Inflamatório */
-  proteina_c_reativa:'Proteína C Reativa',vhs:'VHS',
+  // ── Eritrograma
+  hemaceas:'Hemácias', hemoglobina:'Hemoglobina', hematocrito:'Hematócrito',
+  vcm:'VCM (Volume Corpuscular Médio)', hcm:'HCM (Hemoglobina Corpuscular Média)',
+  chcm:'CHCM (Conc. Hgb Corpuscular Média)', rdw:'RDW (Amplitude de Distribuição)',
+  reticulocitos:'Reticulócitos',
+  // ── Leucograma
+  leucocitos:'Leucócitos totais',
+  neutrofilos:'Neutrófilos segmentados', neutrofilos_seg:'Neutrófilos segmentados',
+  neutrofilos_bast:'Neutrófilos bastonetes',
+  linfocitos:'Linfócitos', monocitos:'Monócitos',
+  eosinofilos:'Eosinófilos', basofilos:'Basófilos',
+  // ── Plaquetograma
+  plaquetas:'Plaquetas', mpv:'VPM (Volume Plaquetário Médio)',
+  // ── Hepatograma
+  alt:'ALT (TGP)', ast:'AST (TGO)', ggt:'GGT (Gama-GT)',
+  fosfatase_alcalina:'Fosfatase Alcalina', fa:'Fosfatase Alcalina',
+  bilirrubina_total:'Bilirrubina total',
+  bilirrubina_direta:'Bilirrubina direta (conjugada)',
+  bilirrubina_indireta:'Bilirrubina indireta (não-conjugada)',
+  acidos_biliares:'Ácidos biliares',
+  // ── Função renal
+  creatinina:'Creatinina', ureia:'Ureia', bun:'BUN (Nitrogênio Ureico)',
+  sdma:'SDMA (Dimetilarginina Simétrica)',
+  // ── Glicídico
+  glicose:'Glicemia', frutosamina:'Frutosamina', hba1c:'Hemoglobina Glicada',
+  // ── Proteínas
+  proteinas:'Proteínas totais', albumina:'Albumina', globulinas:'Globulinas',
+  fibrinogeno:'Fibrinogênio', fibrinogenio:'Fibrinogênio',
+  // ── Lipídico
+  triglicerideos:'Triglicerídeos', colesterol:'Colesterol total',
+  hdl:'HDL-Colesterol', ldl:'LDL-Colesterol',
+  // ── Pancreático
+  amilase:'Amilase', lipase:'Lipase',
+  // ── Muscular/Cardíaco
+  ck:'CK (Creatina Quinase)', ldh:'LDH (Lactato Desidrogenase)',
+  troponina_i:'Troponina I', nt_probnp:'NT-proBNP',
+  // ── Eletrólitos
+  sodio:'Sódio', potassio:'Potássio', cloro:'Cloreto',
+  calcio:'Cálcio total', calcio_ionizado:'Cálcio ionizado',
+  fosforo:'Fósforo', magnesio:'Magnésio',
+  // ── Endocrinologia
+  t4_total:'T4 total', t4_livre:'T4 livre', tsh:'TSH',
+  cortisol:'Cortisol basal', cortisol_pos_acth:'Cortisol pós-ACTH',
+  cortisol_pos_dexametasona:'Cortisol pós-Dexametasona',
+  insulina:'Insulina', progesterona:'Progesterona', estradiol:'Estradiol',
+  testosterona:'Testosterona',
+  // ── Coagulação
+  tp:'TP (Tempo de Protrombina)', ttpa:'TTPa (Tempo Parcial Tromboplastina)',
+  inr:'INR',
+  // ── Inflamação
+  proteina_c_reativa:'Proteína C Reativa', pcr:'Proteína C Reativa',
+  vhs:'VHS (Velocidade Hemossedimentação)',
+  // ── Urinálise — Físico-químico
+  densidade_urina:'Densidade urinária', ph_urina:'pH urinário',
+  proteina_urina:'Proteína urinária', proteinuria:'Proteinúria',
+  glicose_urina:'Glicosúria', cetonas_urina:'Cetonúria',
+  bilirrubina_urina:'Bilirrubinúria', urobilinogenio:'Urobilinogênio',
+  sangue_urina:'Hemoglobinúria/Hematúria', nitrito:'Nitrito',
+  leucocitos_urina:'Leucocitúria',
+  rpc_urina:'RPC urinário (Relação Proteína/Creatinina)',
+  // ── Urinálise — Sedimento
+  eritrocitos_urina:'Eritrócitos no sedimento',
+  cilindros_urina:'Cilindros urinários',
+  cristais_urina:'Cristais urinários',
+  bacterias_urina:'Bactérias urinárias',
+  celulas_epiteliais_urina:'Células epiteliais urinárias',
 };
+
 const C={ok:'var(--leaf)',warn:'var(--amber)',critical:'var(--ruby)',info:'var(--cobalt)'};
 
 function pN(s){ return parseFloat((s||'0').replace(/\./g,'').replace(',','.')); }
