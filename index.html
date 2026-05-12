@@ -2170,22 +2170,11 @@ body.modal-open {
 
   .result-section-h { font-size: 12px; margin: 16px 0 8px 0; }
 
-  /* Marker cards — empilhar valor abaixo do nome em telas pequenas */
-  .marker-card {
-    padding: 10px 12px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .marker-card-right {
-    text-align: left;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: space-between;
-  }
-  .marker-card-value { font-size: 16px; margin-bottom: 0; }
+  /* Marker cards no mobile — manter head em row, barra abaixo */
+  .marker-card { padding: 11px 13px; }
+  .marker-card-head { gap: 10px; }
+  .marker-card-value { font-size: 16px; }
+  .marker-card-ref { font-size: 10.5px; }
 
   .insight-row { padding: 12px; gap: 10px; }
   .insight-icon { width: 28px; height: 28px; font-size: 14px; }
@@ -2212,6 +2201,178 @@ body.modal-open {
 }
 
 /* ══ FIM RESULT SCREEN PREMIUM ═══════════════════════════ */
+
+
+/* ══ SCORE GAUGE + BARRAS DE MARCADORES ══════════════════ */
+
+.rh-score-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+}
+.rh-gauge {
+  flex-shrink: 0;
+}
+.rh-score-meta {
+  flex: 1;
+  min-width: 0;
+}
+.rh-score-label {
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 6px;
+  letter-spacing: -.2px;
+}
+.rh-score-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.rh-bar-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: rgba(255,255,255,.65);
+  font-weight: 500;
+}
+.rh-bar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── MARCADORES — refinamento com barra visual */
+.marker-card {
+  display: block;
+  flex-direction: unset;
+  padding: 13px 14px;
+}
+.marker-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.marker-card-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.1px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.marker-card-ref {
+  font-size: 11px;
+  color: var(--ink2);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 3px;
+  letter-spacing: -.02em;
+  line-height: 1.4;
+}
+.marker-card-ref strong {
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.marker-card-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.marker-card-unit {
+  font-size: .55em;
+  opacity: .65;
+  font-weight: 500;
+  margin-left: 2px;
+}
+.marker-card-status {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 99px;
+  letter-spacing: .06em;
+  margin-top: 5px;
+  display: inline-block;
+}
+
+/* Barra visual de posição do valor */
+.marker-bar-wrap {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,.04);
+}
+.marker-bar-track {
+  position: relative;
+  height: 6px;
+  background: linear-gradient(90deg,
+    rgba(220,53,69,.15) 0%,
+    rgba(220,53,69,.08) 20%,
+    rgba(0,0,0,.04) 30%,
+    rgba(0,0,0,.04) 70%,
+    rgba(220,53,69,.08) 80%,
+    rgba(220,53,69,.15) 100%);
+  border-radius: 99px;
+  overflow: visible;
+}
+.marker-bar-ref {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(22,168,126,.25);
+  border-radius: 99px;
+  box-shadow: inset 0 0 0 1px rgba(22,168,126,.4);
+}
+.marker-bar-dot {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid white;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0,0,0,.18);
+  z-index: 2;
+}
+.marker-bar-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 9.5px;
+  color: var(--mist);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -.02em;
+}
+.marker-bar-axis span:first-child::before { content: '◀ '; opacity: .5; }
+.marker-bar-axis span:last-child::after { content: ' ▶'; opacity: .5; }
+
+/* Mobile — gauge compactado */
+@media (max-width: 480px) {
+  .rh-score-wrap { gap: 10px; padding: 10px 12px; }
+  .rh-gauge svg { width: 78px; height: 78px; }
+  .marker-card-value { font-size: 16px; }
+  .marker-card-name { font-size: 12.5px; }
+  .marker-bar-track { height: 5px; }
+  .marker-bar-dot { width: 12px; height: 12px; border-width: 2px; }
+}
+@media (max-width: 375px) {
+  .rh-gauge svg { width: 70px; height: 70px; }
+}
 
 </style>
 </head>
@@ -6295,11 +6456,29 @@ function renderResult(){
         ${usedAI    ? `<span class="rh-tag rh-tag-info">IA</span>` : ''}
       </div>
 
-      <div class="rh-score-circle">
-        <div class="rh-score-value" style="color:${scoreColor}">${score}</div>
-        <div class="rh-score-info">
-          <div class="rh-score-label">Score Clínico</div>
-          <div class="rh-score-sub">${overall==='normal' ? 'Quadro estável' : overall==='attention' ? 'Requer atenção' : 'Quadro crítico'}</div>
+      <!-- Score gauge + breakdown -->
+      <div class="rh-score-wrap">
+        <div class="rh-gauge">
+          <svg width="92" height="92" viewBox="0 0 92 92">
+            <circle cx="46" cy="46" r="36" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="7"/>
+            <circle cx="46" cy="46" r="36" fill="none" stroke="${scoreColor}" stroke-width="7"
+              stroke-dasharray="${(2*Math.PI*36).toFixed(1)}"
+              stroke-dashoffset="${((2*Math.PI*36)*(1-score/100)).toFixed(1)}"
+              stroke-linecap="round" transform="rotate(-90 46 46)"
+              style="transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>
+            <text x="46" y="44" text-anchor="middle" font-family="Sora,sans-serif"
+              font-size="22" font-weight="800" fill="white">${score}</text>
+            <text x="46" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace"
+              font-size="8" fill="rgba(255,255,255,.4)" letter-spacing=".1em">SCORE</text>
+          </svg>
+        </div>
+        <div class="rh-score-meta">
+          <div class="rh-score-label">${overall==='normal' ? 'Quadro estável' : overall==='attention' ? 'Requer atenção' : 'Quadro crítico'}</div>
+          <div class="rh-score-bars">
+            ${critCount ? `<div class="rh-bar-line"><span class="rh-bar-dot" style="background:#FCA5A5"></span><span>${critCount} crítico${critCount>1?'s':''}</span></div>` : ''}
+            ${warnCount ? `<div class="rh-bar-line"><span class="rh-bar-dot" style="background:#FDE68A"></span><span>${warnCount} atenção</span></div>` : ''}
+            ${okCount   ? `<div class="rh-bar-line"><span class="rh-bar-dot" style="background:#6EE7B7"></span><span>${okCount} normal${okCount>1?'is':''}</span></div>` : ''}
+          </div>
         </div>
       </div>
     </div>
@@ -6320,15 +6499,47 @@ function renderResult(){
     ${evalResults.map(m => {
       const stClass = m.status === 'critical' ? 'is-crit' : m.status === 'warn' ? 'is-warn' : 'is-ok';
       const stLabel = m.status === 'critical' ? 'CRÍTICO' : m.status === 'warn' ? 'ATENÇÃO' : 'NORMAL';
+      const stIcon  = m.status === 'critical' ? '🔴' : m.status === 'warn' ? '🟡' : '🟢';
+      // Calcular barra visual de posição se possível
+      let barHTML = '';
+      const refMatch = String(m.ref||'').match(/([\d.,]+)\s*[-–—]\s*([\d.,]+)/);
+      const numValue = parseFloat(String(m.value||'').replace(',','.'));
+      if(refMatch && !isNaN(numValue)) {
+        const min = parseFloat(refMatch[1].replace(',','.'));
+        const max = parseFloat(refMatch[2].replace(',','.'));
+        if(!isNaN(min) && !isNaN(max) && max > min) {
+          const range = max - min;
+          const padding = range * 0.3;
+          const totalMin = min - padding;
+          const totalMax = max + padding;
+          const pct = Math.max(0, Math.min(100, ((numValue - totalMin) / (totalMax - totalMin)) * 100));
+          const refStartPct = ((min - totalMin) / (totalMax - totalMin)) * 100;
+          const refEndPct   = ((max - totalMin) / (totalMax - totalMin)) * 100;
+          const dotColor = m.status === 'critical' ? '#DC3545' : m.status === 'warn' ? '#E8911A' : '#16A87E';
+          barHTML = `<div class="marker-bar-wrap">
+            <div class="marker-bar-track">
+              <div class="marker-bar-ref" style="left:${refStartPct.toFixed(1)}%;width:${(refEndPct-refStartPct).toFixed(1)}%"></div>
+              <div class="marker-bar-dot" style="left:${pct.toFixed(1)}%;background:${dotColor}"></div>
+            </div>
+            <div class="marker-bar-axis">
+              <span>${escapeHTML(refMatch[1])}</span>
+              <span>${escapeHTML(refMatch[2])}</span>
+            </div>
+          </div>`;
+        }
+      }
       return `<div class="marker-card ${stClass}">
-        <div class="marker-card-left">
-          <div class="marker-card-name">${escapeHTML(m.name||m.label||'—')}</div>
-          ${m.ref ? `<div class="marker-card-ref">Ref: ${escapeHTML(m.ref)}</div>` : ''}
+        <div class="marker-card-head">
+          <div class="marker-card-left">
+            <div class="marker-card-name">${stIcon} ${escapeHTML(m.name||m.label||'—')}</div>
+            ${m.ref ? `<div class="marker-card-ref"><strong>Ref:</strong> ${escapeHTML(m.ref)}${m.unit ? ` ${escapeHTML(m.unit)}` : ''}</div>` : ''}
+          </div>
+          <div class="marker-card-right">
+            <div class="marker-card-value">${escapeHTML(String(m.value||'—'))}${m.unit ? `<span class="marker-card-unit"> ${escapeHTML(m.unit)}</span>` : ''}</div>
+            <span class="marker-card-status">${stLabel}</span>
+          </div>
         </div>
-        <div class="marker-card-right">
-          <div class="marker-card-value">${escapeHTML(String(m.value||'—'))}${m.unit ? ` <span style="font-size:.7em;opacity:.7">${escapeHTML(m.unit)}</span>` : ''}</div>
-          <span class="marker-card-status">${stLabel}</span>
-        </div>
+        ${barHTML}
       </div>`;
     }).join('')}` : ''}
 
@@ -7719,497 +7930,574 @@ function exportOneExam(id){
   const recs = exam.result?.recommendations || [];
   const patterns = exam.result?.patterns || [];
   const summary = exam.result?.summary || '';
-  const dateStr = exam.date ? new Date(exam.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-  const printedAt = new Date().toLocaleString('pt-BR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-  const critInsights = insights.filter(i=>i.level==='critical');
-  const warnInsights = insights.filter(i=>i.level==='warn');
-  const okInsights   = insights.filter(i=>i.level==='ok');
-  const infoInsights = insights.filter(i=>i.level==='info');
+  // Vet info
+  const vet = S.user || {};
+  const vetName = vet.name || '—';
+  const vetCrmv = vet.crmv || '—';
+  const vetSpec = vet.specialty || vet.spec || '—';
+  const vetClinic = vet.clinic || '';
+  const vetEmail = vet.email || '';
 
-  const scoreVal = overall==='normal'?92:overall==='attention'?65:36;
-  const scoreColor = overall==='critical'?'#DC3545':overall==='attention'?'#E8911A':'#16A87E';
-  const overallLabel = {normal:'✓ Normal',attention:'⚠ Atenção Clínica',critical:'🚨 Crítico'}[overall]||overall;
-  const overallBg = {normal:'#E6F7F3',attention:'#FEF5E7',critical:'#FEF0F1'}[overall];
-  const overallFg = {normal:'#0B6B52',attention:'#7A4800',critical:'#8B1A20'}[overall];
+  // Counts
+  const critList = results.filter(m => m.status === 'critical');
+  const warnList = results.filter(m => m.status === 'warn');
+  const okList   = results.filter(m => m.status === 'ok');
 
-  // Build markers rows HTML
-  const hemaKeys = results.filter(m=>['hemaceas','hemoglobina','hematocrito','vcm','hcm','chcm','rdw','leucocitos','neutrofilos','neutrofilos_bast','linfocitos','monocitos','eosinofilos','basofilos','plaquetas','mpv'].includes(m.key));
-  const biochemKeys = results.filter(m=>!['hemaceas','hemoglobina','hematocrito','vcm','hcm','chcm','rdw','leucocitos','neutrofilos','neutrofilos_bast','linfocitos','monocitos','eosinofilos','basofilos','plaquetas','mpv'].includes(m.key));
+  // Date formatting
+  const examDate = exam.date
+    ? new Date(exam.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})
+    : '—';
+  const reportDate = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const reportTime = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
-  const statusIcon = {ok:'✓', warn:'⚠', critical:'✕', info:'ℹ'}
-  const statusColor = {ok:'#0B6B52', warn:'#7A4800', critical:'#8B1A20', info:'#1E40AF'}
-  const barColor = {ok:'#16A87E', warn:'#E8911A', critical:'#DC3545', info:'#2563EB'}
-
-  function markerRows(list){
-    return list.map(m=>`
-      <tr>
-        <td class="mk-name">${m.label}</td>
-        <td class="mk-val" style="color:${barColor[m.status]}">${m.value}</td>
-        <td class="mk-unit">${m.unit}</td>
-        <td class="mk-ref">${m.refStr} ${m.unit}</td>
-        <td class="mk-status" style="color:${statusColor[m.status]}">
-          <span class="mk-badge" style="background:${barColor[m.status]}20;color:${statusColor[m.status]};border:1px solid ${barColor[m.status]}40">
-            ${statusIcon[m.status]} ${m.status==='ok'?'Normal':m.status==='warn'?'Atenção':'Crítico'}
-          </span>
-        </td>
-        <td class="mk-bar-cell">
-          <div class="mk-bar-track">
-            <div class="mk-bar-fill" style="width:${m.pct}%;background:${barColor[m.status]}"></div>
-          </div>
-        </td>
-      </tr>`).join('');
-  }
-
-  function patternBlock(){
-    if(!patterns.length) return '';
-    const icons={hepatopathy:'🫀',nephropathy:'🫘',inflammatory:'🔴',dehydration:'💧',infection:'🦠',anemia:'🩸',other:'📊'};
-    const colors={hepatopathy:'#7A4800',nephropathy:'#1E40AF',inflammatory:'#8B1A20',dehydration:'#0C4A6E',infection:'#7A4800',anemia:'#881337',other:'#374151'};
-    const bgs={hepatopathy:'#FEF5E7',nephropathy:'#EFF6FF',inflammatory:'#FEF0F1',dehydration:'#F0F9FF',infection:'#FEF5E7',anemia:'#FFF1F2',other:'#F9FAFB'};
-    const conf={high:'Alta confiança',moderate:'Confiança moderada',possible:'Possível'};
-    return `<div class="section-block">
-      <div class="section-title">🧠 Padrões Clínicos Identificados</div>
-      <div class="patterns-grid">
-        ${patterns.map(p=>`
-          <div class="pattern-card" style="background:${bgs[p.type]||'#F9FAFB'};border-color:${colors[p.type]||'#374151'}30">
-            <div class="pattern-head">
-              <span class="pattern-icon">${icons[p.type]||'📊'}</span>
-              <span class="pattern-name" style="color:${colors[p.type]||'#374151'}">${p.name}</span>
-              <span class="pattern-conf" style="color:${colors[p.type]||'#374151'}">${conf[p.confidence]||p.confidence}</span>
-            </div>
-            <div class="pattern-desc" style="color:${colors[p.type]||'#374151'}">${p.description}</div>
-          </div>`).join('')}
-      </div>
-    </div>`;
-  }
+  // Overall label
+  const overallLabel = overall === 'normal' ? 'NORMAL' : overall === 'attention' ? 'REQUER ATENÇÃO' : 'CRÍTICO';
+  const overallColor = overall === 'normal' ? '#16A87E' : overall === 'attention' ? '#B45309' : '#B91C2C';
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="DiagnoVet IA"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="format-detection" content="telephone=no"/>
-<meta name="color-scheme" content="light"/>
-<title>Laudo DiagnoVet — ${escapeHTML(patient.name)} — ${dateStr}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<title>Laudo Clínico — ${escapeHTML(patient.name)} — ${examDate}</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --ink:#0C1A14; --ink2:#2D4A3E; --ink3:#5A7A6E; --mist:#8AADA0;
-  --leaf:#16A87E; --leaf-l:#E6F7F3; --leaf-d:#0B6B52;
-  --paper:#FAFCFB; --fog:#E8EEE9; --snow:#FFFFFF;
-  --night:#091610; --night2:#0F2119;
-  --ruby:#DC3545; --ruby-l:#FEF0F1;
-  --amber:#E8911A; --amber-l:#FEF5E7;
-  --cobalt:#2563EB; --cobalt-l:#EFF6FF;
-}
-body{
-  font-family:'Plus Jakarta Sans',sans-serif;
-  background:var(--paper);color:var(--ink);
-  font-size:13px;line-height:1.6;
-  -webkit-font-smoothing:antialiased;
-  padding:0;margin:0;
-}
-.page{max-width:860px;margin:0 auto;padding:40px 48px 64px;}
+  @page { size: A4; margin: 18mm 14mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Helvetica Neue', 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1A1F1B;
+    margin: 0;
+    padding: 0;
+    background: white;
+    font-size: 11pt;
+    line-height: 1.45;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 
-/* ── HEADER ── */
-.report-header{
-  display:flex;align-items:flex-start;justify-content:space-between;
-  padding-bottom:24px;margin-bottom:28px;
-  border-bottom:2px solid var(--night);
-}
-.brand{display:flex;align-items:center;gap:12px;}
-.brand-icon{width:40px;height:40px;background:var(--leaf);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.brand-name{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--night);letter-spacing:-.3px;}
-.brand-name em{color:var(--leaf);font-style:normal;font-weight:900;}
-.brand-sub{font-size:10px;color:var(--mist);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
-.report-meta{text-align:right;font-size:11px;color:var(--mist);}
-.report-meta strong{display:block;font-size:12px;color:var(--ink2);font-weight:700;margin-bottom:2px;}
+  /* ── HEADER */
+  .lpro-header {
+    border-bottom: 3px solid #16A87E;
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .lpro-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .lpro-logo {
+    width: 44px;
+    height: 44px;
+    background: #16A87E;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .lpro-brand-info h1 {
+    font-size: 17pt;
+    font-weight: 800;
+    margin: 0;
+    color: #0E2318;
+    letter-spacing: -.5px;
+  }
+  .lpro-brand-info .sub {
+    font-size: 8.5pt;
+    color: #5C6B62;
+    letter-spacing: .04em;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+  .lpro-doc-info {
+    text-align: right;
+    font-size: 8.5pt;
+    color: #5C6B62;
+  }
+  .lpro-doc-info .doc-id {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 9pt;
+    color: #1A1F1B;
+    margin-bottom: 3px;
+    letter-spacing: -.02em;
+  }
 
-/* ── PATIENT HERO ── */
-.patient-hero{
-  background:var(--night);border-radius:16px;
-  padding:24px 28px;margin-bottom:24px;
-  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
-}
-.ph-left{}
-.ph-eyebrow{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
-.ph-name{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:5px;}
-.ph-meta{font-size:13px;color:rgba(255,255,255,.45);margin-bottom:14px;}
-.ph-badges{display:flex;gap:8px;flex-wrap:wrap;}
-.ph-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:999px;font-size:11px;font-weight:700;}
-.badge-status{background:${overallBg};color:${overallFg};border:1px solid ${overallFg}30;}
-.badge-ai{background:rgba(22,168,126,.15);color:#6EE7B7;border:1px solid rgba(22,168,126,.3);}
-.badge-file{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12);}
-.ph-score{text-align:center;flex-shrink:0;}
-.ph-score-label{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;letter-spacing:.04em;}
-.ph-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
-.ph-info{background:var(--snow);border:1px solid var(--fog);border-radius:10px;padding:11px 14px;}
-.ph-info-lbl{font-size:9px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:4px;}
-.ph-info-val{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-.1px;}
+  /* ── TITLE BLOCK */
+  .lpro-title-block {
+    background: linear-gradient(135deg, #0E2318 0%, #091610 100%);
+    color: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+  }
+  .lpro-title-block h2 {
+    margin: 0 0 4px 0;
+    font-size: 16pt;
+    font-weight: 800;
+    letter-spacing: -.5px;
+  }
+  .lpro-title-block .sub {
+    font-size: 9.5pt;
+    color: rgba(255,255,255,.6);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .lpro-title-block .overall-tag {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 12px;
+    background: ${overallColor};
+    color: white;
+    font-size: 9.5pt;
+    font-weight: 800;
+    border-radius: 99px;
+    letter-spacing: .08em;
+  }
 
-/* ── CRITICAL ALERT ── */
-.alert-critical{
-  background:var(--ruby-l);border:1.5px solid rgba(220,53,69,.3);
-  border-radius:12px;padding:16px 20px;margin-bottom:20px;
-}
-.alert-crit-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.alert-crit-icon{width:26px;height:26px;background:var(--ruby);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.alert-crit-title{font-size:11px;font-weight:800;color:#8B1A20;letter-spacing:.08em;text-transform:uppercase;}
-.alert-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;font-size:13px;color:#8B1A20;line-height:1.55;}
-.alert-row:last-child{margin-bottom:0;}
-.alert-row span:first-child{flex-shrink:0;}
-.alert-warn{background:var(--amber-l);border:1.5px solid rgba(232,145,26,.25);border-radius:12px;padding:14px 18px;margin-bottom:20px;}
-.alert-warn-title{font-size:11px;font-weight:800;color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+  /* ── SECTION */
+  .lpro-section {
+    margin-bottom: 18px;
+    page-break-inside: avoid;
+  }
+  .lpro-section-h {
+    font-size: 9.5pt;
+    font-weight: 800;
+    color: #16A87E;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    border-bottom: 1.5px solid #E0E5E2;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+  }
 
-/* ── SECTIONS ── */
-.section-block{margin-bottom:24px;}
-.section-title{
-  font-family:'Sora',sans-serif;
-  font-size:15px;font-weight:700;color:var(--ink);
-  letter-spacing:-.5px;padding-bottom:10px;
-  border-bottom:1.5px solid var(--fog);margin-bottom:16px;
-  display:flex;align-items:center;gap:8px;
-}
+  /* ── INFO GRID (paciente + vet) */
+  .lpro-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .lpro-info-card {
+    background: #F7F9F8;
+    border: 1px solid #E0E5E2;
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .lpro-info-card h4 {
+    margin: 0 0 8px 0;
+    font-size: 8.5pt;
+    font-weight: 800;
+    color: #16A87E;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .lpro-info-row {
+    display: flex;
+    margin-bottom: 4px;
+    font-size: 10pt;
+  }
+  .lpro-info-row .label {
+    color: #5C6B62;
+    width: 80px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .lpro-info-row .value {
+    color: #1A1F1B;
+    font-weight: 700;
+    flex: 1;
+  }
 
-/* ── MARKERS TABLE ── */
-.mk-table{width:100%;border-collapse:collapse;font-size:13px;}
-.mk-table thead tr{background:var(--fog);}
-.mk-table th{font-size:9px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:1.5px solid var(--fog);}
-.mk-table tbody tr{border-bottom:1px solid var(--fog);}
-.mk-table tbody tr:last-child{border-bottom:none;}
-.mk-table tbody tr:hover{background:#F9FBFA;}
-.mk-name{font-weight:600;color:var(--ink);padding:9px 12px;}
-.mk-val{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;padding:9px 8px;}
-.mk-unit{color:var(--mist);font-size:11px;padding:9px 8px;}
-.mk-ref{color:var(--mist);font-size:11px;font-family:'JetBrains Mono',monospace;padding:9px 8px;white-space:nowrap;}
-.mk-status{padding:9px 8px;}
-.mk-badge{padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;}
-.mk-bar-cell{padding:9px 12px;width:100px;}
-.mk-bar-track{height:5px;background:var(--fog);border-radius:3px;overflow:hidden;}
-.mk-bar-fill{height:100%;border-radius:3px;}
+  /* ── SUMMARY */
+  .lpro-summary {
+    background: #F0FAF6;
+    border-left: 4px solid #16A87E;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+  .lpro-summary strong {
+    color: #16A87E;
+    font-weight: 800;
+  }
 
-/* ── INSIGHTS ── */
-.insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;}
-.insight-card{background:var(--snow);border:1px solid var(--fog);border-radius:10px;padding:12px 14px;}
-.insight-card.crit{background:#FEF0F1;border-color:rgba(220,53,69,.2);}
-.insight-card.warn{background:#FEF5E7;border-color:rgba(232,145,26,.2);}
-.insight-card.ok{background:#E6F7F3;border-color:rgba(22,168,126,.2);}
-.insight-card.info{background:#EFF6FF;border-color:rgba(37,99,235,.2);}
-.insight-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
-.insight-text{font-size:12px;line-height:1.6;color:var(--ink);}
-.insight-row-inner{display:flex;gap:9px;align-items:flex-start;}
+  /* ── MARKERS TABLE */
+  .lpro-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  .lpro-table thead th {
+    background: #0E2318;
+    color: white;
+    font-size: 8.5pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 9px 10px;
+    text-align: left;
+  }
+  .lpro-table thead th:nth-child(2),
+  .lpro-table thead th:nth-child(3) { text-align: right; }
+  .lpro-table thead th:nth-child(4) { text-align: center; }
 
-/* ── RECOMMENDATIONS ── */
-.recs-section{background:var(--night);border-radius:14px;padding:22px 24px;}
-.recs-label{font-size:10px;font-weight:800;color:var(--leaf);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;}
-.rec-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
-.rec-item:last-child{margin-bottom:0;}
-.rec-num{width:20px;height:20px;border-radius:5px;background:var(--leaf);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--night);flex-shrink:0;margin-top:1px;}
-.rec-text{font-size:13px;color:rgba(255,255,255,.8);line-height:1.6;letter-spacing:-.05px;}
+  .lpro-table tbody tr {
+    border-bottom: 1px solid #E0E5E2;
+  }
+  .lpro-table tbody tr:last-child { border-bottom: none; }
+  .lpro-table tbody td {
+    padding: 10px;
+    font-size: 10pt;
+    vertical-align: middle;
+  }
+  .lpro-marker-name {
+    font-weight: 700;
+    color: #1A1F1B;
+  }
+  .lpro-marker-name .ref {
+    display: block;
+    font-size: 8.5pt;
+    color: #5C6B62;
+    font-weight: 500;
+    margin-top: 1px;
+    font-family: 'SF Mono', monospace;
+  }
+  .lpro-marker-value {
+    text-align: right;
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 11.5pt;
+    font-weight: 800;
+    letter-spacing: -.3px;
+  }
+  .lpro-marker-value .unit {
+    font-size: 8.5pt;
+    color: #5C6B62;
+    font-weight: 500;
+    margin-left: 2px;
+  }
+  .lpro-marker-ref-col {
+    text-align: right;
+    font-family: 'SF Mono', monospace;
+    font-size: 9pt;
+    color: #5C6B62;
+  }
+  .lpro-marker-status {
+    text-align: center;
+  }
+  .lpro-marker-status .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-size: 8pt;
+    font-weight: 800;
+    letter-spacing: .08em;
+  }
+  .badge-ok   { background: #DCFCE7; color: #166534; }
+  .badge-warn { background: #FEF3C7; color: #92400E; }
+  .badge-crit { background: #FEE2E2; color: #991B1B; }
 
-/* ── SUMMARY ── */
-.summary-box{background:var(--night2);border-radius:14px;padding:20px 24px;margin-bottom:24px;border:1px solid rgba(22,168,126,.1);}
-.summary-lbl{font-size:10px;font-weight:800;color:var(--leaf);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
-.summary-text{font-size:14px;color:rgba(255,255,255,.82);line-height:1.8;font-weight:300;}
+  /* Linhas críticas com cor de fundo sutil */
+  tr.row-crit { background: #FEF2F2; }
+  tr.row-warn { background: #FFFBEB; }
+  tr.row-crit .lpro-marker-value { color: #B91C2C; }
+  tr.row-warn .lpro-marker-value { color: #B45309; }
 
-/* ── HEMATOZOÁRIOS ── */
-.hemato-box{display:flex;align-items:center;gap:12px;border-radius:10px;padding:12px 16px;margin-bottom:16px;border:1px solid;}
+  /* ── INSIGHTS */
+  .lpro-insight {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    page-break-inside: avoid;
+  }
+  .lpro-insight.crit { background: #FEF2F2; border-left: 4px solid #DC2626; }
+  .lpro-insight.warn { background: #FFFBEB; border-left: 4px solid #D97706; }
+  .lpro-insight.ok   { background: #F0FDF4; border-left: 4px solid #16A34A; }
+  .lpro-insight.info { background: #EFF6FF; border-left: 4px solid #2563EB; }
+  .lpro-insight-icon {
+    font-size: 14pt;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .lpro-insight-body { flex: 1; }
+  .lpro-insight-title {
+    font-size: 10.5pt;
+    font-weight: 800;
+    color: #1A1F1B;
+    margin-bottom: 3px;
+    letter-spacing: -.1px;
+  }
+  .lpro-insight-text {
+    font-size: 9.5pt;
+    color: #38463E;
+    line-height: 1.5;
+  }
 
-/* ── LAB INFO ── */
-.lab-info{background:var(--leaf-l);border:1px solid rgba(22,168,126,.15);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--ink3);display:flex;gap:16px;flex-wrap:wrap;}
-.lab-info strong{color:var(--leaf-d);}
+  /* ── RECOMMENDATIONS */
+  .lpro-rec {
+    background: #F0FAF6;
+    border: 1px solid #BBE5D4;
+    border-radius: 6px;
+    padding: 11px 14px 11px 38px;
+    margin-bottom: 7px;
+    position: relative;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #1A1F1B;
+  }
+  .lpro-rec::before {
+    content: '➤';
+    position: absolute;
+    left: 14px;
+    top: 11px;
+    color: #16A87E;
+    font-weight: 800;
+    font-size: 11pt;
+  }
 
-/* ── PATTERNS ── */
-.patterns-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.pattern-card{border-radius:10px;padding:12px 14px;border:1px solid;}
-.pattern-head{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
-.pattern-icon{font-size:16px;flex-shrink:0;}
-.pattern-name{font-size:13px;font-weight:700;flex:1;}
-.pattern-conf{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(0,0,0,.06);}
-.pattern-desc{font-size:12px;line-height:1.55;opacity:.9;}
+  /* ── SIGNATURE */
+  .lpro-signature {
+    margin-top: 32px;
+    padding-top: 18px;
+    border-top: 2px solid #0E2318;
+    page-break-inside: avoid;
+  }
+  .lpro-sig-line {
+    width: 280px;
+    border-bottom: 1px solid #1A1F1B;
+    margin-bottom: 6px;
+    height: 28px;
+  }
+  .lpro-sig-name {
+    font-size: 11pt;
+    font-weight: 800;
+    color: #0E2318;
+    letter-spacing: -.2px;
+  }
+  .lpro-sig-info {
+    font-size: 9pt;
+    color: #5C6B62;
+    margin-top: 2px;
+  }
+  .lpro-sig-info strong { color: #1A1F1B; font-weight: 700; }
 
-/* ── RAW TEXT ── */
-.raw-box{background:var(--fog);border-radius:10px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3);line-height:1.7;white-space:pre-wrap;max-height:300px;overflow:hidden;border:1px solid var(--fog);}
+  /* ── FOOTER */
+  .lpro-footer {
+    margin-top: 30px;
+    padding-top: 14px;
+    border-top: 1px solid #E0E5E2;
+    text-align: center;
+    font-size: 8pt;
+    color: #8B9690;
+    letter-spacing: .05em;
+  }
+  .lpro-footer .brand {
+    color: #16A87E;
+    font-weight: 800;
+    letter-spacing: .08em;
+  }
 
-/* ── SAFETY ── */
-.safety-note{background:var(--leaf-l);border:1px solid rgba(22,168,126,.2);border-radius:10px;padding:12px 16px;display:flex;gap:10px;margin-top:24px;}
-.safety-text{font-size:11px;color:var(--ink3);line-height:1.6;}
-.safety-text strong{color:var(--leaf-d);}
+  /* ── PRINT */
+  @media print {
+    .no-print { display: none !important; }
+    body { padding: 0; }
+  }
 
-/* ── FOOTER ── */
-.report-footer{
-  margin-top:40px;padding-top:18px;border-top:1.5px solid var(--fog);
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:11px;color:var(--mist);
-}
-.footer-brand{font-family:'Sora',sans-serif;font-size:13px;color:var(--ink2);font-weight:600;}
-.footer-brand em{color:var(--leaf);font-style:italic;}
-
-/* ── DIVIDER ── */
-.divider{height:1px;background:var(--fog);margin:20px 0;}
-
-/* ── PAGE BREAK ── */
-@media print{
-  .page{padding:20px 32px 40px;}
-  .no-print{display:none!important;}
-  body{background:#fff;}
-  .patient-hero,.recs-section,.summary-box{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .page-break{page-break-before:always;}
-}
-
-/* ── PRINT BUTTON ── */
-.print-toolbar{
-  position:sticky;top:0;z-index:100;
-  background:rgba(250,252,251,.95);backdrop-filter:blur(8px);
-  padding:12px 48px;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--fog);
-}
-.print-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:9px 20px;border-radius:8px;border:none;cursor:pointer;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;
-  transition:color var(--d-instant) var(--e-out),background var(--d-instant) var(--e-out),border-color var(--d-instant) var(--e-out);
-}
-.btn-print-pdf{background:var(--leaf);color:#fff;}
-.btn-print-pdf:hover{background:var(--leaf-d);transform:translateY(-1px);box-shadow:0 4px 14px rgba(22,168,126,.3);}
-.btn-print-json{background:var(--fog);color:var(--ink2);}
-.btn-print-json:hover{background:var(--night);color:#fff;}
-.toolbar-title{font-family:'Sora',sans-serif;font-size:15px;color:var(--ink);font-weight:600;letter-spacing:-.2px;}
+  .print-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: #16A87E;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 11pt;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(22,168,126,.35);
+    z-index: 100;
+  }
+  .print-btn:hover { background: #138862; }
 </style>
 </head>
 <body>
-
-<!-- TOOLBAR -->
-<div class="print-toolbar no-print">
-  <div class="toolbar-title">📋 Laudo Clínico — ${patient.name}</div>
-  <div style="display:flex;gap:8px;">
-    <button class="print-btn btn-print-json" onclick="downloadJSON()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Baixar JSON
-    </button>
-    <button class="print-btn btn-print-pdf" onclick="window.print()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-      Imprimir / Salvar PDF
-    </button>
-  </div>
-</div>
-
-<div class="page">
+  <button class="print-btn no-print" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
 
   <!-- HEADER -->
-  <div class="report-header">
-    <div class="brand">
-      <div class="brand-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <!-- Paw: 4 toe pads -->
-          <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
-          <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".96"/>
-          <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".88"/>
-          <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".88"/>
-          <!-- Paw: central pad -->
-          <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".96"/>
-          <circle cx="2" cy="7" r="1.4" fill="#3B82F6" opacity=".85"/>
-          <path d="M15.5 18.5Q18 14.5 17 10.5" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-          <ellipse cx="12" cy="18.5" rx="6" ry="3.5" fill="white" opacity=".92"/>
-          <circle cx="2" cy="8.5" r="1.5" fill="#3B82F6" opacity=".8"/>
-          <circle cx="22" cy="8.5" r="1.5" fill="#3B82F6" opacity=".8"/>
-        </svg>
-      </div>
-      <div>
-        <div class="brand-name">Diagno<em>Vet IA</em></div>
-        <div class="brand-sub">Diagnóstico Clínico Veterinário · Laudo Clínico</div>
+  <div class="lpro-header">
+    <div class="lpro-brand">
+      <div class="lpro-logo">🐾</div>
+      <div class="lpro-brand-info">
+        <h1>DiagnoVet IA</h1>
+        <div class="sub">Sistema Clínico de Diagnóstico Veterinário</div>
       </div>
     </div>
-    <div class="report-meta">
-      <strong>Gerado em</strong>${printedAt}
-      <div style="margin-top:4px;">Exame: ${exam.type || 'Hemograma'}</div>
-      <div>Data coleta: ${dateStr}</div>
-      ${exam.usedAI ? '<div style="color:var(--leaf-d);font-weight:700;margin-top:4px;">✓ Analisado por Claude AI</div>' : ''}
+    <div class="lpro-doc-info">
+      <div class="doc-id">Laudo #${escapeHTML(exam.id?.slice(-8).toUpperCase()||'XXXXXX')}</div>
+      <div>Emitido em ${reportDate}</div>
+      <div>às ${reportTime}</div>
     </div>
   </div>
 
-  <!-- PATIENT HERO -->
-  <div class="patient-hero">
-    <div class="ph-left">
-      <div class="ph-eyebrow">Laudo Clínico · ${exam.type}</div>
-      <div class="ph-name">${escapeHTML(patient.name)}</div>
-      <div class="ph-meta">${patient.species}${patient.breed&&patient.breed!=='—'?' · '+patient.breed:''} · ${patient.sex||'—'} · ${patient.age||'—'} · ${patient.weight||'—'}</div>
-      <div class="ph-badges">
-        <span class="ph-badge badge-status">${overallLabel}</span>
-        ${exam.usedAI ? '<span class="ph-badge badge-ai">Claude AI</span>' : ''}
-        ${exam.imported&&exam.importedFileName ? `<span class="ph-badge badge-file">📄 ${exam.importedFileName}</span>` : ''}
-      </div>
-    </div>
-    <div class="ph-score">
-      <svg width="88" height="88" viewBox="0 0 88 88">
-        <circle cx="44" cy="44" r="34" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="7"/>
-        <circle cx="44" cy="44" r="34" fill="none" stroke="${scoreColor}" stroke-width="7"
-          stroke-dasharray="${(2*Math.PI*34).toFixed(1)}"
-          stroke-dashoffset="${((2*Math.PI*34)*(1-scoreVal/100)).toFixed(1)}"
-          stroke-linecap="round" transform="rotate(-90 44 44)"/>
-        <text x="44" y="40" text-anchor="middle" font-family="Sora,sans-serif" font-size="20" font-weight="700" fill="white">${scoreVal}</text>
-        <text x="44" y="55" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="9" fill="rgba(255,255,255,.35)">SCORE IA</text>
-      </svg>
-      <div class="ph-score-label">CONFIANÇA DIAGNÓSTICA</div>
-    </div>
+  <!-- TITLE -->
+  <div class="lpro-title-block">
+    <h2>${escapeHTML(exam.type||'Exame Laboratorial')}</h2>
+    <div class="sub">Laudo Clínico Interpretativo · ${examDate}</div>
+    <span class="overall-tag">${overallLabel}</span>
   </div>
 
-  <!-- PATIENT INFO GRID -->
-  <div class="ph-grid">
-    <div class="ph-info"><div class="ph-info-lbl">Tutor</div><div class="ph-info-val">${patient.owner||'—'}</div></div>
-    <div class="ph-info"><div class="ph-info-lbl">Espécie</div><div class="ph-info-val">${patient.species}</div></div>
-    <div class="ph-info"><div class="ph-info-lbl">Raça / Idade</div><div class="ph-info-val">${patient.breed||'SRD'} · ${patient.age||'—'}</div></div>
-    <div class="ph-info"><div class="ph-info-lbl">Peso / Sexo</div><div class="ph-info-val">${patient.weight||'—'} · ${patient.sex||'—'}</div></div>
+  <!-- INFO -->
+  <div class="lpro-info-grid">
+    <div class="lpro-info-card">
+      <h4>🐾 Paciente</h4>
+      <div class="lpro-info-row"><span class="label">Nome:</span><span class="value">${escapeHTML(patient.name)}</span></div>
+      <div class="lpro-info-row"><span class="label">Espécie:</span><span class="value">${escapeHTML(patient.species||'—')}</span></div>
+      <div class="lpro-info-row"><span class="label">Raça:</span><span class="value">${escapeHTML(patient.breed||'SRD')}</span></div>
+      <div class="lpro-info-row"><span class="label">Sexo:</span><span class="value">${escapeHTML(patient.sex||'—')}</span></div>
+      <div class="lpro-info-row"><span class="label">Idade:</span><span class="value">${escapeHTML(patient.age||'—')}</span></div>
+      <div class="lpro-info-row"><span class="label">Peso:</span><span class="value">${escapeHTML(patient.weight||'—')}</span></div>
+      <div class="lpro-info-row"><span class="label">Tutor:</span><span class="value">${escapeHTML(patient.owner||'—')}</span></div>
+    </div>
+    <div class="lpro-info-card">
+      <h4>👨‍⚕️ Médico-Veterinário</h4>
+      <div class="lpro-info-row"><span class="label">Nome:</span><span class="value">${escapeHTML(vetName)}</span></div>
+      <div class="lpro-info-row"><span class="label">CRMV:</span><span class="value">${escapeHTML(vetCrmv)}</span></div>
+      <div class="lpro-info-row"><span class="label">Especialidade:</span><span class="value">${escapeHTML(vetSpec)}</span></div>
+      ${vetClinic ? `<div class="lpro-info-row"><span class="label">Clínica:</span><span class="value">${escapeHTML(vetClinic)}</span></div>` : ''}
+      ${vetEmail ? `<div class="lpro-info-row"><span class="label">Contato:</span><span class="value">${escapeHTML(vetEmail)}</span></div>` : ''}
+    </div>
   </div>
-
-  <!-- LAB INFO FROM DOC -->
-  ${exam.patientFromDoc?.vet || exam.patientFromDoc?.clinic ? `
-  <div class="lab-info">
-    ${exam.patientFromDoc.vet    ? `<span><strong>Médico(a):</strong> ${exam.patientFromDoc.vet}</span>` : ''}
-    ${exam.patientFromDoc.clinic ? `<span><strong>Clínica:</strong> ${exam.patientFromDoc.clinic}</span>` : ''}
-    ${exam.patientFromDoc.date   ? `<span><strong>Data laudo:</strong> ${exam.patientFromDoc.date}</span>` : ''}
-  </div>` : ''}
-
-  <!-- HEMATOZOÁRIOS -->
-  ${exam.hematozoarios && exam.hematozoarios !== 'não realizado' ? `
-  <div class="hemato-box" style="background:${exam.hematozoarios==='negativo'?'#E6F7F3':'#FEF0F1'};border-color:${exam.hematozoarios==='negativo'?'rgba(22,168,126,.3)':'rgba(220,53,69,.3)'}">
-    <span style="font-size:20px">${exam.hematozoarios==='negativo'?'🔬':'⚠️'}</span>
-    <div>
-      <div style="font-size:9px;font-weight:800;color:${exam.hematozoarios==='negativo'?'var(--leaf-d)':'var(--ruby)'};letter-spacing:.09em;text-transform:uppercase">Pesquisa de Hematozoários</div>
-      <div style="font-size:14px;font-weight:700;color:${exam.hematozoarios==='negativo'?'var(--leaf-d)':'var(--ruby)'};margin-top:2px">${exam.hematozoarios.charAt(0).toUpperCase()+exam.hematozoarios.slice(1)}</div>
-    </div>
-  </div>` : ''}
-
-  <!-- CRITICAL ALERTS -->
-  ${critInsights.length ? `
-  <div class="alert-critical">
-    <div class="alert-crit-head">
-      <div class="alert-crit-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-      <div class="alert-crit-title">🚨 Alertas Críticos — Revisão Imediata Necessária</div>
-    </div>
-    ${critInsights.map(i=>`<div class="alert-row"><span>🚨</span><span>${i.text}</span></div>`).join('')}
-  </div>` : ''}
-
-  ${warnInsights.length && !critInsights.length ? `
-  <div class="alert-warn">
-    <div class="alert-warn-title">⚠️ Pontos de Atenção Clínica</div>
-    ${warnInsights.map(i=>`<div class="alert-row"><span>⚠️</span><span style="color:#7A4800">${i.text}</span></div>`).join('')}
-  </div>` : ''}
-
-  <!-- MARKERS: HEMATOLOGIA -->
-  ${hemaKeys.length ? `
-  <div class="section-block">
-    <div class="section-title">🧬 Hematologia</div>
-    <table class="mk-table">
-      <thead><tr><th>Parâmetro</th><th>Resultado</th><th>Unidade</th><th>Referência</th><th>Status</th><th>Gráfico</th></tr></thead>
-      <tbody>${markerRows(hemaKeys)}</tbody>
-    </table>
-  </div>` : ''}
-
-  <!-- MARKERS: BIOQUÍMICA -->
-  ${biochemKeys.length ? `
-  <div class="section-block">
-    <div class="section-title">🧪 Bioquímica</div>
-    <table class="mk-table">
-      <thead><tr><th>Parâmetro</th><th>Resultado</th><th>Unidade</th><th>Referência</th><th>Status</th><th>Gráfico</th></tr></thead>
-      <tbody>${markerRows(biochemKeys)}</tbody>
-    </table>
-  </div>` : ''}
-
-  <!-- PATTERNS -->
-  ${patternBlock()}
 
   <!-- SUMMARY -->
   ${summary ? `
-  <div class="summary-box">
-    <div class="summary-lbl">📌 Resumo Clínico</div>
-    <div class="summary-text">${summary}</div>
+  <div class="lpro-summary" style="margin-top:18px">
+    <strong>📝 Resumo Clínico:</strong> ${escapeHTML(summary)}
   </div>` : ''}
 
-  <!-- INSIGHTS -->
-  ${insights.length ? `
-  <div class="section-block">
-    <div class="section-title">🧠 Interpretação Clínica${exam.usedAI?' · Claude AI':''}</div>
-    <div class="insights-grid">
-      ${[...critInsights,...warnInsights,...infoInsights,...okInsights].map(i=>`
-        <div class="insight-card ${i.level}">
-          <div class="insight-row-inner">
-            <div class="insight-dot" style="background:${{ok:'#16A87E',warn:'#E8911A',critical:'#DC3545',info:'#2563EB'}[i.level]||'#8AADA0'}"></div>
-            <div class="insight-text">${i.text}</div>
-          </div>
-        </div>`).join('')}
-    </div>
+  <!-- MARKERS TABLE -->
+  ${results.length ? `
+  <div class="lpro-section">
+    <div class="lpro-section-h">📊 Parâmetros Laboratoriais Analisados</div>
+    <table class="lpro-table">
+      <thead>
+        <tr>
+          <th>Parâmetro</th>
+          <th>Resultado</th>
+          <th>Referência</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${results.map(m => {
+          const rowClass = m.status === 'critical' ? 'row-crit' : m.status === 'warn' ? 'row-warn' : '';
+          const badgeClass = m.status === 'critical' ? 'badge-crit' : m.status === 'warn' ? 'badge-warn' : 'badge-ok';
+          const stLabel = m.status === 'critical' ? 'CRÍTICO' : m.status === 'warn' ? 'ATENÇÃO' : 'NORMAL';
+          return `<tr class="${rowClass}">
+            <td class="lpro-marker-name">${escapeHTML(m.name||m.label||'—')}</td>
+            <td class="lpro-marker-value">${escapeHTML(String(m.value||'—'))}${m.unit ? `<span class="unit">${escapeHTML(m.unit)}</span>` : ''}</td>
+            <td class="lpro-marker-ref-col">${escapeHTML(m.ref||'—')}${m.unit && m.ref ? ` ${escapeHTML(m.unit)}` : ''}</td>
+            <td class="lpro-marker-status"><span class="badge ${badgeClass}">${stLabel}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>` : ''}
+
+  <!-- CRITICAL INSIGHTS -->
+  ${insights.filter(i=>i.level==='critical').length ? `
+  <div class="lpro-section">
+    <div class="lpro-section-h">🚨 Achados Críticos</div>
+    ${insights.filter(i=>i.level==='critical').map(i => `<div class="lpro-insight crit">
+      <div class="lpro-insight-icon">🚨</div>
+      <div class="lpro-insight-body">
+        ${i.title ? `<div class="lpro-insight-title">${escapeHTML(i.title)}</div>` : ''}
+        <div class="lpro-insight-text">${escapeHTML(i.text||'')}</div>
+      </div>
+    </div>`).join('')}
+  </div>` : ''}
+
+  <!-- WARNINGS -->
+  ${insights.filter(i=>i.level==='warn').length ? `
+  <div class="lpro-section">
+    <div class="lpro-section-h">⚠ Pontos de Atenção</div>
+    ${insights.filter(i=>i.level==='warn').map(i => `<div class="lpro-insight warn">
+      <div class="lpro-insight-icon">⚠</div>
+      <div class="lpro-insight-body">
+        ${i.title ? `<div class="lpro-insight-title">${escapeHTML(i.title)}</div>` : ''}
+        <div class="lpro-insight-text">${escapeHTML(i.text||'')}</div>
+      </div>
+    </div>`).join('')}
+  </div>` : ''}
+
+  <!-- OK INSIGHTS -->
+  ${insights.filter(i=>i.level==='ok').length ? `
+  <div class="lpro-section">
+    <div class="lpro-section-h">✓ Observações Normais</div>
+    ${insights.filter(i=>i.level==='ok').map(i => `<div class="lpro-insight ok">
+      <div class="lpro-insight-icon">✓</div>
+      <div class="lpro-insight-body">
+        ${i.title ? `<div class="lpro-insight-title">${escapeHTML(i.title)}</div>` : ''}
+        <div class="lpro-insight-text">${escapeHTML(i.text||'')}</div>
+      </div>
+    </div>`).join('')}
+  </div>` : ''}
+
+  <!-- INFO -->
+  ${insights.filter(i=>i.level==='info').length ? `
+  <div class="lpro-section">
+    <div class="lpro-section-h">ℹ Informações Complementares</div>
+    ${insights.filter(i=>i.level==='info').map(i => `<div class="lpro-insight info">
+      <div class="lpro-insight-icon">ℹ</div>
+      <div class="lpro-insight-body">
+        ${i.title ? `<div class="lpro-insight-title">${escapeHTML(i.title)}</div>` : ''}
+        <div class="lpro-insight-text">${escapeHTML(i.text||'')}</div>
+      </div>
+    </div>`).join('')}
   </div>` : ''}
 
   <!-- RECOMMENDATIONS -->
   ${recs.length ? `
-  <div class="section-block">
-    <div class="recs-section">
-      <div class="recs-label">📈 Próximos Passos Recomendados</div>
-      ${recs.map((r,i)=>`
-        <div class="rec-item">
-          <div class="rec-num">${i+1}</div>
-          <div class="rec-text">${r}</div>
-        </div>`).join('')}
-    </div>
+  <div class="lpro-section">
+    <div class="lpro-section-h">💡 Recomendações Clínicas</div>
+    ${recs.map(r => {
+      const txt = typeof r === 'string' ? r : (r.text || r.title || '');
+      return `<div class="lpro-rec">${escapeHTML(txt)}</div>`;
+    }).join('')}
   </div>` : ''}
 
-  <!-- CONTEXT / OBSERVATIONS -->
-  ${exam.context || exam.observacoes ? `
-  <div class="section-block">
-    <div class="section-title" style="font-size:14px">📝 Contexto e Observações</div>
-    ${exam.context ? `<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px">Contexto Clínico</div><div style="font-size:13px;color:var(--ink2);line-height:1.7">${exam.context}</div></div>` : ''}
-    ${exam.observacoes ? `<div><div style="font-size:10px;font-weight:800;color:var(--mist);letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px">Observações do Laboratório</div><div style="font-size:13px;color:var(--ink2);line-height:1.7">${exam.observacoes}</div></div>` : ''}
+  <!-- OBSERVATIONS -->
+  ${exam.observacoes ? `
+  <div class="lpro-section">
+    <div class="lpro-section-h">📋 Observações Adicionais</div>
+    <div style="font-size:10pt;color:#1A1F1B;line-height:1.6">${escapeHTML(exam.observacoes)}</div>
   </div>` : ''}
 
-  <!-- RAW TEXT -->
-  ${exam.rawText ? `
-  <div class="section-block">
-    <div class="section-title" style="font-size:14px">📄 Texto Original do Laudo</div>
-    <div class="raw-box">${exam.rawText.replace(/[<>]/g, c=>c==='<'?'&lt;':'&gt;')}</div>
-  </div>` : ''}
-
-  <!-- SAFETY NOTE -->
-  <div class="safety-note">
-    <span style="font-size:18px;flex-shrink:0">⚖️</span>
-    <div class="safety-text">
-      <strong>Nota de Segurança Clínica:</strong> Este laudo é gerado pelo DiagnoVet como suporte à decisão clínica e não substitui o julgamento do médico-veterinário responsável. Os achados utilizam linguagem como "pode sugerir", "compatível com" e "merece investigação". Nenhum diagnóstico definitivo é fornecido e nenhum medicamento é prescrito. A interpretação final depende da integração com exame físico completo, histórico clínico e outros dados disponíveis.
+  <!-- SIGNATURE -->
+  <div class="lpro-signature">
+    <div class="lpro-sig-line"></div>
+    <div class="lpro-sig-name">${escapeHTML(vetName)}</div>
+    <div class="lpro-sig-info">
+      <strong>CRMV:</strong> ${escapeHTML(vetCrmv)}
+      ${vetSpec && vetSpec !== '—' ? ` · <strong>Especialidade:</strong> ${escapeHTML(vetSpec)}` : ''}
+      ${vetClinic ? ` · ${escapeHTML(vetClinic)}` : ''}
     </div>
   </div>
 
   <!-- FOOTER -->
-  <div class="report-footer">
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
-      <div>
-        <div class="footer-brand">DiagnoVet IA · Diagnóstico Veterinário</div>
-        <div>${printedAt} · ${exam.usedAI?'Claude AI':'Análise clínica'}</div>
-      </div>
-      <div style="text-align:right;border-top:1px solid var(--fog);padding-top:10px;min-width:200px">
-        <div style="font-size:13px;font-weight:700;color:var(--ink)">${escapeHTML(S.user?.name||'Médico(a) Veterinário(a)')}</div>
-        ${S.user?.crmv ? `<div style="font-size:11px;color:var(--mist);margin-top:2px">${escapeHTML(S.user.crmv)}</div>` : ''}
-        ${S.user?.specialty ? `<div style="font-size:11px;color:var(--mist)">${escapeHTML(S.user.specialty)}</div>` : ''}
-        ${S.user?.clinic ? `<div style="font-size:11px;color:var(--mist)">${escapeHTML(S.user.clinic)}</div>` : ''}
-      </div>
-    </div>
+  <div class="lpro-footer">
+    Laudo gerado por <span class="brand">DiagnoVet IA</span> · VitaHub Solutions · ${reportDate} ${reportTime}<br/>
+    Este laudo é um documento de apoio à decisão clínica. A interpretação final é de responsabilidade do médico-veterinário.
   </div>
 
-</div>
-
-<scr\x69pt>
-const _exportData = ${JSON.stringify(JSON.stringify({version:'3.0',exportedAt:new Date().toISOString(),patient,exam}))};
-function downloadJSON(){
-  const b=new Blob([_exportData],{type:'application/json'});
-  const u=URL.createObjectURL(b); const a=document.createElement('a');
-  a.href=u; a.download='diagnovet-${(patient.name||'paciente').replace(/[^a-zA-Z0-9]/g,'-')}-${exam.date||'sd'}.json';
-  a.click(); URL.revokeObjectURL(u);
-}
-<\/script>
 </body>
 </html>`;
 
@@ -8217,7 +8505,7 @@ function downloadJSON(){
   if (!win) { toast('Popup bloqueado. Permita popups para exportar o laudo.', 'warn'); return; }
   win.document.write(html);
   win.document.close();
-  toast('Laudo aberto em nova aba. Use Ctrl+P para salvar como PDF.', 'ok');
+  toast('Laudo aberto em nova aba. Use o botão "Imprimir" para salvar como PDF.', 'ok');
 }
 
 /* ══════════════════════════════════════════════
