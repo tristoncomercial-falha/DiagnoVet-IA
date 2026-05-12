@@ -1855,6 +1855,364 @@ body.modal-open {
 
 /* ══ FIM RESPONSIVIDADE UNIVERSAL ════════════════════════ */
 
+
+/* ══════════════════════════════════════════════════════════
+   TELA DE RESULTADO — DESIGN PREMIUM RESPONSIVO
+   ══════════════════════════════════════════════════════════ */
+
+/* Hero card — escuro e compacto */
+.result-hero-card {
+  background: linear-gradient(160deg, #0E2318 0%, #091610 100%);
+  border-radius: 16px;
+  padding: 20px 18px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(9,22,16,.12);
+}
+.result-hero-card::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(22,168,126,.12), transparent 60%);
+  pointer-events: none;
+}
+
+.rh-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,.4);
+  letter-spacing: .12em;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+}
+
+.rh-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -.6px;
+  margin-bottom: 4px;
+  line-height: 1.1;
+}
+.rh-meta {
+  font-size: 12px;
+  color: rgba(255,255,255,.45);
+  margin-bottom: 12px;
+}
+
+/* Score badge — circular */
+.rh-score-circle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,.04);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,.06);
+  margin-top: 12px;
+}
+.rh-score-value {
+  font-family: 'Sora', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+.rh-score-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.rh-score-label {
+  font-size: 11px;
+  color: rgba(255,255,255,.5);
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.rh-score-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,.35);
+  margin-top: 2px;
+}
+
+/* Tags row */
+.rh-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.rh-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.rh-tag-crit  { background: rgba(220,53,69,.18);  color: #FCA5A5; border: 1px solid rgba(220,53,69,.25); }
+.rh-tag-warn  { background: rgba(232,145,26,.18); color: #FDE68A; border: 1px solid rgba(232,145,26,.25); }
+.rh-tag-ok    { background: rgba(22,168,126,.15); color: #6EE7B7; border: 1px solid rgba(22,168,126,.25); }
+.rh-tag-info  { background: rgba(255,255,255,.06); color: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.1); }
+
+/* Summary card — destaque clínico */
+.result-summary {
+  background: var(--snow);
+  border: 1px solid var(--fog);
+  border-left: 3px solid var(--leaf);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.result-summary-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--leaf-d);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* Section header */
+.result-section-h {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -.2px;
+  margin: 18px 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.result-section-h-count {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--mist);
+  background: var(--fog);
+  padding: 1px 8px;
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Marker card — limpo, sem amontoado */
+.marker-card {
+  background: var(--snow);
+  border: 1px solid var(--fog);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  transition: all var(--d-fast) var(--e-out);
+}
+.marker-card:hover {
+  border-color: var(--ghost);
+  box-shadow: 0 2px 8px rgba(9,22,16,.04);
+}
+.marker-card-left {
+  flex: 1;
+  min-width: 0;
+}
+.marker-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 2px;
+  line-height: 1.25;
+}
+.marker-card-ref {
+  font-size: 10.5px;
+  color: var(--mist);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -.02em;
+}
+.marker-card-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+.marker-card-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  line-height: 1;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.marker-card-status {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 99px;
+  letter-spacing: .04em;
+  display: inline-block;
+}
+.marker-card.is-crit { border-color: rgba(220,53,69,.3); background: linear-gradient(90deg, rgba(220,53,69,.04), transparent 50%); }
+.marker-card.is-crit .marker-card-value { color: #DC3545; }
+.marker-card.is-crit .marker-card-status { background: rgba(220,53,69,.12); color: #B91C2C; }
+.marker-card.is-warn { border-color: rgba(232,145,26,.3); background: linear-gradient(90deg, rgba(232,145,26,.04), transparent 50%); }
+.marker-card.is-warn .marker-card-value { color: #B45309; }
+.marker-card.is-warn .marker-card-status { background: rgba(232,145,26,.14); color: #92400E; }
+.marker-card.is-ok .marker-card-value { color: var(--ink2); }
+.marker-card.is-ok .marker-card-status { background: rgba(22,168,126,.12); color: var(--leaf-d); }
+
+/* Insight card — para interpretações */
+.insight-row {
+  background: var(--snow);
+  border: 1px solid var(--fog);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.insight-row.is-crit { border-left: 3px solid #DC3545; background: linear-gradient(90deg, rgba(220,53,69,.03), transparent 30%); }
+.insight-row.is-warn { border-left: 3px solid var(--amber); background: linear-gradient(90deg, rgba(232,145,26,.03), transparent 30%); }
+.insight-row.is-ok   { border-left: 3px solid var(--leaf); }
+.insight-row.is-info { border-left: 3px solid #3B82F6; }
+.insight-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+.insight-row.is-crit .insight-icon { background: rgba(220,53,69,.1); }
+.insight-row.is-warn .insight-icon { background: rgba(232,145,26,.12); }
+.insight-row.is-ok   .insight-icon { background: rgba(22,168,126,.12); }
+.insight-row.is-info .insight-icon { background: rgba(59,130,246,.12); }
+.insight-body { flex: 1; min-width: 0; }
+.insight-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 3px;
+  line-height: 1.35;
+}
+.insight-text {
+  font-size: 12.5px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+
+/* Recommendation pill */
+.rec-pill {
+  background: var(--leaf-xl);
+  border: 1px solid rgba(22,168,126,.18);
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 8px;
+  font-size: 12.5px;
+  color: var(--ink);
+  line-height: 1.55;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.rec-pill-icon {
+  flex-shrink: 0;
+  color: var(--leaf-d);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* Action buttons row — mobile */
+.result-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--fog);
+}
+.result-actions .btn {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   MOBILE — resultado super otimizado (≤768px)
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .result-hero-card {
+    padding: 16px 14px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+  }
+  .rh-name { font-size: 19px; }
+  .rh-meta { font-size: 11.5px; margin-bottom: 10px; }
+  .rh-eyebrow { font-size: 9px; letter-spacing: .08em; }
+  .rh-score-value { font-size: 24px; }
+  .rh-score-circle { padding: 10px 12px; gap: 10px; margin-top: 10px; }
+
+  .rh-tags { gap: 5px; }
+  .rh-tag { font-size: 10px; padding: 3px 8px; }
+
+  .result-summary {
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .result-section-h { font-size: 12px; margin: 16px 0 8px 0; }
+
+  /* Marker cards — empilhar valor abaixo do nome em telas pequenas */
+  .marker-card {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .marker-card-right {
+    text-align: left;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+  }
+  .marker-card-value { font-size: 16px; margin-bottom: 0; }
+
+  .insight-row { padding: 12px; gap: 10px; }
+  .insight-icon { width: 28px; height: 28px; font-size: 14px; }
+  .insight-title { font-size: 12.5px; }
+  .insight-text  { font-size: 12px; }
+
+  .rec-pill { padding: 10px 12px; font-size: 12px; }
+
+  /* Action buttons — empilhar em mobile */
+  .result-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .result-actions .btn { width: 100%; }
+}
+
+/* Telas muito pequenas (≤375px) */
+@media (max-width: 375px) {
+  .rh-name { font-size: 17px; }
+  .rh-tags { gap: 4px; }
+  .rh-tag { font-size: 9.5px; padding: 2px 7px; }
+  .marker-card-name { font-size: 12.5px; }
+  .marker-card-value { font-size: 15px; }
+}
+
+/* ══ FIM RESULT SCREEN PREMIUM ═══════════════════════════ */
+
 </style>
 </head>
 <body>
@@ -5894,19 +6252,20 @@ function renderResult(){
 
   const {patient, exam, evalResults: rawEvalResults, overall: rawOverall, insights: rawInsights, recommendations: rawRecs, summary: rawSummary, usedAI} = S.currentResult;
 
-  // ── Null guards — nunca deixar undefined causar crash
+  // ── Null guards
   const evalResults    = Array.isArray(rawEvalResults) ? rawEvalResults : [];
   const insights       = Array.isArray(rawInsights)    ? rawInsights    : [];
   const recommendations= Array.isArray(rawRecs)        ? rawRecs        : [];
   const overall        = rawOverall || 'normal';
   const summary        = rawSummary || 'Interpretação clínica concluída.';
+
   const score = overall==='normal' ? 92 : overall==='attention' ? 65 : 36;
-  const scoreColor = overall==='critical' ? '#DC3545' : overall==='attention' ? '#E8911A' : '#16A87E';
-  const circ = 2*Math.PI*30;
-  const offset = circ*(1 - score/100);
-  const hasCrit = insights.some(i => i.level === 'critical');
-  const hasWarn = insights.some(i => i.level === 'warn');
-  const dateStr = exam.date ? new Date(exam.date+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '—';
+  const scoreColor = overall==='critical' ? '#FCA5A5' : overall==='attention' ? '#FDE68A' : '#6EE7B7';
+
+  // Counts por status
+  const critCount = evalResults.filter(m => m.status === 'critical').length;
+  const warnCount = evalResults.filter(m => m.status === 'warn').length;
+  const okCount   = evalResults.filter(m => m.status === 'ok').length;
 
   // Separate insights by level
   const critInsights = insights.filter(i => i.level === 'critical');
@@ -5914,154 +6273,163 @@ function renderResult(){
   const okInsights   = insights.filter(i => i.level === 'ok');
   const infoInsights = insights.filter(i => i.level === 'info');
 
-  // Status pills for header
-  const critCount = evalResults.filter(m => m.status === 'critical').length;
-  const warnCount = evalResults.filter(m => m.status === 'warn').length;
-  const okCount   = evalResults.filter(m => m.status === 'ok').length;
+  // Date
+  const dateStr = exam.date
+    ? new Date(exam.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})
+    : '—';
 
-  const patterns = exam.result?.patterns || [];
+  // Status label PT
+  const statusLabels = { ok: 'NORMAL', warn: 'ATENÇÃO', crit: 'CRÍTICO', critical: 'CRÍTICO' };
 
   el.innerHTML = `
-    <!-- ══ HERO HEADER ══ -->
-    <div class="result-hero" style="margin-bottom:16px">
-      <div style="flex:1">
-        <div class="rh-eyebrow">📊 LAUDO CLÍNICO INTERPRETATIVO · ${exam.type} · ${exam.imported?'📥 Importado':'Mtrimestral'} · ${dateStr}</div>
-        <div class="rh-name">${escapeHTML(patient.name)}</div>
-        <div class="rh-meta">${patient.species} · ${patient.breed||'SRD'} · ${patient.age||'—'} · ${patient.weight||'—'}</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-          ${TAG[overall]||''}
-          ${usedAI ? '<span class="tag tag-info" style="margin-left:0">Claude AI</span>' : ''}
-          ${exam.imported&&exam.importedFileName ? `<span class="tag tag-neutral">📄 ${exam.importedFileName}</span>` : ''}
-          ${critCount ? `<span class="tag" style="background:rgba(220,53,69,.2);color:#FCA5A5;border:1px solid rgba(220,53,69,.3)">🚨 ${critCount} crítico${critCount>1?'s':''}</span>` : ''}
-          ${warnCount ? `<span class="tag" style="background:rgba(232,145,26,.18);color:#FDE68A;border:1px solid rgba(232,145,26,.3)">⚠️ ${warnCount} atenção</span>` : ''}
-          ${okCount   ? `<span class="tag" style="background:rgba(22,168,126,.15);color:#6EE7B7;border:1px solid rgba(22,168,126,.3)">✅ ${okCount} normal${okCount>1?'s':''}</span>` : ''}
-        </div>
-      </div>
-      <div style="text-align:center;flex-shrink:0">
-        <svg width="84" height="84" viewBox="0 0 84 84">
-          <circle cx="42" cy="42" r="32" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="6"/>
-          <circle cx="42" cy="42" r="32" fill="none" stroke="${scoreColor}" stroke-width="6"
-            stroke-dasharray="${(2*Math.PI*32).toFixed(1)}"
-            stroke-dashoffset="${((2*Math.PI*32)*(1-score/100)).toFixed(1)}"
-            stroke-linecap="round" transform="rotate(-90 42 42)"/>
-          <text x="42" y="38" text-anchor="middle" font-family="Sora,sans-serif" font-size="19" font-weight="700" fill="white">${score}</text>
-          <text x="42" y="52" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="9" fill="rgba(255,255,255,.35)">SCORE IA</text>
-        </svg>
-        <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">Confiança diagnóstica</div>
-        ${exam.aiError ? '<div style="font-size:10px;color:var(--amber);margin-top:4px">⚠ Análise clínica</div>' : ''}
-      </div>
-    </div>
+    <!-- ══ HERO COMPACTO ══ -->
+    <div class="result-hero-card">
+      <div class="rh-eyebrow">📋 Laudo Clínico · ${escapeHTML(exam.type||'Exame')} · ${dateStr}</div>
+      <div class="rh-name">${escapeHTML(patient.name)}</div>
+      <div class="rh-meta">${escapeHTML(patient.species||'')} · ${escapeHTML(patient.breed||'SRD')} · ${escapeHTML(patient.age||'—')} · ${escapeHTML(patient.weight||'—')}</div>
 
-    <!-- ══ LAB INFO FROM DOC ══ -->
-    ${exam.patientFromDoc?.vet || exam.patientFromDoc?.clinic ? `
-    <div style="background:var(--leaf-xl);border:1px solid rgba(22,168,126,.15);border-radius:var(--r12);padding:10px 16px;margin-bottom:14px;font-size:12px;color:var(--ink3);display:flex;gap:16px;flex-wrap:wrap">
-      ${exam.patientFromDoc.vet    ? `<span><strong style="color:var(--leaf-d)">Médico(a):</strong> ${exam.patientFromDoc.vet}</span>` : ''}
-      ${exam.patientFromDoc.clinic ? `<span><strong style="color:var(--leaf-d)">Clínica:</strong> ${exam.patientFromDoc.clinic}</span>` : ''}
-      ${exam.patientFromDoc.date   ? `<span><strong style="color:var(--leaf-d)">Data:</strong> ${exam.patientFromDoc.date}</span>` : ''}
-    </div>` : ''}
-
-    <!-- ══ CYTOLOGY BLOCK ══ -->
-    ${exam.cytologyFindings ? renderCytologyBlock(exam.cytologyFindings) : ''}
-
-    <!-- ══ HEMATOZOÁRIOS ══ -->
-    ${exam.hematozoarios && exam.hematozoarios !== 'não realizado' ? `
-    <div style="background:${exam.hematozoarios==='negativo'?'var(--leaf-l)':'var(--ruby-l)'};border:1px solid ${exam.hematozoarios==='negativo'?'rgba(22,168,126,.2)':'rgba(220,53,69,.2)'};border-radius:var(--r12);padding:12px 18px;display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <span style="font-size:22px">${exam.hematozoarios==='negativo' ? '🔬' : '⚠️'}</span>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:${exam.hematozoarios==='negativo'?'var(--leaf-d)':'var(--ruby)'};letter-spacing:.07em;text-transform:uppercase">Pesquisa de Hematozoários</div>
-        <div style="font-size:14px;font-weight:700;color:${exam.hematozoarios==='negativo'?'var(--leaf-d)':'var(--ruby)'};margin-top:2px">${exam.hematozoarios.charAt(0).toUpperCase()+exam.hematozoarios.slice(1)}</div>
-      </div>
-    </div>` : ''}
-
-    <!-- ══ CRITICAL ALERT BANNER ══ -->
-    ${hasCrit ? `
-    <div class="alert-strip" style="margin-bottom:16px">
-      <div class="alert-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-      <div style="flex:1">
-        <div style="font-size:10px;font-weight:700;color:#8B1A20;letter-spacing:.07em;margin-bottom:8px">⚠ ALERTAS PRIORITÁRIOS</div>
-        ${critInsights.map(i => `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;font-size:13px;color:#8B1A20;line-height:1.5"><span style="flex-shrink:0">🚨</span><span>${i.text}</span></div>`).join('')}
-        ${warnInsights.map(i => `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;font-size:13px;color:#7A4800;line-height:1.5"><span style="flex-shrink:0">⚠️</span><span>${i.text}</span></div>`).join('')}
-      </div>
-    </div>` : hasWarn ? `
-    <div style="background:var(--amber-l);border:1px solid rgba(232,145,26,.25);border-radius:var(--r16);padding:14px 18px;display:flex;gap:12px;margin-bottom:16px">
-      <span style="font-size:20px;flex-shrink:0">⚠️</span>
-      <div style="flex:1">
-        <div style="font-size:10px;font-weight:700;color:var(--amber);letter-spacing:.07em;margin-bottom:8px">PONTOS DE ATENÇÃO</div>
-        ${warnInsights.map(i => `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;font-size:13px;color:#7A4800;line-height:1.5"><span style="flex-shrink:0">•</span><span>${i.text}</span></div>`).join('')}
-      </div>
-    </div>` : ''}
-
-    <!-- ══ MARKERS + PATTERNS + INSIGHTS GRID ══ -->
-    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-bottom:14px">
-      <!-- LEFT: markers by category -->
-      <div>
-        ${renderMarkerCard(HEMATOLOGY_KEYS, evalResults, 'Hematologia', '🧬', '#F0F9FF')}
-        ${renderMarkerCard(BIOCHEM_KEYS, evalResults, 'Bioquímica', '🧪', '#FEF5E7')}
-        ${!evalResults.length ? `<div class="card cp"><div style="font-size:13px;color:var(--mist);padding:8px 0;text-align:center">Nenhum marcador com referência encontrado para esta espécie.</div></div>` : ''}
+      <div class="rh-tags">
+        ${critCount ? `<span class="rh-tag rh-tag-crit">🚨 ${critCount} crítico${critCount>1?'s':''}</span>` : ''}
+        ${warnCount ? `<span class="rh-tag rh-tag-warn">⚠ ${warnCount} atenção</span>` : ''}
+        ${okCount   ? `<span class="rh-tag rh-tag-ok">✓ ${okCount} normal${okCount>1?'is':''}</span>` : ''}
+        ${usedAI    ? `<span class="rh-tag rh-tag-info">IA</span>` : ''}
       </div>
 
-      <!-- RIGHT: patterns + insights + recs -->
-      <div>
-        ${renderPatternChips(patterns)}
-
-        <div class="ai-card" style="margin-bottom:14px">
-          <div class="ai-card-lbl">🧠 INSIGHTS CLÍNICOS${usedAI ? ' · Claude AI' : ''}</div>
-          ${insights.length ? [
-            ...critInsights.map(i => `<div class="insight-row"><div class="idot" style="background:var(--ruby)"></div><span>${i.text}</span></div>`),
-            ...warnInsights.map(i => `<div class="insight-row"><div class="idot" style="background:var(--amber)"></div><span>${i.text}</span></div>`),
-            ...infoInsights.map(i => `<div class="insight-row"><div class="idot" style="background:var(--cobalt)"></div><span>${i.text}</span></div>`),
-            ...okInsights.map(i => `<div class="insight-row"><div class="idot" style="background:var(--leaf)"></div><span>${i.text}</span></div>`),
-          ].join('') : '<div style="font-size:13px;color:var(--mist)">Sem insights gerados.</div>'}
-        </div>
-
-        <div class="recs-dark">
-          <div class="recs-lbl">📈 PRÓXIMOS PASSOS RECOMENDADOS</div>
-          ${recommendations.map((r,i) => `<div class="rec-row"><div class="rec-num">${i+1}</div><span>${r}</span></div>`).join('')}
+      <div class="rh-score-circle">
+        <div class="rh-score-value" style="color:${scoreColor}">${score}</div>
+        <div class="rh-score-info">
+          <div class="rh-score-label">Score Clínico</div>
+          <div class="rh-score-sub">${overall==='normal' ? 'Quadro estável' : overall==='attention' ? 'Requer atenção' : 'Quadro crítico'}</div>
         </div>
       </div>
     </div>
 
-    <!-- ══ SUMMARY ══ -->
-    <div style="background:var(--night);border-radius:var(--r16);padding:20px 24px;margin-bottom:14px">
-      <div style="font-size:10px;font-weight:700;color:var(--leaf);letter-spacing:.09em;margin-bottom:10px">📌 RESUMO CLÍNICO</div>
-      <div style="font-size:14px;color:rgba(255,255,255,.82);line-height:1.75;font-weight:300">${summary}</div>
-    </div>
-
-    <!-- ══ LAB OBSERVATIONS ══ -->
-    ${exam.observacoes ? `
-    <div style="background:var(--fog);border-radius:var(--r12);padding:14px 18px;margin-bottom:14px">
-      <div style="font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Observações do laboratório</div>
-      <div style="font-size:13px;color:var(--ink2);line-height:1.65">${exam.observacoes}</div>
+    <!-- ══ RESUMO CLÍNICO ══ -->
+    ${summary ? `
+    <div class="result-summary">
+      <div class="result-summary-label">📝 Resumo clínico</div>
+      ${escapeHTML(summary)}
     </div>` : ''}
 
-    <!-- ══ SAFETY NOTE ══ -->
-    <div style="background:var(--leaf-xl);border:1px solid rgba(22,168,126,.18);border-radius:var(--r12);padding:12px 16px;display:flex;gap:10px;align-items:flex-start;margin-bottom:16px">
-      <span style="font-size:16px;flex-shrink:0">⚖️</span>
-      <div style="font-size:12px;color:var(--ink3);line-height:1.6">
-        <strong style="color:var(--leaf-d)">Nota de segurança clínica:</strong> Esta análise é suporte à decisão clínica e não substitui o julgamento do médico-veterinário. Os achados utilizam linguagem como "pode sugerir", "compatível com", "merece investigação". Nenhum diagnóstico definitivo é fornecido e nenhum medicamento é prescrito.
+    <!-- ══ MARCADORES LABORATORIAIS ══ -->
+    ${evalResults.length ? `
+    <div class="result-section-h">
+      Parâmetros analisados
+      <span class="result-section-h-count">${evalResults.length}</span>
+    </div>
+    ${evalResults.map(m => {
+      const stClass = m.status === 'critical' ? 'is-crit' : m.status === 'warn' ? 'is-warn' : 'is-ok';
+      const stLabel = m.status === 'critical' ? 'CRÍTICO' : m.status === 'warn' ? 'ATENÇÃO' : 'NORMAL';
+      return `<div class="marker-card ${stClass}">
+        <div class="marker-card-left">
+          <div class="marker-card-name">${escapeHTML(m.name||m.label||'—')}</div>
+          ${m.ref ? `<div class="marker-card-ref">Ref: ${escapeHTML(m.ref)}</div>` : ''}
+        </div>
+        <div class="marker-card-right">
+          <div class="marker-card-value">${escapeHTML(String(m.value||'—'))}${m.unit ? ` <span style="font-size:.7em;opacity:.7">${escapeHTML(m.unit)}</span>` : ''}</div>
+          <span class="marker-card-status">${stLabel}</span>
+        </div>
+      </div>`;
+    }).join('')}` : ''}
+
+    <!-- ══ INSIGHTS CRÍTICOS ══ -->
+    ${critInsights.length ? `
+    <div class="result-section-h">
+      🚨 Achados críticos
+      <span class="result-section-h-count">${critInsights.length}</span>
+    </div>
+    ${critInsights.map(i => `<div class="insight-row is-crit">
+      <div class="insight-icon">🚨</div>
+      <div class="insight-body">
+        ${i.title ? `<div class="insight-title">${escapeHTML(i.title)}</div>` : ''}
+        <div class="insight-text">${escapeHTML(i.text||'')}</div>
       </div>
+    </div>`).join('')}` : ''}
+
+    <!-- ══ INSIGHTS DE ATENÇÃO ══ -->
+    ${warnInsights.length ? `
+    <div class="result-section-h">
+      ⚠ Pontos de atenção
+      <span class="result-section-h-count">${warnInsights.length}</span>
+    </div>
+    ${warnInsights.map(i => `<div class="insight-row is-warn">
+      <div class="insight-icon">⚠</div>
+      <div class="insight-body">
+        ${i.title ? `<div class="insight-title">${escapeHTML(i.title)}</div>` : ''}
+        <div class="insight-text">${escapeHTML(i.text||'')}</div>
+      </div>
+    </div>`).join('')}` : ''}
+
+    <!-- ══ INSIGHTS POSITIVOS ══ -->
+    ${okInsights.length ? `
+    <div class="result-section-h">
+      ✓ Observações normais
+      <span class="result-section-h-count">${okInsights.length}</span>
+    </div>
+    ${okInsights.map(i => `<div class="insight-row is-ok">
+      <div class="insight-icon">✓</div>
+      <div class="insight-body">
+        ${i.title ? `<div class="insight-title">${escapeHTML(i.title)}</div>` : ''}
+        <div class="insight-text">${escapeHTML(i.text||'')}</div>
+      </div>
+    </div>`).join('')}` : ''}
+
+    <!-- ══ INFO ADICIONAIS ══ -->
+    ${infoInsights.length ? `
+    <div class="result-section-h">
+      ℹ Informações adicionais
+      <span class="result-section-h-count">${infoInsights.length}</span>
+    </div>
+    ${infoInsights.map(i => `<div class="insight-row is-info">
+      <div class="insight-icon">ℹ</div>
+      <div class="insight-body">
+        ${i.title ? `<div class="insight-title">${escapeHTML(i.title)}</div>` : ''}
+        <div class="insight-text">${escapeHTML(i.text||'')}</div>
+      </div>
+    </div>`).join('')}` : ''}
+
+    <!-- ══ RECOMENDAÇÕES ══ -->
+    ${recommendations.length ? `
+    <div class="result-section-h">
+      💡 Recomendações clínicas
+      <span class="result-section-h-count">${recommendations.length}</span>
+    </div>
+    ${recommendations.map(r => {
+      const txt = typeof r === 'string' ? r : (r.text || r.title || '');
+      return `<div class="rec-pill">
+        <div class="rec-pill-icon">→</div>
+        <div>${escapeHTML(txt)}</div>
+      </div>`;
+    }).join('')}` : ''}
+
+    <!-- ══ AÇÕES ══ -->
+    <div class="result-actions">
+      <button class="btn btn-primary btn-md" onclick="exportOneExam(S.currentResult?.exam?.id)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar laudo
+      </button>
+      <button class="btn btn-ghost btn-md" onclick="nav('import')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo exame
+      </button>
+      <button class="btn btn-ghost btn-md" onclick="nav('exams')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Ver histórico
+      </button>
     </div>
 
-    <!-- ══ ACTIONS ══ -->
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-primary btn-sm" onclick="nav('import')" style="flex:1;justify-content:center;min-width:120px">Novo laudo</button>
-      <button class="btn btn-ghost btn-sm" onclick="openStudy('${exam.id}')" style="flex:1;justify-content:center;min-width:120px">Estudo detalhado</button>
-      <button class="btn btn-ghost btn-sm" onclick="exportOneExam('${exam.id}')" style="flex:1;justify-content:center;min-width:120px">Exportar laudo</button>
-    </div>`;
-
-  // Animate bars after render
-  setTimeout(() => {
-    document.querySelectorAll('.bar-fill').forEach(b => {
-      const w = b.style.width;
-      b.style.width = '0%';
-      setTimeout(() => { b.style.width = w; }, 80);
-    });
-  }, 100);
+    <!-- Animation reflow -->
+    <script>
+      setTimeout(() => {
+        document.querySelectorAll('.bar-fill').forEach(b => {
+          const w = b.style.width;
+          b.style.width = '0%';
+          setTimeout(() => { b.style.width = w; }, 80);
+        });
+      }, 100);
+    <\/script>
+  `;
 }
-
-/* ══════════════════════════════════════════════
-   USAGE STRIP (global topbar indicator)
-══════════════════════════════════════════════ */
 function updateUsageStrip(){
   const plan = getUserPlan();
   const usage = getUsage();
