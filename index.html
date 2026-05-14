@@ -12,6 +12,8 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.workers.dev https://api.anthropic.com https://*.supabase.co https://*.supabase.io; img-src 'self' data: blob:; object-src 'none'; base-uri 'self';">
 <meta name="description" content="DiagnoVet IA — VitaHub Solutions · DiagnoVet IA."/>
 <meta name="theme-color" content="#091610"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-Frame-Options" content="DENY"/>
 <title>DiagnoVet — Diagnóstico Clínico Veterinário</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -2388,6 +2390,261 @@ body.modal-open {
 @media (max-width: 375px) {
   .rh-gauge svg { width: 70px; height: 70px; }
 }
+
+
+/* ══ CHART + MARKER CARD REFINEMENTS ══════════════════════ */
+
+/* Chart card responsivo */
+.result-chart-card svg {
+  min-width: 700px;
+}
+.result-chart-card {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Marker cards — mais peso visual */
+.marker-card {
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(9,22,16,.04);
+  transition: all var(--d-fast) var(--e-out);
+}
+.marker-card:hover {
+  box-shadow: 0 4px 16px rgba(9,22,16,.08);
+  transform: translateY(-1px);
+}
+
+/* Bar visual mais proeminente */
+.marker-bar-wrap {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,.05);
+}
+.marker-bar-track {
+  height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(90deg,
+    rgba(220,53,69,.12) 0%,
+    rgba(220,53,69,.06) 15%,
+    #F0F2F1 25%,
+    #F0F2F1 75%,
+    rgba(220,53,69,.06) 85%,
+    rgba(220,53,69,.12) 100%);
+}
+.marker-bar-ref {
+  height: 100%;
+  background: rgba(22,168,126,.3);
+  border-radius: 99px;
+  box-shadow: inset 0 0 0 1px rgba(22,168,126,.5);
+}
+.marker-bar-dot {
+  width: 16px;
+  height: 16px;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.marker-bar-axis {
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--mist);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Valor numérico mais destaque */
+.marker-card-value {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+}
+
+/* Referência com mais contraste */
+.marker-card-ref {
+  font-size: 11.5px;
+  color: var(--ink2);
+  margin-top: 4px;
+}
+.marker-card-ref strong {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* Status badge mais visível */
+.marker-card-status {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 99px;
+  letter-spacing: .06em;
+}
+
+/* Hover states mais expressivos */
+.marker-card.is-crit {
+  border-color: rgba(220,53,69,.35);
+  border-left: 4px solid #DC3545;
+}
+.marker-card.is-warn {
+  border-color: rgba(232,145,26,.35);
+  border-left: 4px solid #E8911A;
+}
+.marker-card.is-ok {
+  border-left: 4px solid var(--leaf);
+}
+
+/* Mobile chart scroll hint */
+@media (max-width: 768px) {
+  .result-chart-card::after {
+    content: 'Deslize para ver todos →';
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    color: var(--mist);
+    margin-top: 8px;
+    opacity: .6;
+  }
+  .marker-card-value { font-size: 17px; }
+  .marker-bar-dot { width: 14px; height: 14px; border-width: 2.5px; }
+  .marker-bar-track { height: 7px; }
+}
+
+
+/* ══ MARKER CARD — BARRA DE REFERÊNCIA PREMIUM ══════════ */
+
+.mkr-card {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--fog);
+}
+.mkr-card:last-child { border-bottom: none; }
+
+/* Linha topo: nome + valor + badge */
+.mkr-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.mkr-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1;
+  min-width: 0;
+}
+.mkr-val-group {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.mkr-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.3px;
+  font-variant-numeric: tabular-nums;
+}
+.mkr-unit {
+  font-size: 11px;
+  color: var(--mist);
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+}
+.mkr-status-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+/* Referência */
+.mkr-ref {
+  font-size: 11.5px;
+  color: var(--mist);
+  margin-bottom: 6px;
+  letter-spacing: .01em;
+}
+
+/* Barra simples */
+.mkr-bar {
+  height: 4px;
+  background: var(--fog);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.mkr-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .mkr-name  { font-size: 13px; }
+  .mkr-value { font-size: 14px; }
+};
+  position: relative;
+  z-index: 1;
+}
+.mkr-zone-high {
+  background: linear-gradient(90deg, rgba(220,53,69,.06), rgba(220,53,69,.15));
+  border-radius: 0 10px 10px 0;
+}
+
+/* Ponteiro */
+.mkr-pointer {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3.5px solid white;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25), 0 0 0 2px rgba(0,0,0,.06);
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.mkr-pointer-label {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: white;
+  padding: 2px 7px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  border: 1.5px solid currentColor;
+}
+
+/* Badge */
+.mkr-badge {
+  display: inline-block;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: 99px;
+  letter-spacing: .08em;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .mkr-card { padding: 12px 14px; }
+  .mkr-value { font-size: 18px; }
+  .mkr-name { font-size: 12.5px; }
+  .mkr-pointer { width: 18px; height: 18px; border-width: 3px; }
+  .mkr-pointer-label { font-size: 10px; bottom: 22px; padding: 2px 5px; }
+  .mkr-bar-track { height: 16px; }
+}
+
+/* Hide old marker-card styles to avoid conflicts */
+.marker-card { display: none; }
+/* ══ FIM MARKER CARD PREMIUM ═══════════════════════════ */
 
 </style>
 </head>
@@ -5961,6 +6218,18 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
           'anthropic-dangerous-direct-browser-access': 'true',
         };
 
+    // ── Anexar JWT do Supabase se logado (Worker valida e aplica quota/rate-limit por usuário)
+    if (S.proxyUrl && _supa && S.user?.supaUser) {
+      try {
+        const { data: { session } } = await _supa.auth.getSession();
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      } catch (e) {
+        console.warn('Could not attach JWT:', e.message);
+      }
+    }
+
     resp = await fetch(endpoint, {
       method: 'POST',
       headers,
@@ -5982,32 +6251,10 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
       errMsg = errBody.error?.message || errMsg;
     } catch(_) {}
 
-    // ── Se proxy retorna 403 (Worker desatualizado/bloqueado)
-    // tenta chamada direta com chave se disponível
-    if (resp.status === 403 && S.proxyUrl) {
-      if (S.key) {
-        console.warn('Proxy retornou 403 — tentando chamada direta com chave API...');
-        const directResp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': S.key,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true',
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-5-20250929',
-            max_tokens: 4096,
-            system: SYSTEM_PROMPT,
-            messages: [{ role: 'user', content: contentBlocks }]
-          })
-        });
-        if (directResp.ok) {
-          const directData = await directResp.json();
-          return parseClaudeResponse(directData);
-        }
-      }
-      throw new Error('Worker bloqueando requisições (403). Redeploye o Worker no Cloudflare ou adicione sua chave API em Configurações → Claude AI.');
+    // 🔒 SEGURANÇA [VULN-1]: NUNCA chamar Anthropic direto do browser — chave fica exposta em DevTools
+    // Se proxy falha → mostrar erro. Toda chamada DEVE passar pelo Worker.
+    if (resp.status === 403) {
+      throw new Error('Servidor temporariamente indisponível (403). Tente novamente em alguns minutos.');
     }
 
     if (resp.status === 401) throw new Error('Chave API inválida ou expirada. Verifique em Configurações → Claude AI.');
@@ -6541,55 +6788,79 @@ function renderResult(){
     <!-- ══ MARCADORES LABORATORIAIS ══ -->
     ${evalResults.length ? `
     <div class="result-section-h">
-      Parâmetros analisados
+      Marcadores laboratoriais
       <span class="result-section-h-count">${evalResults.length}</span>
     </div>
+    <div style="background:var(--snow);border:1px solid var(--fog);border-radius:14px;padding:4px 18px 4px;margin-bottom:14px">
+
     ${evalResults.map(m => {
+
       const stClass = m.status === 'critical' ? 'is-crit' : m.status === 'warn' ? 'is-warn' : 'is-ok';
       const stLabel = m.status === 'critical' ? 'CRÍTICO' : m.status === 'warn' ? 'ATENÇÃO' : 'NORMAL';
-      const stIcon  = m.status === 'critical' ? '🔴' : m.status === 'warn' ? '🟡' : '🟢';
-      // Calcular barra visual de posição se possível
-      let barHTML = '';
-      const refMatch = String(m.ref||'').match(/([\d.,]+)\s*[-–—]\s*([\d.,]+)/);
-      const numValue = parseFloat(String(m.value||'').replace(',','.'));
-      if(refMatch && !isNaN(numValue)) {
-        const min = parseFloat(refMatch[1].replace(',','.'));
-        const max = parseFloat(refMatch[2].replace(',','.'));
-        if(!isNaN(min) && !isNaN(max) && max > min) {
-          const range = max - min;
-          const padding = range * 0.3;
-          const totalMin = min - padding;
-          const totalMax = max + padding;
-          const pct = Math.max(0, Math.min(100, ((numValue - totalMin) / (totalMax - totalMin)) * 100));
-          const refStartPct = ((min - totalMin) / (totalMax - totalMin)) * 100;
-          const refEndPct   = ((max - totalMin) / (totalMax - totalMin)) * 100;
-          const dotColor = m.status === 'critical' ? '#DC3545' : m.status === 'warn' ? '#E8911A' : '#16A87E';
-          barHTML = `<div class="marker-bar-wrap">
-            <div class="marker-bar-track">
-              <div class="marker-bar-ref" style="left:${refStartPct.toFixed(1)}%;width:${(refEndPct-refStartPct).toFixed(1)}%"></div>
-              <div class="marker-bar-dot" style="left:${pct.toFixed(1)}%;background:${dotColor}"></div>
-            </div>
-            <div class="marker-bar-axis">
-              <span>${escapeHTML(refMatch[1])}</span>
-              <span>${escapeHTML(refMatch[2])}</span>
-            </div>
-          </div>`;
+      const dotColor = m.status === 'critical' ? '#DC3545' : m.status === 'warn' ? '#E8911A' : '#16A87E';
+      const bgTint   = m.status === 'critical' ? 'rgba(220,53,69,.06)' : m.status === 'warn' ? 'rgba(232,145,26,.05)' : 'transparent';
+      const borderC  = m.status === 'critical' ? '#DC3545' : m.status === 'warn' ? '#E8911A' : '#16A87E';
+
+      // ── Calcular posição na barra
+      const refStr   = m.refStr || m.ref || '';
+      const refMatch = refStr.match(/([\d.,]+)\s*[-–—]\s*([\d.,]+)/);
+      const numVal   = parseFloat(String(m.value||'').replace(',','.'));
+
+      let pctPos = -1, refStart = 20, refEnd = 80;
+      let refMin = '', refMax = '';
+
+      if(refMatch && !isNaN(numVal)) {
+        const rMin = parseFloat(refMatch[1].replace(',','.'));
+        const rMax = parseFloat(refMatch[2].replace(',','.'));
+        refMin = refMatch[1]; refMax = refMatch[2];
+        if(!isNaN(rMin) && !isNaN(rMax) && rMax > rMin) {
+          const pad  = (rMax - rMin) * 0.45;
+          const tMin = rMin - pad;
+          const tMax = rMax + pad;
+          pctPos   = Math.max(2, Math.min(98, ((numVal - tMin)/(tMax - tMin))*100));
+          refStart = Math.max(1, ((rMin - tMin)/(tMax - tMin))*100);
+          refEnd   = Math.min(99, ((rMax - tMin)/(tMax - tMin))*100);
         }
       }
-      return `<div class="marker-card ${stClass}">
-        <div class="marker-card-head">
-          <div class="marker-card-left">
-            <div class="marker-card-name">${stIcon} ${escapeHTML(m.name||m.label||'—')}</div>
-            ${m.ref ? `<div class="marker-card-ref"><strong>Ref:</strong> ${escapeHTML(m.ref)}${m.unit ? ` ${escapeHTML(m.unit)}` : ''}</div>` : ''}
-          </div>
-          <div class="marker-card-right">
-            <div class="marker-card-value">${escapeHTML(String(m.value||'—'))}${m.unit ? `<span class="marker-card-unit"> ${escapeHTML(m.unit)}</span>` : ''}</div>
-            <span class="marker-card-status">${stLabel}</span>
+
+      const hasBar = pctPos >= 0;
+
+      // ── Calcular largura da barra proporcional
+      let barW = 0;
+      if(refMatch && !isNaN(numVal)) {
+        const rMin = parseFloat(refMatch[1].replace(',','.'));
+        const rMax = parseFloat(refMatch[2].replace(',','.'));
+        if(!isNaN(rMin) && !isNaN(rMax) && rMax > rMin) {
+          const pad  = (rMax - rMin) * 0.5;
+          const tMax = rMax + pad;
+          barW = Math.max(4, Math.min(100, (numVal / tMax) * 100));
+        }
+      } else {
+        barW = m.pct || 50;
+      }
+
+      const statusIcon = m.status === 'ok' ? '✓' : '✗';
+      const statusText = m.status === 'critical' ? 'Crítico' : m.status === 'warn' ? 'Atenção' : 'Normal';
+
+      return `<div class="mkr-card">
+        <!-- Linha 1: nome · valor · badge -->
+        <div class="mkr-row">
+          <div class="mkr-name">${escapeHTML(m.label||m.key||'—')}</div>
+          <div class="mkr-val-group">
+            <span class="mkr-value" style="color:${borderC}">${escapeHTML(String(m.value||'—'))}</span>
+            ${m.unit ? `<span class="mkr-unit">${escapeHTML(m.unit)}</span>` : ''}
+            <span class="mkr-status-badge" style="color:${borderC}">${statusIcon} ${statusText}</span>
           </div>
         </div>
-        ${barHTML}
+        <!-- Linha 2: referência -->
+        ${refStr ? `<div class="mkr-ref">Ref: ${escapeHTML(refStr)}${m.unit ? ' '+escapeHTML(m.unit) : ''}</div>` : ''}
+        <!-- Linha 3: barra proporcional -->
+        <div class="mkr-bar">
+          <div class="mkr-bar-fill" style="width:${barW.toFixed(1)}%;background:${borderC}"></div>
+        </div>
       </div>`;
-    }).join('')}` : ''}
+    }).join('')}
+    </div>` : ''}
 
     <!-- ══ INSIGHTS CRÍTICOS ══ -->
     ${critInsights.length ? `
@@ -6880,7 +7151,7 @@ function renderPlansScreen(){
       <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Plano atual · ${month}</div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
         <div>
-          <div style="font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:var(--snow);letter-spacing:-1px">${plan.name}</div>
+          <div style="font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:var(--snow);letter-spacing:-1px">${escapeHTML(plan.name)}</div>
           <div style="font-size:13px;color:rgba(255,255,255,.45);margin-top:3px">${plan.price}</div>
         </div>
         <span class="plan-badge" style="background:${plan.color};color:${plan.colorText};border:1px solid ${isTrial?'rgba(232,145,26,.3)':'rgba(22,168,126,.3)'}">${plan.badge}</span>
@@ -6899,7 +7170,7 @@ function renderPlansScreen(){
       <div style="width:32px;height:32px;border-radius:8px;background:rgba(22,168,126,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">💰</div>
       <div style="flex:1">
         <div style="font-size:13px;font-weight:700;color:var(--snow);margin-bottom:2px">Economize com o plano trimestral</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.4)">Básico: 20% off · Pro: 30% off — assine trimestral e economize</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Básico: 10% off · Pro: 20% off — assine trimestral e economize</div>
       </div>
       <span style="font-size:11px;font-weight:800;color:var(--leaf);white-space:nowrap">Ver oferta →</span>
     </div>
@@ -8452,7 +8723,7 @@ function exportOneExam(id){
           return `<tr class="${rowClass}">
             <td class="lpro-marker-name">${escapeHTML(m.name||m.label||'—')}</td>
             <td class="lpro-marker-value">${escapeHTML(String(m.value||'—'))}${m.unit ? `<span class="unit">${escapeHTML(m.unit)}</span>` : ''}</td>
-            <td class="lpro-marker-ref-col">${escapeHTML(m.ref||'—')}${m.unit && m.ref ? ` ${escapeHTML(m.unit)}` : ''}</td>
+            <td class="lpro-marker-ref-col">${escapeHTML((m.refStr||m.ref||'—'))}${m.unit && (m.refStr||m.ref) ? ` ${escapeHTML(m.unit)}` : ''}</td>
             <td class="lpro-marker-status"><span class="badge ${badgeClass}">${stLabel}</span></td>
           </tr>`;
         }).join('')}
