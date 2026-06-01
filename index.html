@@ -3737,6 +3737,107 @@ function escapeHTML(str) {
 const DEFAULT_PROXY = 'https://diagnovetia-api.tristoncomercial.workers.dev';
 
 // ── DEMO ACCOUNT — credenciais fixas (altere aqui quando quiser)
+
+// ════════════════════════════════════════════════════════════════════════════════
+// TIER 1 IMPROVEMENTS - VALIDAÇÃO E ERROR HANDLING
+// ════════════════════════════════════════════════════════════════════════════════
+
+// 1. Validação de Formato CRMV
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function validateCRMV(crmv) {
+  const crmvRegex = /^CRMV-[A-Z]{2}\s?\d{4,6}$/i;
+  if (!crmvRegex.test(crmv.trim())) {
+    return {
+      valid: false,
+      message: 'CRMV inválido. Formato esperado: CRMV-XX 00000 (ex: CRMV-PB 12345)'
+    };
+  }
+  return { valid: true };
+}
+
+// 2. Mapeamento de Mensagens de Erro Específicas
+const ERROR_MESSAGES = {
+  'User already registered': 'Este e-mail já está cadastrado. Use "Esqueci minha senha" para recuperar acesso.',
+  'Invalid email': 'E-mail inválido. Verifique o formato e tente novamente.',
+  'Weak password': 'Senha fraca. Use no mínimo 6 caracteres.',
+  'Email not confirmed': 'Confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.',
+  'Invalid credentials': 'E-mail ou senha incorretos. Verifique e tente novamente.',
+  'Too many requests': 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.',
+  'email_signup_disabled': 'Cadastro desativado no momento. Tente mais tarde.',
+  'invalid_grant': 'E-mail ou senha incorretos.'
+};
+
+// 3. Função para obter mensagem de erro apropriada
+function getErrorMessage(error) {
+  if (!error) return 'Erro desconhecido. Tente novamente.';
+  
+  const errorKey = error.message || error.msg || error.error_description || '';
+  
+  for (const [key, message] of Object.entries(ERROR_MESSAGES)) {
+    if (errorKey.includes(key)) {
+      return message;
+    }
+  }
+  
+  return errorKey || 'Erro ao processar sua requisição. Tente novamente.';
+}
+
+// 4. Auto-login pós-confirmação de email
+async function handleEmailConfirmation() {
+  const searchParams = new URLSearchParams(window.location.search);
+  const accessToken = searchParams.get('access_token');
+  const tokenType = searchParams.get('type');
+  
+  if (tokenType === 'signup' && accessToken) {
+    try {
+      const { data, error } = await _supa.auth.refreshSession();
+      if (!error && data.session) {
+        DATA_MODE = 'cloud';
+        const profile = await getSupaProfile(data.session.user.id);
+        await enter({ 
+          ...profile, 
+          id: data.session.user.id, 
+          email: data.session.user.email,
+          supaUser: data.session.user 
+        }, true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return true;
+      }
+    } catch(e) {
+      console.error('Auto-login falhou:', e);
+    }
+  }
+  return false;
+}
+
+// 5. Rate Limiting simples no cliente
+const requestCounts = new Map();
+function checkClientRateLimit(action, limit = 3, windowMs = 3600000) {
+  const key = action;
+  const now = Date.now();
+  let data = requestCounts.get(key) || { count: 0, resetTime: now };
+  
+  if (now - data.resetTime > windowMs) {
+    data = { count: 0, resetTime: now };
+  }
+  
+  if (data.count >= limit) {
+    return {
+      allowed: false,
+      message: 'Muitas tentativas. Aguarde alguns minutos.'
+    };
+  }
+  
+  data.count++;
+  requestCounts.set(key, data);
+  return { allowed: true };
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
 const DEMO_EMAIL = 'demo@diagnovet.com.br';
 const DEMO_PASS  = 'DiagnoVet@2025';
 const DEMO_NAME  = 'Dra. Leylla Patrick';
@@ -4121,7 +4222,15 @@ async function doRegister(){
   if(!name||!email||!pass){showErr('Preencha todos os campos.');return;}
   if(pass.length<6){showErr('Senha mínima de 6 caracteres.');return;}
   if(!email.includes('@')||!email.includes('.')){showErr('E-mail inválido.');return;}
-  if(!crmv.trim()){showErr('Informe o CRMV.');return;}
+  if(!crmv.trim()){
+    showErr('Informe o CRMV. Formato: CRMV-XX 00000');
+    return;
+  }
+  const crmvValidation = validateCRMV(crmv);
+  if(!crmvValidation.valid){
+    showErr(crmvValidation.message);
+    return;
+  }
 
   // ── Supabase Auth (real users)
   if(_supa){
@@ -4142,9 +4251,7 @@ async function doRegister(){
         }
       });
       if(error){
-        const msg = error.message || error.msg || error.error_description
-          || (typeof error === 'string' ? error : 'Erro ao criar conta. Tente novamente.');
-        showErr(msg);
+        showErr(getErrorMessage(error));
         setBtn('Criar minha conta', false);
         return;
       }
@@ -5862,6 +5969,52 @@ function populatePatientDropdown(){
 /* ══════════════════════════════════════════════
    ANALYSIS ENGINE — FIXED
 ══════════════════════════════════════════════ */
+
+
+
+// Fetch com timeout
+async function fetchWithTimeout(url, options = {}, timeout = 30000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// Função auxiliar para retry com backoff
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      
+      if (response.status === 429) {
+        // Rate limit - aguardar progressivamente
+        const waitTime = Math.pow(2, attempt) * 1000;
+        console.warn(`⏳ Rate limited. Aguardando ${waitTime}ms...`);
+        await new Promise(r => setTimeout(r, waitTime));
+        continue;
+      }
+      
+      if (!response.ok && attempt < maxRetries) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      return response;
+    } catch (error) {
+      if (attempt === maxRetries) throw error;
+      const delay = Math.pow(2, attempt) * 100;
+      console.warn(`Tentativa ${attempt} falhou, aguardando ${delay}ms...`);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+}
 
 // Safe JSON extractor — handles Claude responses that may have surrounding text
 function safeParseJSON(raw) {
