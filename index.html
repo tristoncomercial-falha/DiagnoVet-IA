@@ -128,7 +128,7 @@ input::placeholder, textarea::placeholder {
 @keyframes orb1       { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(30px,-20px) scale(1.1); } }
 @keyframes orb2       { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(-20px,30px) scale(.9); } }
 @keyframes orb3       { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(15px,15px) scale(1.05); } }
-@keyframes pawBeat    { 0%,100% { transform:scale(1); } 50% { transform:scale(1.04); } }
+@keyframes pawBeat    { 0%,100% { transform:scale(1); opacity:.032; } 50% { transform:scale(1.03); opacity:.055; } }
 @keyframes cardIn     { from { opacity:0; transform:translateY(32px) scale(.97); } to { opacity:1; transform:none; } }
 .fade-in { animation:fadeSlide var(--d-base) var(--e-out) both; }
 
@@ -145,7 +145,7 @@ input::placeholder, textarea::placeholder {
 .auth-bg-orb-2 { width:400px; height:400px; background:radial-gradient(circle, rgba(37,99,235,.12) 0%, transparent 70%); bottom:-60px; left:-60px; animation:orb2 15s ease-in-out infinite; }
 .auth-bg-orb-3 { width:280px; height:280px; background:radial-gradient(circle, rgba(22,168,126,.08) 0%, transparent 70%); top:40%; left:40%; animation:orb3 10s ease-in-out infinite; }
 .auth-bg-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(22,168,126,.04) 1px, transparent 1px),linear-gradient(90deg, rgba(22,168,126,.04) 1px, transparent 1px); background-size:48px 48px; mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%); }
-.auth-bg-logo { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); opacity:.04; animation:pawBeat 6s ease-in-out infinite; pointer-events:none; }
+.auth-bg-logo { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); opacity:.04; animation:pawBeat 9s ease-in-out infinite; pointer-events:none; }
 .auth-card {
   display:grid; grid-template-columns:minmax(0,480px) minmax(0,420px);
   border-radius:var(--r28); overflow:hidden;
@@ -1332,14 +1332,14 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: .5;
-  animation: orbFloat 18s ease-in-out infinite;
+  opacity: .42;
+  animation: orbFloat 24s ease-in-out infinite;
 }
 .auth-bg-orb-1 { 
   width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(22,168,126,.35) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(22,168,126,.26) 0%, transparent 70%);
   top: -150px; left: -150px;
-  animation-duration: 22s;
+  animation-duration: 28s;
 }
 .auth-bg-orb-2 {
   width: 400px; height: 400px;
@@ -1357,8 +1357,12 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
 }
 @keyframes orbFloat {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33%      { transform: translate(40px, -30px) scale(1.05); }
-  66%      { transform: translate(-30px, 40px) scale(.95); }
+  50%      { transform: translate(0, -18px) scale(1.04); }
+}
+/* Respiro lento e sincronizado do logo (o primeiro plano ecoa o fundo) */
+@keyframes logoBreath {
+  0%, 100% { opacity: .45; transform: scale(1); }
+  50%      { opacity: .70; transform: scale(1.06); }
 }
 
 /* Auth grid pattern */
@@ -1428,6 +1432,7 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
   z-index: -1;
   filter: blur(8px);
   opacity: .6;
+  animation: logoBreath 9s ease-in-out infinite;
 }
 .auth-brand-name {
   font-family: 'Sora', sans-serif;
@@ -1446,6 +1451,9 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
   width: 100%;
   animation: fadeUp .55s .15s var(--e-out) both;
 }
+
+/* Campos assentam suavemente ao abrir a tela (escopado só no login) */
+#auth .fld { animation: fadeUp .5s .12s var(--e-out) both; }
 
 .auth-form-head {
   text-align: center;
@@ -1827,6 +1835,9 @@ html, body {
     scroll-behavior: auto !important;
   }
   .auth-bg-orb { animation: none !important; }
+  .auth-bg-logo { animation: none !important; }
+  .auth-logo-circle::after { animation: none !important; }
+  #auth .fld { animation: none !important; }
   .auth-slogan-accent { animation: none !important; }
 }
 
@@ -2646,6 +2657,38 @@ body.modal-open {
 .marker-card { display: none; }
 /* ══ FIM MARKER CARD PREMIUM ═══════════════════════════ */
 
+</style>
+<style>
+/* ──────────────────────────────────────────────
+   Login — respiração clínica (suave, leve na GPU)
+   Anima só transform/opacity. O bloco global de
+   prefers-reduced-motion já desliga tudo isto.
+   ────────────────────────────────────────────── */
+@keyframes authHalo {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: .32; }
+  50%      { transform: translate(-50%, -50%) scale(1.14); opacity: .58; }
+}
+/* Halo verde que respira devagar atrás do logo */
+.auth-logo-circle::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 185%; height: 185%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(22,168,126,.40) 0%, rgba(22,168,126,0) 70%);
+  z-index: -2;
+  pointer-events: none;
+  animation: authHalo 7s ease-in-out infinite;
+}
+/* Fundo mais sereno: orbs respiram bem devagar e andam menos */
+@keyframes orbBreath1 { 0%,100% { transform: translate(0,0) scale(1); }   50% { transform: translate(10px,-8px) scale(1.05); } }
+@keyframes orbBreath2 { 0%,100% { transform: translate(0,0) scale(1); }   50% { transform: translate(-8px,10px) scale(.97); } }
+.auth-bg-orb-1 { animation: orbBreath1 20s ease-in-out infinite; }
+.auth-bg-orb-2 { animation: orbBreath2 24s ease-in-out infinite; }
+.auth-bg-orb-3 { animation: orbBreath1 22s ease-in-out infinite; }
+/* A pata gigante respira mais devagar ainda */
+.auth-bg-logo { animation-duration: 9s; }
 </style>
 </head>
 <body>
@@ -3743,11 +3786,6 @@ const DEFAULT_PROXY = 'https://diagnovetia-api.tristoncomercial.workers.dev';
 // ════════════════════════════════════════════════════════════════════════════════
 
 // 1. Validação de Formato CRMV
-function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
 function validateCRMV(crmv) {
   const crmvRegex = /^CRMV-[A-Z]{2}\s?\d{4,6}$/i;
   if (!crmvRegex.test(crmv.trim())) {
@@ -4336,7 +4374,7 @@ async function demoLogin(){
   await enter(acc);
 }
 
-async function enter(acc, isNew = false){
+async function enter(acc, isNew = false, isRestore = false){
   // Normalize — Supabase profile uses snake_case, app uses camelCase
   acc.plan       = acc.plan       || 'trial';
   acc.planExpiry = acc.planExpiry || acc.plan_expiry  || null;
@@ -4362,7 +4400,18 @@ async function enter(acc, isNew = false){
   await loadUserData(acc.id);
   seedDemo();
   _navHistory = [];
-  try { history.replaceState({screen:'dashboard'},'','#dashboard'); } catch(e){}
+
+  // ── BUGFIX: manter a tela em que o usuário estava ao atualizar a página (F5).
+  // nav() grava a tela atual no hash da URL (ex.: #patients). Ao recarregar, a
+  // sessão é restaurada e o fluxo cai aqui — então lemos esse hash e voltamos
+  // para a mesma tela, em vez de forçar sempre o dashboard. Só restauramos telas
+  // "estáveis" (listas/seções); telas que dependem de estado volátil em memória,
+  // como 'result'/'study', caem no dashboard para não abrir vazias após o refresh.
+  const RESTORE_SCREENS = ['dashboard','import','exams','patients','intern','settings','plans'];
+  let restoreScreen = (location.hash || '').replace(/^#/, '');
+  if(!RESTORE_SCREENS.includes(restoreScreen)) restoreScreen = 'dashboard';
+
+  try { history.replaceState({screen:restoreScreen},'','#'+restoreScreen); } catch(e){}
   document.getElementById('auth').style.display='none';
   document.getElementById('app').style.display='block';
   updateUserUI(); updateKeyUI(); updatePlanUI();
@@ -4381,13 +4430,14 @@ async function enter(acc, isNew = false){
   // ── Trial expired: show wall immediately
   if(checkTrialWall()) return;
 
-  nav('dashboard');
+  nav(restoreScreen);
 
-  // Show personalized welcome message
+  // Show personalized welcome message — apenas em login real, não ao restaurar
+  // a sessão (refresh), senão a saudação reaparece a cada F5.
   const name = acc.name || acc.email || '';
   if(!acc.isDemo){
-    setTimeout(() => showWelcome(name, isNew ? 'new' : 'returning'), 600);
-    // Inicia lembretes de internação
+    if(!isRestore) setTimeout(() => showWelcome(name, isNew ? 'new' : 'returning'), 600);
+    // Inicia lembretes de internação (mantém ativo também após refresh)
     startInternReminders();
     // Atualiza badge
     updateInternBadge();
@@ -4400,6 +4450,10 @@ function doLogout(){
   S.patients=[]; S.exams=[]; S.currentResult=null; S.interns=[];
   if(_internReminderTimer){ clearInterval(_internReminderTimer); _internReminderTimer=null; }
   DATA_MODE = 'local';
+  // Limpa o hash da URL e o histórico de navegação para que um próximo login
+  // não herde a tela em que o usuário anterior estava.
+  _navHistory = [];
+  try { history.replaceState({}, '', window.location.pathname + window.location.search); } catch(e){}
   document.getElementById('app').style.display='none';
   document.getElementById('auth').style.display='flex';
   document.getElementById('a-email').value='';
@@ -5388,8 +5442,11 @@ let _navHistory = [];
 let _navIgnorePopstate = false;
 
 function nav(sc, addToHistory=true){
-  // ── Trial wall — intercept all navigation if avaliação expired
-  if(S.user && !S.user.isDemo && sc !== 'trial-expired'){
+  // ── Trial wall — intercepta navegação se a avaliação expirou, MAS libera as
+  // telas de Planos, Configurações e a própria parede, para o usuário poder
+  // fazer upgrade, ajustar a conta ou sair em vez de ficar preso.
+  const TRIAL_ALLOWED = ['trial-expired','plans','settings'];
+  if(S.user && !S.user.isDemo && !TRIAL_ALLOWED.includes(sc)){
     const ts = getTrialStatus();
     if(ts.active && ts.expired){
       checkTrialWall();
@@ -5970,52 +6027,6 @@ function populatePatientDropdown(){
    ANALYSIS ENGINE — FIXED
 ══════════════════════════════════════════════ */
 
-
-
-// Fetch com timeout
-async function fetchWithTimeout(url, options = {}, timeout = 30000) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-  
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal
-    });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
-// Função auxiliar para retry com backoff
-async function fetchWithRetry(url, options, maxRetries = 3) {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const response = await fetch(url, options);
-      
-      if (response.status === 429) {
-        // Rate limit - aguardar progressivamente
-        const waitTime = Math.pow(2, attempt) * 1000;
-        console.warn(`⏳ Rate limited. Aguardando ${waitTime}ms...`);
-        await new Promise(r => setTimeout(r, waitTime));
-        continue;
-      }
-      
-      if (!response.ok && attempt < maxRetries) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      return response;
-    } catch (error) {
-      if (attempt === maxRetries) throw error;
-      const delay = Math.pow(2, attempt) * 100;
-      console.warn(`Tentativa ${attempt} falhou, aguardando ${delay}ms...`);
-      await new Promise(r => setTimeout(r, delay));
-    }
-  }
-}
-
 // Safe JSON extractor — handles Claude responses that may have surrounding text
 function safeParseJSON(raw) {
   if (!raw) return null;
@@ -6088,6 +6099,11 @@ function normalizeVal(v) {
   // Remove common unit suffixes and whitespace, keep numeric part
   return String(v).replace(/\s*(milhões?\/µL|M\/µL|g\/dL|%|fL|\/mm³|\/µL|U\/L|mg\/dL|g\/L|mmol\/L|µmol\/L|K\/µL|10³\/µL|10⁶\/µL|\*10\^3|\*10\^6|x10\^3|x10\^6)\s*/gi,'').replace(/\s+/g,'').trim();
 }
+
+// Identificador único do modelo Claude (centralizado para evitar divergência).
+// claude-sonnet-4-6 é o Sonnet atual (fev/2026). O snapshot anterior
+// 'claude-sonnet-4-5-20250929' também funciona, caso prefira fixar o que já testou.
+const CLAUDE_MODEL = 'claude-sonnet-4-6';
 
 const SYSTEM_PROMPT = `You are an advanced veterinary clinical pathologist AI specialized in interpreting ALL types of laboratory exams for dogs, cats, horses, and cattle.
 
@@ -6271,7 +6287,10 @@ Respond ONLY with this exact JSON (no markdown, no text before or after):
 
   "recommendations": [
     "Specific next step in Portuguese — exam name or clinical action, non-prescriptive"
-  ]
+  ],
+
+  "extractionConfidence": "alta|media|baixa — quão confiável foi a LEITURA dos valores no documento (use 'baixa' se a imagem estiver ruim, ilegível, cortada ou ambígua)",
+  "valoresIlegiveis": ["lista, em português, dos parâmetros que NÃO foi possível ler com segurança no documento; deixe [] se todos foram lidos com clareza"]
 }
 
 ━━━ CLINICAL SAFETY RULES ━━━
@@ -6317,6 +6336,38 @@ const EV_MAP = {
   colesterol: 'colesterol',
   rdw: 'rdw',
 };
+
+// ── fetch com timeout (AbortController) e 1 retry em falha transitória ──
+// Evita que a análise fique presa para sempre e tenta de novo em erros 429/5xx
+// ou falha de rede. Em timeout, não repete (para não dobrar a espera).
+async function fetchWithTimeoutRetry(url, options, { timeoutMs = 90000, retries = 1, retryDelayMs = 1200 } = {}) {
+  let lastErr;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const resp = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timer);
+      if ([429, 500, 502, 503, 504].includes(resp.status) && attempt < retries) {
+        await new Promise(r => setTimeout(r, retryDelayMs * (attempt + 1)));
+        continue;
+      }
+      return resp;
+    } catch (e) {
+      clearTimeout(timer);
+      lastErr = e;
+      if (e.name === 'AbortError') {
+        throw new Error('A análise demorou demais e foi interrompida (timeout). Tente novamente.');
+      }
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, retryDelayMs * (attempt + 1)));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw lastErr;
+}
 
 async function callClaudeWithFile(patient, context) {
   let contentBlocks = [];
@@ -6383,25 +6434,28 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
       }
     }
 
-    resp = await fetch(endpoint, {
+    resp = await fetchWithTimeoutRetry(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5-20250929',
+        model: CLAUDE_MODEL,
         max_tokens: 4096,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: contentBlocks }]
       })
-    });
+    }, { timeoutMs: 90000, retries: 1 });
   } catch (netErr) {
-    throw new Error(`Erro de rede: ${netErr.message}. Verifique sua conexão.`);
+    // Mensagens já amigáveis (ex.: timeout) passam direto; rede crua é formatada.
+    throw new Error(/timeout|demorou|conex/i.test(netErr.message) ? netErr.message : `Erro de rede: ${netErr.message}. Verifique sua conexão.`);
   }
 
   if (!resp.ok) {
     let errMsg = `HTTP ${resp.status}`;
+    let errCode = '';
     try {
       const errBody = await resp.json();
       errMsg = errBody.error?.message || errMsg;
+      errCode = errBody.error?.code || '';
     } catch(_) {}
 
     // 🔒 SEGURANÇA [VULN-1]: NUNCA chamar Anthropic direto do browser — chave fica exposta em DevTools
@@ -6410,8 +6464,11 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
       throw new Error('Servidor temporariamente indisponível (403). Tente novamente em alguns minutos.');
     }
 
-    if (resp.status === 401) throw new Error('Chave API inválida ou expirada. Verifique em Configurações → Claude AI.');
-    if (resp.status === 429) throw new Error('Limite de requisições atingido. Aguarde um momento e tente novamente.');
+    if (resp.status === 401) {
+      if (errCode === 'no_token' || errCode === 'invalid_token') throw new Error(errMsg || 'Sessão expirada. Entre novamente.');
+      throw new Error('Chave API inválida ou expirada. Verifique em Configurações → Claude AI.');
+    }
+    if (resp.status === 429) throw new Error(errCode === 'quota_exceeded' ? errMsg : 'Limite de requisições atingido. Aguarde um momento e tente novamente.');
     if (resp.status === 400) throw new Error(`Requisição inválida: ${errMsg}`);
     throw new Error(errMsg);
   }
@@ -6551,6 +6608,8 @@ async function runImport() {
   const observacoes = aiResult?.observacoes || '';
   const cytologyFindings = aiResult?.cytologyFindings || null;
   const examTypeDetected = aiResult?.examType || '';
+  const extractionConfidence = aiResult?.extractionConfidence || '';
+  const valoresIlegiveis = Array.isArray(aiResult?.valoresIlegiveis) ? aiResult.valoresIlegiveis.filter(Boolean) : [];
 
   // For cytology exams, determine overall from insights rather than numeric markers
   let finalOverall = overall;
@@ -6592,6 +6651,8 @@ async function runImport() {
     recommendations: Array.isArray(recommendations)? recommendations: [],
     summary:         summary                       || 'Interpretação clínica concluída.',
     usedAI:          !!aiResult,
+    extractionConfidence,
+    valoresIlegiveis,
   };
 
   // Conta o uso APÓS confirmar que há resultado para mostrar
@@ -6890,7 +6951,30 @@ function renderResult(){
   // Status label PT
   const statusLabels = { ok: 'NORMAL', warn: 'ATENÇÃO', crit: 'CRÍTICO', critical: 'CRÍTICO' };
 
+  // ── Confiança da extração + valores que a IA não conseguiu ler com segurança
+  const extractionConfidence = S.currentResult.extractionConfidence || '';
+  const valoresIlegiveis = Array.isArray(S.currentResult.valoresIlegiveis) ? S.currentResult.valoresIlegiveis.filter(Boolean) : [];
+  let confBanner = '';
+  if (usedAI && (extractionConfidence || valoresIlegiveis.length)) {
+    const cmap = {
+      alta:  ['#E6F7F3','#0B6B52','Confiança alta na leitura dos valores'],
+      media: ['#FEF5E7','#7A4800','Confiança média — confira os valores extraídos'],
+      baixa: ['#FEF0F1','#8B1A20','Confiança baixa — confira os valores com atenção']
+    };
+    const c = cmap[String(extractionConfidence).toLowerCase()] || cmap.media;
+    const lista = valoresIlegiveis.length
+      ? `<div style="margin-top:6px"><strong>Valores a conferir no documento:</strong> ${escapeHTML(valoresIlegiveis.join(', '))}</div>`
+      : '';
+    confBanner = `<div style="background:${c[0]};color:${c[1]};border-radius:12px;padding:10px 14px;font-size:12.5px;line-height:1.45;margin-bottom:14px">🔎 ${c[2]}${lista}</div>`;
+  }
+
   el.innerHTML = `
+    <!-- ══ AVISO CLÍNICO ══ -->
+    <div style="background:var(--amber-l,#FEF5E7);border:1px solid #F0D9A8;color:#7A4800;border-radius:12px;padding:10px 14px;font-size:12.5px;line-height:1.45;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start">
+      <span style="font-size:15px;line-height:1">⚠️</span>
+      <span><strong>Apoio à decisão — requer revisão profissional.</strong> Esta interpretação é gerada por IA a partir do documento enviado e pode conter erros de leitura. A conferência dos valores e a conduta final são de responsabilidade do médico-veterinário.</span>
+    </div>
+    ${confBanner}
     <!-- ══ HERO COMPACTO ══ -->
     <div class="result-hero-card">
       <div class="rh-eyebrow">📋 Laudo Clínico · ${escapeHTML(exam.type||'Exame')} · ${dateStr}</div>
@@ -7697,7 +7781,7 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
             method: 'POST',
             headers,
             body: JSON.stringify({
-              model: 'claude-sonnet-4-5-20250929',
+              model: CLAUDE_MODEL,
               max_tokens: 4096,
               system: SYSTEM_PROMPT,
               messages: [{ role: 'user', content: userContent }]
@@ -9075,7 +9159,7 @@ async function handleEmailRedirect(){
       const user = data.session.user;
       const profile = await getSupaProfile(user.id);
       DATA_MODE = 'cloud';
-      await enter({ ...profile, id: user.id, email: user.email, supaUser: user });
+      await enter({ ...profile, id: user.id, email: user.email, supaUser: user }, false, true);
     }
   } catch(e) {
     console.warn('Session restore failed:', e.message);
