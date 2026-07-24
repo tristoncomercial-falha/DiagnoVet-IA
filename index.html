@@ -4015,8 +4015,24 @@ function supaExamToLocal(e){
            observacoes:e.observacoes, cytologyFindings:e.cytology_findings,
            examTypeDetected:e.exam_type_detected };
 }
+// ── Identificadores compativeis com o banco ─────────────────────────
+// As colunas id/user_id/patient_id no Supabase sao do tipo uuid.
+// Ids locais no formato 'p123...' ou 'e123...' fazem o banco recusar
+// a gravacao com erro 400. Geramos uuid de verdade para registros novos.
+function uuid(){
+  if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  // Fallback para navegadores sem randomUUID
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random()*16|0;
+    const v = c === 'x' ? r : ((r & 0x3) | 0x8);
+    return v.toString(16);
+  });
+}
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isUuid(v){ return typeof v === 'string' && UUID_RE.test(v); }
+
 function localExamToSupa(e, userId){
-  return { user_id:userId, patient_id:e.patientId, type:e.type, date:e.date,
+  return { id:e.id, user_id:userId, patient_id:e.patientId, type:e.type, date:e.date,
            status:e.status, markers:e.markers, result:e.result,
            context:e.context, raw_text:e.rawText, used_ai:e.usedAI,
            imported_file_name:e.importedFileName, hematozoarios:e.hematozoarios,
@@ -4027,6 +4043,9 @@ function localExamToSupa(e, userId){
 // ── Save exam to cloud
 async function saveExamCloud(exam){
   if(DATA_MODE !== 'cloud' || !_supa || !S.user) return;
+  // Registros antigos/demo tem id fora do padrao uuid -> o banco recusaria (400)
+  if(!isUuid(exam.id) || !isUuid(S.user.id)) return;
+  if(exam.patientId && !isUuid(exam.patientId)) return;
   try {
     await _supa.from('exams').upsert(localExamToSupa(exam, S.user.id));
   } catch(e) { console.warn('Cloud exam save failed:', e.message); }
@@ -4035,6 +4054,7 @@ async function saveExamCloud(exam){
 // ── Save patient to cloud
 async function savePatientCloud(patient){
   if(DATA_MODE !== 'cloud' || !_supa || !S.user) return;
+  if(!isUuid(patient.id) || !isUuid(S.user.id)) return;
   try {
     await _supa.from('patients').upsert({...patient, user_id: S.user.id});
   } catch(e) { console.warn('Cloud patient save failed:', e.message); }
@@ -5054,7 +5074,7 @@ function saveIntern() {
     const newName = document.getElementById('inp-name')?.value.trim();
     if(!newName) { toast('Informe o nome do novo paciente.','warn'); return; }
     const newPatient = {
-      id: 'p' + Date.now(),
+      id: uuid(),
       name:    newName,
       species: document.getElementById('inp-species')?.value || 'Canino',
       breed:   document.getElementById('inp-breed')?.value.trim() || '',
@@ -6778,6 +6798,14 @@ async function runImport() {
     }
     if (aiResult.summary) summary = aiResult.summary;
     if (aiResult.patterns?.length > 0) patterns = aiResult.patterns;
+  } else {
+    // A IA nao rodou. O texto NAO pode soar como laudo normal.
+    summary = 'A análise por IA não foi concluída. Os itens abaixo vêm apenas da '
+            + 'comparação automática com faixas de referência e não constituem '
+            + 'interpretação clínica. Refaça a análise antes de usar este documento.';
+    insights = [{ text: summary, level: 'critical' }].concat(insights);
+    recommendations = ['Refazer a análise: a interpretação por IA não foi gerada.']
+                        .concat(recommendations);
   }
 
   const hematozoarios = aiResult?.hematozoarios || '';
@@ -6795,7 +6823,7 @@ async function runImport() {
     finalOverall = hasCritInsight ? 'critical' : hasWarnInsight ? 'attention' : 'normal';
   }
 
-  const eid = 'e' + Date.now();
+  const eid = uuid();
   const exam = {
     id: eid,
     patientId: patient.id,
@@ -7144,7 +7172,16 @@ function renderResult(){
     confBanner = `<div style="background:${c[0]};color:${c[1]};border-radius:12px;padding:10px 14px;font-size:12.5px;line-height:1.45;margin-bottom:14px">🔎 ${c[2]}${lista}</div>`;
   }
 
+  // Faixa de alerta quando a IA nao rodou nesta analise
+  const aiFailBanner = (S.currentResult && S.currentResult.usedAI === false)
+    ? `<div style="background:#FEF0F1;border:1.5px solid #E5484D;color:#8B1A20;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start">
+         <span style="font-size:16px;line-height:1">⛔</span>
+         <span><strong>A interpretação por IA não foi gerada.</strong> O conteúdo abaixo resulta apenas da comparação com faixas de referência e <strong>não é um laudo</strong>. Refaça a análise antes de qualquer uso clínico.</span>
+       </div>`
+    : '';
+
   el.innerHTML = `
+    ${aiFailBanner}
     <!-- ══ AVISO CLÍNICO ══ -->
     <div style="background:var(--amber-l,#FEF5E7);border:1px solid #F0D9A8;color:#7A4800;border-radius:12px;padding:10px 14px;font-size:12.5px;line-height:1.45;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start">
       <span style="font-size:15px;line-height:1">⚠️</span>
@@ -8007,6 +8044,14 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
     if (aiResult.recommendations?.length > 0) recommendations = aiResult.recommendations;
     if (aiResult.summary) summary = aiResult.summary;
     if (aiResult.patterns?.length > 0) patterns = aiResult.patterns;
+  } else {
+    // A IA nao rodou. O texto NAO pode soar como laudo normal.
+    summary = 'A análise por IA não foi concluída. Os itens abaixo vêm apenas da '
+            + 'comparação automática com faixas de referência e não constituem '
+            + 'interpretação clínica. Refaça a análise antes de usar este documento.';
+    insights = [{ text: summary, level: 'critical' }].concat(insights);
+    recommendations = ['Refazer a análise: a interpretação por IA não foi gerada.']
+                        .concat(recommendations);
   }
 
   const idx = S.exams.findIndex(e => e.id === examId);
@@ -8173,7 +8218,7 @@ function savePatient(){
     const idx = S.patients.findIndex(p=>p.id===id);
     if(idx>=0) S.patients[idx] = {...S.patients[idx],...data};
   } else {
-    patientId = 'p' + Date.now();
+    patientId = uuid();
     S.patients.unshift({ id:patientId, ...data, createdAt: new Date().toISOString().slice(0,10) });
   }
 
