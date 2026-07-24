@@ -6859,9 +6859,12 @@ async function runImport() {
     valoresIlegiveis,
   };
 
-  // Conta o uso APÓS confirmar que há resultado para mostrar
-  incrementUsage();
-  if(getUserPlan().id === 'trial') incrementDailyUsage();
+  // Conta o uso SO quando a IA realmente respondeu. Analise que falhou nao
+  // pode consumir a cota do veterinario (no trial, seria o unico exame do dia).
+  if (aiResult) {
+    incrementUsage();
+    if(getUserPlan().id === 'trial') incrementDailyUsage();
+  }
 
   updateCritBadge();
   // Wait for browser to paint (ensures proc overlay is fully gone before navigating)
