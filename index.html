@@ -6633,10 +6633,9 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
       body: JSON.stringify({
         model: CLAUDE_MODEL,
         max_tokens: 4096,
-        // Prompt caching: o bloco de sistema e' identico em toda chamada.
-        // ttl '1h' mantem o cache quente mesmo com pouco movimento (fase inicial).
-        system: [{ type: 'text', text: SYSTEM_PROMPT,
-                   cache_control: { type: 'ephemeral', ttl: '1h' } }],
+        // NAO usar system em formato de array aqui: o proxy publicado descarta
+        // o bloco e o modelo ignora o prompt (retorna JSON fora do schema).
+        system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: contentBlocks }]
       })
     }, { timeoutMs: 90000, retries: 1 });
@@ -6692,6 +6691,14 @@ function parseClaudeResponse(data) {
   if (!parsed) {
     console.error('Raw Claude response:', rawText.slice(0, 500));
     throw new Error('Resposta da IA não é JSON válido. Verifique o console para detalhes.');
+  }
+  // Valida o formato: JSON valido mas fora do schema esperado nao pode passar
+  // como sucesso, senao o app exibe o laudo local generico sem avisar ninguem.
+  const temFormato = parsed.summary || Array.isArray(parsed.insights)
+                     || parsed.examType || parsed.extractedValues;
+  if (!temFormato) {
+    console.error('Resposta fora do formato esperado:', rawText.slice(0, 500));
+    throw new Error('A IA respondeu em formato inesperado. Refaça a análise.');
   }
   return parsed;
 }
@@ -7999,9 +8006,7 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
             body: JSON.stringify({
               model: CLAUDE_MODEL,
               max_tokens: 4096,
-              // Prompt caching: bloco de sistema identico em toda chamada.
-              system: [{ type: 'text', text: SYSTEM_PROMPT,
-                         cache_control: { type: 'ephemeral', ttl: '1h' } }],
+              system: SYSTEM_PROMPT,
               messages: [{ role: 'user', content: userContent }]
             })
           });
