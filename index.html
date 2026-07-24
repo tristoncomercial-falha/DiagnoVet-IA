@@ -196,6 +196,26 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
 .auth-link { color:var(--leaf-d); font-weight:600; cursor:pointer; }
 .auth-link:hover { text-decoration:underline; }
 .auth-demo-btn { margin-top:20px; padding-top:20px; border-top:1px solid var(--fog); text-align:center; }
+.auth-mob{display:none !important}
+@media (max-width:900px){
+  .auth-brand-top.auth-mob{display:flex !important}
+  .auth-slogan-bottom.auth-mob{display:block !important}
+  .auth-stamp-centered.auth-mob{display:flex !important}
+  .auth-panel-r{justify-content:flex-start; text-align:center}
+  .auth-panel-r .fld{text-align:left}
+}
+.auth-mobile-brand{display:none; align-items:center; justify-content:center; gap:11px; margin-bottom:22px}
+.auth-mobile-mark{width:44px;height:44px;border-radius:12px;background:var(--leaf);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 20px rgba(22,168,126,.32)}
+.auth-mobile-name{font-family:'Sora',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.6px;color:var(--ink)}
+.auth-mobile-name em{color:var(--leaf);font-style:normal}
+.auth-pulse{margin-top:22px;height:36px}
+.auth-pulse svg{width:100%;height:100%;overflow:visible}
+.auth-pulse path{fill:none;stroke:var(--leaf);stroke-width:2;opacity:.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:520;stroke-dashoffset:520;animation:authTrace 5.5s var(--e-out) .4s forwards}
+@keyframes authTrace{to{stroke-dashoffset:0}}
+.auth-chips{display:flex;gap:16px;flex-wrap:wrap;margin-top:auto;padding-top:28px;font-size:12px;color:rgba(255,255,255,.42)}
+.auth-chip{display:flex;align-items:center;gap:7px}
+.auth-chip i{width:6px;height:6px;border-radius:50%;background:var(--leaf);box-shadow:0 0 0 4px rgba(22,168,126,.14);font-style:normal;flex-shrink:0}
+@media (max-width:900px){ .auth-mobile-brand{display:flex} }
 @media (max-width:860px) { .auth-card { grid-template-columns:1fr; max-width:460px; } .auth-panel-l { display:none; } .auth-panel-r { border-radius:var(--r28); } }
 @media (max-width:480px) { #auth { padding:0; align-items:flex-end; } .auth-card { max-width:100%; border-radius:var(--r28) var(--r28) 0 0; } .auth-panel-r { padding:28px 22px max(28px, env(safe-area-inset-bottom)); } .auth-mobile-brand { display:flex !important; } .fld-row { grid-template-columns:1fr; gap:0; } }
 .auth-mobile-brand { display:none; align-items:center; justify-content:center; gap:10px; margin-bottom:20px; }
@@ -1527,9 +1547,7 @@ textarea.fld-in:focus { border-color:var(--leaf); box-shadow:0 0 0 3px rgba(22,1
 }
 
 /* Esconder o painel split antigo se ainda existir */
-.auth-panel-l, .auth-panel-r {
-  display: none !important;
-}
+/* regra removida: escondia os paineis do layout dividido */
 
 /* Mobile responsiveness */
 @media (max-width: 520px) {
@@ -2689,6 +2707,39 @@ body.modal-open {
 .auth-bg-orb-3 { animation: orbBreath1 22s ease-in-out infinite; }
 /* A pata gigante respira mais devagar ainda */
 .auth-bg-logo { animation-duration: 9s; }
+
+/* ══ Aceite de termos no cadastro ══ */
+.auth-consent{
+  display:flex; align-items:flex-start; gap:10px;
+  margin:4px 0 16px; font-size:12.5px; line-height:1.5; color:var(--mist);
+  text-align:left;
+}
+.auth-consent input[type=checkbox]{
+  width:17px; height:17px; margin:2px 0 0; flex-shrink:0;
+  accent-color:var(--leaf); cursor:pointer;
+}
+.auth-consent label{cursor:pointer}
+.auth-consent a{color:var(--leaf-d); font-weight:700; text-decoration:underline}
+.auth-consent.err input[type=checkbox]{outline:2px solid var(--ruby); outline-offset:2px}
+
+/* ══ LOGO do painel: respiro proprio, sem apagar ══ */
+@keyframes markBeat { 0%,100% { transform:scale(1); } 50% { transform:scale(1.04); } }
+.auth-logotype-mark{
+  animation: markBeat 4s ease-in-out infinite !important;
+  opacity: 1 !important;
+  background: var(--leaf) !important;
+}
+.auth-logotype-mark svg{ opacity:1 !important; }
+@media (prefers-reduced-motion: reduce){
+  .auth-logotype-mark{ animation:none !important; }
+}
+
+/* ══ MOBILE: so o cartao branco do login (definitivo) ══ */
+@media (max-width:900px){
+  .auth-panel-l{ display:none !important; }
+  .auth-card{ grid-template-columns:1fr !important; max-width:460px !important; }
+  .auth-panel-r{ border-radius:var(--r28) !important; }
+}
 </style>
 </head>
 <body>
@@ -2820,49 +2871,61 @@ function showErr(m){
 </script>
 <div id="auth">
 
-  <!-- Animated background -->
   <div class="auth-bg">
     <div class="auth-bg-orb auth-bg-orb-1"></div>
     <div class="auth-bg-orb auth-bg-orb-2"></div>
     <div class="auth-bg-orb auth-bg-orb-3"></div>
     <div class="auth-bg-grid"></div>
-    <!-- Giant background paw -->
-    <div class="auth-bg-logo">
-      <svg width="560" height="560" viewBox="0 0 24 24" fill="none">
-        <circle cx="9.5" cy="5.2" r="2.4" fill="white"/>
-        <circle cx="14.5" cy="5.2" r="2.4" fill="white"/>
-        <circle cx="5.8" cy="9.4" r="1.9" fill="white"/>
-        <circle cx="18.2" cy="9.4" r="1.9" fill="white"/>
-        <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white"/>
-        <circle cx="2" cy="7" r="1.5" fill="#3B82F6"/>
-        <circle cx="22" cy="7" r="1.5" fill="#3B82F6"/>
-        <line x1="9.5" y1="5.2" x2="2" y2="7" stroke="#3B82F6" stroke-width="1"/>
-        <line x1="14.5" y1="5.2" x2="22" y2="7" stroke="#3B82F6" stroke-width="1"/>
-      </svg>
-    </div>
   </div>
 
-  <div class="auth-card auth-card-centered">
+  <div class="auth-card">
 
-    <!-- LOGO + BRAND no topo -->
-    <div class="auth-brand-top">
-      <div class="auth-logo-circle">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".98"/>
-          <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".98"/>
-          <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".92"/>
-          <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".92"/>
-          <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".98"/>
-        </svg>
+    <!-- ===== PAINEL ESQUERDO (desktop) ===== -->
+    <div class="auth-panel-l">
+      <div class="auth-logotype">
+        <div class="auth-logotype-mark">
+          <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="9.5" cy="5.2" r="2.4" fill="white"/><circle cx="14.5" cy="5.2" r="2.4" fill="white"/><circle cx="5.8" cy="9.4" r="1.9" fill="white"/><circle cx="18.2" cy="9.4" r="1.9" fill="white"/><ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white"/></svg>
+        </div>
+        <div class="auth-logotype-name">Diagno<em>Vet IA</em></div>
       </div>
-      <div class="auth-brand-name">Diagno<em>Vet IA</em></div>
+
+      <div style="margin:auto 0">
+        <div class="auth-headline">Menos desgaste.<br><i>Mais clareza cl&iacute;nica.</i></div>
+        <div class="auth-lead">O software que devolve tempo ao m&eacute;dico-veterin&aacute;rio &mdash; leitura de exames assistida por IA, com o laudo sempre sob sua revis&atilde;o.</div>
+        <div class="auth-pulse">
+          <svg viewBox="0 0 520 40" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0,20 L150,20 L168,20 L182,6 L198,34 L214,12 L228,20 L300,20 L318,20 L330,20 L344,4 L360,36 L376,20 L520,20"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="auth-chips">
+        <div class="auth-chip"><i></i> Registro CRMV</div>
+        <div class="auth-chip"><i></i> Dados protegidos (LGPD)</div>
+      </div>
+
+      <div class="auth-stamp">VitaHub Solutions &middot; Brasil 2026</div>
     </div>
 
-    <!-- FORMULÁRIO centralizado -->
-    <div class="auth-form-block">
+    <!-- ===== PAINEL DIREITO (formul&aacute;rio) ===== -->
+    <div class="auth-panel-r">
+
+      <div class="auth-brand-top auth-mob">
+        <div class="auth-logo-circle">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <circle cx="9.5" cy="5.2" r="2.4" fill="white" opacity=".98"/>
+            <circle cx="14.5" cy="5.2" r="2.4" fill="white" opacity=".98"/>
+            <circle cx="5.8" cy="9.4" r="1.9" fill="white" opacity=".92"/>
+            <circle cx="18.2" cy="9.4" r="1.9" fill="white" opacity=".92"/>
+            <ellipse cx="12" cy="16" rx="5.5" ry="4.2" fill="white" opacity=".98"/>
+          </svg>
+        </div>
+        <div class="auth-brand-name">Diagno<em>Vet IA</em></div>
+      </div>
+
       <div class="auth-form-head">
         <div class="auth-form-title" id="auth-title">Bem-vindo(a)</div>
-        <div class="auth-form-sub" id="auth-sub">Entre para acessar sua clínica digital</div>
+        <div class="auth-form-sub" id="auth-sub">Entre para acessar sua cl&iacute;nica digital</div>
       </div>
 
       <div class="auth-tabs">
@@ -2879,7 +2942,7 @@ function showErr(m){
         </div>
         <div class="fld">
           <label>Senha</label>
-          <input id="a-pass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+          <input id="a-pass" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"/>
         </div>
         <button class="btn-auth" onclick="doLogin()">
           <span>Entrar na plataforma</span>
@@ -2893,40 +2956,42 @@ function showErr(m){
 
       <div id="f-reg" class="hidden">
         <div class="fld-row">
-          <div class="fld" style="flex:0 0 30%"><label>Título</label><select id="r-title"><option>Dr.</option><option>Dra.</option><option>Med. Vet.</option></select></div>
+          <div class="fld" style="flex:0 0 30%"><label>T&iacute;tulo</label><select id="r-title"><option>Dr.</option><option>Dra.</option><option>Med. Vet.</option></select></div>
           <div class="fld" style="flex:1"><label>Nome completo</label><input id="r-name" type="text" placeholder="Seu nome"/></div>
         </div>
         <div class="fld-row">
           <div class="fld" style="flex:1"><label>CRMV</label><input id="r-crmv" type="text" placeholder="CRMV-XX 00000"/></div>
-          <div class="fld" style="flex:1"><label>Especialidade</label><input id="r-spec" type="text" placeholder="Ex: Clínica geral"/></div>
+          <div class="fld" style="flex:1"><label>Especialidade</label><input id="r-spec" type="text" placeholder="Ex: Cl&iacute;nica geral"/></div>
         </div>
         <div class="fld"><label>E-mail profissional</label><input id="r-email" type="email" placeholder="dra@clinica.com.br" autocomplete="email"/></div>
-        <div class="fld"><label>Senha (mín. 6 caracteres)</label><input id="r-pass" type="password" placeholder="••••••••" autocomplete="new-password"/></div>
+        <div class="fld"><label>Senha (m&iacute;n. 6 caracteres)</label><input id="r-pass" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="new-password"/></div>
+        <div class="auth-consent" id="consent-box">
+          <input type="checkbox" id="r-consent"/>
+          <label for="r-consent">Li e aceito os <a href="termos-de-uso.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="politica-privacidade.html" target="_blank" rel="noopener">Pol&iacute;tica de Privacidade</a>.</label>
+        </div>
         <button class="btn-auth" onclick="doRegister()">
           <span>Criar minha conta</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
-        <div class="auth-footer" style="margin-top:14px">Já tem conta? <span class="auth-link" onclick="authTab('login')">Entrar</span></div>
+        <div class="auth-footer" style="margin-top:14px">J&aacute; tem conta? <span class="auth-link" onclick="authTab('login')">Entrar</span></div>
       </div>
-    </div>
 
-    <!-- SLOGAN embaixo -->
-    <div class="auth-slogan-bottom">
-      <div class="auth-slogan-line">
-        Menos desgaste. <span class="auth-slogan-accent">Mais clareza clínica.</span>
+      <div class="auth-slogan-bottom auth-mob">
+        <div class="auth-slogan-line">
+          Menos desgaste. <span class="auth-slogan-accent">Mais clareza cl&iacute;nica.</span>
+        </div>
+        <div class="auth-slogan-sub">
+          O software que devolve tempo ao m&eacute;dico-veterin&aacute;rio.
+        </div>
       </div>
-      <div class="auth-slogan-sub">
-        O software que devolve tempo ao médico-veterinário.
+
+      <div class="auth-stamp-centered auth-mob">
+        <span>VitaHub Solutions</span>
+        <span class="auth-stamp-dot">&middot;</span>
+        <span>Brasil 2026</span>
       </div>
-    </div>
 
-    <!-- Stamp -->
-    <div class="auth-stamp-centered">
-      <span>VitaHub Solutions</span>
-      <span class="auth-stamp-dot">·</span>
-      <span>Brasil 2026</span>
     </div>
-
   </div>
 </div>
 
@@ -3052,7 +3117,7 @@ function showErr(m){
       <!-- Trial banner (shown only during avaliação) -->
       <div class="trial-banner" id="trial-banner" onclick="openUpgradeModal('trial')">
         <div class="trial-dot"></div>
-        <div class="trial-text" id="trial-banner-text">Período avaliação ativo — 7 dias restantes · 0/10 exames hoje</div>
+        <div class="trial-text" id="trial-banner-text">Período avaliação ativo — 7 dias restantes · 0/1 exame hoje</div>
         <div class="trial-cta">Ver planos →</div>
       </div>
 
@@ -4014,7 +4079,7 @@ const PLANS = {
     color: '#FEF5E7',
     colorText: '#7A4800',
     analysesPerMonth: 9999,
-    analysesPerDay: 10,
+    analysesPerDay: 1,
     trialDays: 7,
     patients: 9999,
     exportPDF: false,
@@ -4044,10 +4109,10 @@ const PLANS = {
     advancedCytology: true,
     prioritySupport: false,
     description: 'Para o vet que quer organização e agilidade',
-    price: 'R$ 67,90/mês',
-    priceMonthly: 67.90,
-    priceQuarterly: 61.11,       // por mês no plano trimestral
-    priceQuarterlyTotal: 183.33,   // total do trimestre (10% off)
+    price: 'R$ 97,90/mês',
+    priceMonthly: 97.90,
+    priceQuarterly: 88.11,       // por mês no plano trimestral
+    priceQuarterlyTotal: 264.33,   // total do trimestre (10% off)
     discount: 10,
   },
   pro: {
@@ -4056,7 +4121,7 @@ const PLANS = {
     badge: '⭐ Pro',
     color: 'var(--leaf-l)',
     colorText: 'var(--leaf-d)',
-    analysesPerMonth: 500,
+    analysesPerMonth: 400,
     analysesPerDay: 9999,
     patients: 9999,
     exportPDF: true,
@@ -4065,10 +4130,10 @@ const PLANS = {
     advancedCytology: true,
     prioritySupport: true,
     description: 'Para quem não pode perder tempo em nenhum momento',
-    price: 'R$ 97,90/mês',
-    priceMonthly: 97.90,
-    priceQuarterly: 78.32,       // por mês no plano trimestral
-    priceQuarterlyTotal: 234.96,   // total do trimestre (20% off)
+    price: 'R$ 167,90/mês',
+    priceMonthly: 167.90,
+    priceQuarterly: 134.32,       // por mês no plano trimestral
+    priceQuarterlyTotal: 402.96,   // total do trimestre (20% off)
     discount: 20,
   },
 };
@@ -4101,7 +4166,7 @@ function getTrialStatus(){
   const today = now.toISOString().slice(0,10);
   const dailyKey = 'daily_' + S.user.id + '_' + today;
   const examsToday = DB.g(dailyKey, 0);
-  const dailyLimit = plan.analysesPerDay || 10;
+  const dailyLimit = plan.analysesPerDay || 1;
   const canUse = !expired && examsToday < dailyLimit;
   return {active:true, expired, daysLeft, examsToday, dailyLimit, canUse};
 }
@@ -4250,6 +4315,9 @@ async function loginLocal(email, pass){
   await enter(acc);
 }
 
+// Versao dos documentos legais aceitos no cadastro (atualizar ao publicar nova versao)
+const TERMS_VERSION = '1.0-2026-07-23';
+
 async function doRegister(){
   const title = document.getElementById('r-title').value;
   const name  = document.getElementById('r-name').value.trim();
@@ -4269,6 +4337,16 @@ async function doRegister(){
     showErr(crmvValidation.message);
     return;
   }
+  // Aceite obrigatorio dos termos e da politica (registro do consentimento)
+  const consentEl = document.getElementById('r-consent');
+  const consentBox = document.getElementById('consent-box');
+  if(!consentEl || !consentEl.checked){
+    if(consentBox) consentBox.classList.add('err');
+    showErr('Para criar a conta, aceite os Termos de Uso e a Politica de Privacidade.');
+    return;
+  }
+  if(consentBox) consentBox.classList.remove('err');
+  const consentAt = new Date().toISOString();
 
   // ── Supabase Auth (real users)
   if(_supa){
@@ -4284,7 +4362,8 @@ async function doRegister(){
       const { data, error } = await _supa.auth.signUp({
         email, password: pass,
         options: {
-          data: { name:`${title} ${name}`, crmv, specialty: spec },
+          data: { name:`${title} ${name}`, crmv, specialty: spec,
+                  terms_accepted_at: consentAt, terms_version: TERMS_VERSION },
           emailRedirectTo: window.location.href.split('#')[0]
         }
       });
@@ -4374,12 +4453,35 @@ async function demoLogin(){
   await enter(acc);
 }
 
+// Nome/CRMV/especialidade guardados nos metadados da autenticacao
+function metaField(u, key){
+  const m = (u && (u.user_metadata || u.raw_user_meta_data)) || {};
+  return String(m[key] || '').trim();
+}
+function metaName(u){ return metaField(u,'name') || metaField(u,'full_name'); }
+
 async function enter(acc, isNew = false, isRestore = false){
   // Normalize — Supabase profile uses snake_case, app uses camelCase
   acc.plan       = acc.plan       || 'trial';
   acc.planExpiry = acc.planExpiry || acc.plan_expiry  || null;
-  acc.name       = acc.name       || acc.full_name    || acc.email || '';
-  acc.crmv       = acc.crmv       || acc.crmv_number  || '';
+
+  // O perfil trouxe nome de verdade?
+  const _hadName = !!(acc.name || acc.full_name);
+  // Ordem: perfil -> metadados do signup -> e-mail (ultimo recurso)
+  acc.name       = acc.name       || acc.full_name    || metaName(acc.supaUser) || acc.email || '';
+  acc.crmv       = acc.crmv       || acc.crmv_number  || metaField(acc.supaUser,'crmv') || '';
+  acc.specialty  = acc.specialty  || metaField(acc.supaUser,'specialty') || '';
+
+  // Auto-reparo: se o perfil estava sem nome, grava agora (ja existe sessao valida)
+  if(_supa && acc.id && !_hadName && metaName(acc.supaUser)){
+    try {
+      _supa.from('profiles').update({
+        name: metaName(acc.supaUser),
+        crmv: acc.crmv || null,
+        specialty: acc.specialty || null
+      }).eq('id', acc.id).then(()=>{}, ()=>{});
+    } catch(e){ /* silencioso: nao bloqueia o login */ }
+  }
   acc.specialty  = acc.specialty  || '';
   acc.clinic     = acc.clinic     || acc.clinic_name  || '';
 
@@ -4658,7 +4760,7 @@ function renderOnboarding(){
         <div style="font-size:24px;margin-bottom:8px">⏱</div>
         <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Trial</div>
         <div style="font-size:22px;font-weight:800;color:var(--amber);font-family:'Sora',sans-serif;letter-spacing:-1px;margin-bottom:8px">Grátis</div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">7 dias · 10 exames/dia<br/>Sem cartão de crédito</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">7 dias · 1 exame/dia<br/>Sem cartão de crédito</div>
         <div style="font-size:11px;color:var(--mist);display:flex;flex-direction:column;gap:5px">
           <div>✓ Hemograma, bioquímica e citologia</div>
           <div>✓ Cão, gato, equino e bovino</div>
@@ -4678,15 +4780,15 @@ function renderOnboarding(){
         <div style="font-size:24px;margin-bottom:8px">📋</div>
         <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Básico</div>
         <div style="margin-bottom:8px">
-          <span style="font-size:22px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;67,90</span>
+          <span style="font-size:22px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,90</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">200 análises/mês<br/>ou R$&nbsp;61,11/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">200 análises/mês<br/>ou R$&nbsp;88,11/mês no trimestral</div>
         <div style="font-size:11px;color:var(--mist);display:flex;flex-direction:column;gap:5px">
           <div>✓ Até 200 laudos por mês</div>
           <div>✓ Laudo em PDF para o tutor</div>
           <div>✓ Todos os seus pacientes</div>
-          <div style="color:var(--fog)">✗ Volume ilimitado</div>
+          <div style="color:var(--fog)">✗ Volume ampliado (Pro)</div>
         </div>
         <button style="width:100%;margin-top:16px;padding:10px;background:var(--leaf-l);border:1.5px solid rgba(22,168,126,.3);border-radius:var(--r8);font-size:13px;font-weight:800;color:var(--leaf-d);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
           Escolher Básico
@@ -4702,12 +4804,12 @@ function renderOnboarding(){
         <div style="font-size:24px;margin-bottom:8px">⚡</div>
         <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Pro</div>
         <div style="margin-bottom:8px">
-          <span style="font-size:22px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,90</span>
+          <span style="font-size:22px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;167,90</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">Ilimitadas/mês<br/>ou R$&nbsp;78,32/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">400 análises/mês<br/>ou R$&nbsp;134,32/mês no trimestral</div>
         <div style="font-size:11px;color:var(--ink2);display:flex;flex-direction:column;gap:5px">
-          <div>✓ Sem limite de laudos</div>
+          <div>✓ Até 400 laudos por mês</div>
           <div>✓ Exportar PDF e JSON</div>
           <div>✓ Suporte quando precisar</div>
           <div>✓ Pacientes ilimitados</div>
@@ -4791,12 +4893,12 @@ function renderTrialExpired(){
       <div style="border:1.5px solid var(--fog);border-radius:var(--r16);padding:20px;background:var(--snow)">
         <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px">Básico</div>
         <div style="margin-bottom:10px">
-          <span style="font-size:24px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;67,90</span>
+          <span style="font-size:24px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,90</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;61,11/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;88,11/mês no trimestral</div>
         <div style="background:#E8F5EE;border-radius:6px;padding:8px 10px;font-size:11px;color:var(--leaf-d);font-weight:600;margin:10px 0">
-          💰 Economize 20% no plano trimestral<br/>R$&nbsp;183,33/trimestre
+          💰 Economize 10% no plano trimestral<br/>R$&nbsp;264,33/trimestre
         </div>
         <div style="font-size:11px;color:var(--mist);line-height:1.8;margin-bottom:14px">
           ✓ 200 análises/mês<br/>
@@ -4813,15 +4915,15 @@ function renderTrialExpired(){
         <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 10px;border-radius:20px;white-space:nowrap">⭐ RECOMENDADO</div>
         <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:6px">Pro</div>
         <div style="margin-bottom:10px">
-          <span style="font-size:24px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;97,90</span>
+          <span style="font-size:24px;font-weight:800;color:var(--leaf);font-family:'Sora',sans-serif;letter-spacing:-1px">R$&nbsp;167,90</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;78,32/mês no trimestral</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:4px">ou R$&nbsp;134,32/mês no trimestral</div>
         <div style="background:rgba(22,168,126,.1);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--leaf-d);font-weight:600;margin:10px 0">
-          💰 Economize 30% no plano trimestral<br/>R$&nbsp;822,36/trimestre
+          💰 Economize 20% no plano trimestral<br/>R$&nbsp;402,96/trimestre
         </div>
         <div style="font-size:11px;color:var(--ink2);line-height:1.8;margin-bottom:14px">
-          ✓ Análises ilimitadas<br/>
+          ✓ 400 análises por mês<br/>
           ✓ PDF e JSON<br/>
           ✓ Suporte prioritário
         </div>
@@ -5877,6 +5979,67 @@ function clearFile(){
   document.getElementById('run-btn').disabled=true;
   document.getElementById('file-input').value='';
 }
+// ── Reducao de imagem antes do envio ────────────────────────────────
+// A API ja reduz imagens acima de ~1568px no lado maior antes de contar
+// tokens, entao enviar mais que isso so gasta banda e tempo. Reduzimos
+// no navegador para acelerar o upload e evitar timeout em conexao ruim.
+// NAO reduzimos abaixo desse limite: texto de exame precisa continuar legivel.
+const IMG_MAX_EDGE = 1568;
+const IMG_QUALITY  = 0.92;
+
+async function downscaleImage(file){
+  try {
+    if(!file || !/^image\//.test(file.type||'')) return null;
+
+    let bmp;
+    if(window.createImageBitmap){
+      bmp = await createImageBitmap(file, { imageOrientation:'from-image' });
+    } else {
+      bmp = await new Promise((res,rej)=>{
+        const im = new Image();
+        im.onload = ()=>res(im);
+        im.onerror = rej;
+        im.src = URL.createObjectURL(file);
+      });
+    }
+
+    const w = bmp.width, h = bmp.height;
+    if(!w || !h){ if(bmp.close) bmp.close(); return null; }
+
+    // Ja esta dentro do limite e e' leve -> nao reprocessa (evita perda a toa)
+    if(Math.max(w,h) <= IMG_MAX_EDGE && file.size <= 2*1024*1024){
+      if(bmp.close) bmp.close();
+      return null;
+    }
+
+    const scale = Math.min(1, IMG_MAX_EDGE / Math.max(w,h));
+    const nw = Math.max(1, Math.round(w*scale));
+    const nh = Math.max(1, Math.round(h*scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = nw; canvas.height = nh;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#FFFFFF';          // PNG transparente nao vira fundo preto
+    ctx.fillRect(0,0,nw,nh);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(bmp, 0, 0, nw, nh);
+    if(bmp.close) bmp.close();
+
+    const dataUrl = canvas.toDataURL('image/jpeg', IMG_QUALITY);
+    const base64 = (dataUrl.split(',')[1]) || '';
+    if(!base64) return null;
+
+    const bytes = Math.round(base64.length * 3 / 4);
+    if(bytes >= file.size) return null;   // nao ficou menor -> mantem o original
+
+    return { base64, mimeType:'image/jpeg', bytes, width:nw, height:nh, dataUrl };
+  } catch(e){
+    console.warn('Nao foi possivel reduzir a imagem; enviando original.', e);
+    return null;
+  }
+}
+
 function handleFile(file){
   if(!file) return;
   if(file.size>12*1024*1024){toast('Arquivo muito grande. Máx. 12 MB.','warn');return;}
@@ -5910,11 +6073,21 @@ function handleFile(file){
     };
     reader.readAsText(file);
   } else {
-    reader.onload=e=>{
-      const b64=e.target.result.split(',')[1];
-      S.pendingFile={type:isImg?'image':'pdf',base64:b64,mimeType:file.type,name:file.name};
+    reader.onload=async e=>{
+      let b64=e.target.result.split(',')[1];
+      let mime=file.type, previewSrc=e.target.result;
       if(isImg){
-        document.getElementById('fp-visual').innerHTML=`<img src="${e.target.result}" class="fp-img" alt="Preview"/>`;
+        const small = await downscaleImage(file);
+        if(small){
+          b64 = small.base64; mime = small.mimeType; previewSrc = small.dataUrl;
+          const kb = (small.bytes/1024).toFixed(0);
+          document.getElementById('fp-size').textContent = kb+' KB (otimizada)';
+          document.getElementById('dz-sub').textContent = kb+' KB · '+small.width+'×'+small.height+' px';
+        }
+      }
+      S.pendingFile={type:isImg?'image':'pdf',base64:b64,mimeType:mime,name:file.name};
+      if(isImg){
+        document.getElementById('fp-visual').innerHTML=`<img src="${previewSrc}" class="fp-img" alt="Pré-visualização do exame"/>`;
       } else {
         document.getElementById('fp-visual').innerHTML=`<div style="margin-top:10px;font-size:12px;color:var(--mist)">PDF carregado · Claude irá ler o conteúdo automaticamente</div>`;
       }
@@ -6440,7 +6613,10 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
       body: JSON.stringify({
         model: CLAUDE_MODEL,
         max_tokens: 4096,
-        system: SYSTEM_PROMPT,
+        // Prompt caching: o bloco de sistema e' identico em toda chamada.
+        // ttl '1h' mantem o cache quente mesmo com pouco movimento (fase inicial).
+        system: [{ type: 'text', text: SYSTEM_PROMPT,
+                   cache_control: { type: 'ephemeral', ttl: '1h' } }],
         messages: [{ role: 'user', content: contentBlocks }]
       })
     }, { timeoutMs: 90000, retries: 1 });
@@ -7244,7 +7420,7 @@ function toggleUsagePopup(){
           ? `<div style="font-size:12px;color:${pct>=90?'var(--ruby)':'rgba(255,255,255,.4)'}">
               ${left===0 ? '⚠ Limite atingido' : `${left} análise${left!==1?'s':''} restante${left!==1?'s':''}`}
              </div>`
-          : `<div style="font-size:12px;color:var(--leaf)">✓ Ilimitadas (Plano Pro)</div>`
+          : `<div style="font-size:12px;color:var(--leaf)">✓ Sem limite mensal na avaliação</div>`
         }
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)">
           <button onclick="nav('plans');toggleUsagePopup()" style="background:none;border:none;color:var(--leaf);font-size:12px;font-weight:600;cursor:pointer;padding:0;font-family:'Plus Jakarta Sans',sans-serif">Ver planos →</button>
@@ -7328,7 +7504,7 @@ function renderPlansScreen(){
     usageBlock = `
       <div style="display:flex;align-items:center;gap:8px;background:rgba(22,168,126,.12);border-radius:var(--r8);padding:12px 14px">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--leaf)" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        <span style="font-size:13px;font-weight:600;color:var(--leaf)">${usage.count} análises · Ilimitadas</span>
+        <span style="font-size:13px;font-weight:600;color:var(--leaf)">${usage.count} análises no período de avaliação</span>
       </div>`;
   }
 
@@ -7358,7 +7534,7 @@ function renderPlansScreen(){
       ctaHtml = `<div style="text-align:center;padding:10px 0;font-size:12px;font-weight:700;color:var(--leaf-d)">✓ Plano atual</div>`;
     } else if(isTrial || (isBasico && pid === 'pro')){
       ctaHtml = `<button class="btn-auth" onclick="openUpgradeModal('general')" style="border-radius:var(--r8);font-size:12px;padding:10px;margin-top:12px">
-        ${pid==='basico'?'Assinar Básico — R$&nbsp;67,90/mês':'Upgrade para Pro — R$&nbsp;97,90/mês'}
+        ${pid==='basico'?'Assinar Básico — R$&nbsp;97,90/mês':'Upgrade para Pro — R$&nbsp;167,90/mês'}
       </button>`;
     }
 
@@ -7369,13 +7545,13 @@ function renderPlansScreen(){
 
         <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px">${p.name}</div>
         <div style="margin-bottom:10px">
-          <span style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:${isCurr?'var(--leaf)':accentColor};letter-spacing:-1px">R$&nbsp;${pid==='basico'?'67,90':'97,90'}</span>
+          <span style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:${isCurr?'var(--leaf)':accentColor};letter-spacing:-1px">R$&nbsp;${pid==='basico'?'97,90':'167,90'}</span>
           <span style="font-size:11px;color:var(--mist)">/mês</span>
         </div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:10px">ou ${pid==='basico'?'R$&nbsp;61,11':'R$&nbsp;67,90'}/mês no plano trimestral</div>
-        ${feat(true, pid==='basico'?'200 análises/mês':'Ilimitadas')}
+        <div style="font-size:10px;color:var(--mist);margin-bottom:10px">ou ${pid==='basico'?'R$&nbsp;88,11':'R$&nbsp;134,32'}/mês no plano trimestral</div>
+        ${feat(true, pid==='basico'?'200 análises/mês':'400 análises/mês')}
         ${feat(true,'PDF e JSON')}
-        ${feat(pid==='pro','Análises ilimitadas')}
+        ${feat(true,'Pacientes ilimitados')}
         ${feat(pid==='pro','Suporte prioritário')}
         ${ctaHtml}
       </div>`;
@@ -7783,7 +7959,9 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
             body: JSON.stringify({
               model: CLAUDE_MODEL,
               max_tokens: 4096,
-              system: SYSTEM_PROMPT,
+              // Prompt caching: bloco de sistema identico em toda chamada.
+              system: [{ type: 'text', text: SYSTEM_PROMPT,
+                         cache_control: { type: 'ephemeral', ttl: '1h' } }],
               messages: [{ role: 'user', content: userContent }]
             })
           });
@@ -8178,22 +8356,22 @@ function renderPlanPanel(){
       <div style="border:${isBasico?'2px solid var(--leaf)':'1px solid var(--fog)'};border-radius:var(--r12);padding:14px;background:${isBasico?'var(--leaf-xl)':'var(--paper)'};position:relative">
         ${isBasico?`<div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--leaf);color:var(--snow);font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">ATUAL</div>`:''}
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px">Básico</div>
-        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isBasico?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;67,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;61,11/mês — trimestral</div>
+        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isBasico?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;97,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;88,11/mês — trimestral</div>
         ${feat(true,'200 análises/mês')}
         ${feat(true,'PDF e JSON')}
-        ${feat(false,'Ilimitadas')}
-        ${feat(false,'Suporte priority')}
+        ${feat(false,'400 análises/mês')}
+        ${feat(false,'Suporte prioritário')}
         ${isTrial?`<button class="btn btn-primary btn-xs" style="width:100%;justify-content:center;margin-top:10px" onclick="openUpgradeModal('general')">Assinar →</button>`:''}
       </div>
       <div style="border:${isPro?'2px solid var(--leaf)':'1.5px solid var(--leaf)'};border-radius:var(--r12);padding:14px;background:${isPro?'var(--leaf-xl)':'var(--snow)'};position:relative">
         <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:${isPro?'var(--leaf)':'var(--night)'};color:var(--snow);font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap">${isPro?'ATUAL':'⭐ PRO'}</div>
         <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px">Pro</div>
-        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;97,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
-        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;67,90/mês trimestral</div>
-        ${feat(true,'Ilimitadas')}
+        <div style="font-family:'Sora',sans-serif;font-size:19px;font-weight:800;color:${isPro?'var(--leaf)':'var(--ink)'};letter-spacing:-.8px;margin-bottom:3px">R$&nbsp;167,90<span style="font-size:10px;font-weight:400;color:var(--mist)">/mês</span></div>
+        <div style="font-size:10px;color:var(--mist);margin-bottom:8px">ou R$&nbsp;134,32/mês trimestral</div>
+        ${feat(true,'400 análises/mês')}
         ${feat(true,'PDF e JSON')}
-        ${feat(true,'Análises ilimitadas')}
+        ${feat(true,'Pacientes ilimitados')}
         ${feat(true,'Suporte prioritário')}
         ${!isPro?`<button class="btn btn-primary btn-xs" style="width:100%;justify-content:center;margin-top:10px" onclick="openUpgradeModal('general')">${isBasico?'Upgrade →':'Assinar →'}</button>`:''}
       </div>
@@ -8272,7 +8450,7 @@ function openUpgradeModal(reason){
 
           <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
             ${[
-              [true, pid==='basico'?'200 análises/mês':'Ilimitadas'],
+              [true, pid==='basico'?'200 análises/mês':'400 análises/mês'],
               [true, 'Todos os tipos de exame'],
               [true, 'Exportar PDF'],
               [pid==='pro', 'Exportar JSON'],
@@ -8327,7 +8505,7 @@ function openUpgradeModal(reason){
       <span style="font-size:18px;flex-shrink:0">⏱</span>
       <div>
         <div style="font-size:12px;font-weight:700;color:#7A4800;margin-bottom:2px">Período avaliação — ${ts.daysLeft} dia${ts.daysLeft!==1?'s':''} restante${ts.daysLeft!==1?'s':''}</div>
-        <div style="font-size:11px;color:#7A4800;opacity:.8">${ts.dailyLimit} exames por dia · Exportação não disponível · Assine para desbloquear tudo</div>
+        <div style="font-size:11px;color:#7A4800;opacity:.8">${ts.dailyLimit} exame${ts.dailyLimit!==1?'s':''} por dia · Exportação não disponível · Assine para desbloquear tudo</div>
       </div>
     </div>` : ''}
 
@@ -9133,7 +9311,7 @@ async function handleEmailRedirect(){
 
   if(type === 'signup'){
     await enter({ ...profile, id: userRes.id, email: userRes.email, supaUser: userRes });
-    showWelcome(profile.name || userRes.email, 'new');
+    showWelcome(profile.name || metaName(userRes) || userRes.email, 'new');
     return true;
   }
   if(type === 'recovery'){
