@@ -9401,12 +9401,29 @@ async function handleEmailRedirect(){
 }
 
 // ── Restaurar sessão Supabase ao recarregar a página
+// Anti-pisca: se existe sessão salva, não mostramos a tela de login enquanto
+// o restore roda — só um splash discreto. Se o restore falhar, o login volta.
+let _splash = null;
+(function(){
+  const saved = DB.g('supa_session', null);
+  if(!saved?.access_token) return;
+  const auth = document.getElementById('auth');
+  if(auth) auth.style.display = 'none';
+  _splash = document.createElement('div');
+  _splash.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(158deg,#123A2B 0%,#0A2318 55%,#071810 100%)';
+  _splash.innerHTML = '<div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#1FB98A,#0F8062);display:flex;align-items:center;justify-content:center;animation:splashPulse 1.6s ease-in-out infinite"><svg width="34" height="34" viewBox="0 0 24 24" fill="#fff"><circle cx="9.5" cy="5.2" r="2.4"/><circle cx="14.5" cy="5.2" r="2.4"/><circle cx="5.8" cy="9.4" r="1.9"/><circle cx="18.2" cy="9.4" r="1.9"/><ellipse cx="12" cy="16" rx="5.5" ry="4.2"/></svg></div><style>@keyframes splashPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.07);opacity:1}}</style>';
+  document.body.appendChild(_splash);
+})();
+function _endSplash(showLogin){
+  if(showLogin){ const a=document.getElementById('auth'); if(a) a.style.display=''; }
+  if(_splash){ _splash.remove(); _splash = null; }
+}
 (async () => {
-  if(!_supa) return;
+  if(!_supa) { _endSplash(true); return; }
   try {
     // Primeiro verifica se veio de redirect de e-mail
     const handled = await handleEmailRedirect();
-    if(handled) return;
+    if(handled) { _endSplash(false); return; }
 
     // Senão, tenta restaurar sessão existente
     const { data } = await _supa.auth.getSession();
@@ -9415,9 +9432,13 @@ async function handleEmailRedirect(){
       const profile = await getSupaProfile(user.id);
       DATA_MODE = 'cloud';
       await enter({ ...profile, id: user.id, email: user.email, supaUser: user }, false, true);
+      _endSplash(false);
+    } else {
+      _endSplash(true); // sem sessão válida: mostra o login
     }
   } catch(e) {
     console.warn('Session restore failed:', e.message);
+    _endSplash(true);
   }
 })();
 
