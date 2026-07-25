@@ -6883,6 +6883,7 @@ async function runImport() {
     insights:        Array.isArray(insights)       ? insights      : [],
     recommendations: Array.isArray(recommendations)? recommendations: [],
     summary:         summary                       || 'Interpretação clínica concluída.',
+    patterns:        Array.isArray(patterns)        ? patterns      : [],
     usedAI:          !!aiResult,
     extractionConfidence,
     valoresIlegiveis,
@@ -7266,6 +7267,9 @@ function renderResult(){
       <div class="result-summary-label">📝 Resumo clínico</div>
       ${escapeHTML(summary)}
     </div>` : ''}
+
+    <!-- ══ PADRÕES CLÍNICOS (hipóteses sugeridas pela IA) ══ -->
+    ${renderPatternChips(Array.isArray(S.currentResult.patterns) ? S.currentResult.patterns : [])}
 
     <!-- ══ MARCADORES LABORATORIAIS ══ -->
     ${evalResults.length ? `
@@ -7843,6 +7847,7 @@ function showExam(id){
     insights: exam.result?.insights || [],
     recommendations: exam.result?.recommendations || [],
     summary: exam.result?.summary || '',
+    patterns: exam.result?.patterns || [],
     usedAI: exam.usedAI || false,
   };
   nav('result');
@@ -8101,6 +8106,7 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
     exam: S.exams[idx] || exam,
     evalResults: results,
     overall, insights, recommendations, summary,
+    patterns: Array.isArray(patterns) ? patterns : [],
     usedAI: !!aiResult,
   };
 
