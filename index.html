@@ -4052,11 +4052,18 @@ async function saveExamCloud(exam){
 }
 
 // ── Save patient to cloud
+// Envia SOMENTE colunas que existem na tabela (espalhar o objeto local
+// mandaria 'createdAt', que nao existe no banco, e causaria erro 400).
+function localPatientToSupa(pt, userId){
+  return { id:pt.id, user_id:userId, name:pt.name||'', species:pt.species||null,
+           breed:pt.breed||null, sex:pt.sex||null, age:pt.age||null,
+           weight:pt.weight||null, owner:pt.owner||null, history:pt.history||null };
+}
 async function savePatientCloud(patient){
   if(DATA_MODE !== 'cloud' || !_supa || !S.user) return;
   if(!isUuid(patient.id) || !isUuid(S.user.id)) return;
   try {
-    await _supa.from('patients').upsert({...patient, user_id: S.user.id});
+    await _supa.from('patients').upsert(localPatientToSupa(patient, S.user.id));
   } catch(e) { console.warn('Cloud patient save failed:', e.message); }
 }
 
@@ -5092,6 +5099,7 @@ function saveIntern() {
       createdAt: new Date().toISOString().slice(0,10),
     };
     S.patients.unshift(newPatient);
+    savePatientCloud(newPatient);
     patientId = newPatient.id;
     populatePatientDropdown();
     toast(`Paciente "${newPatient.name}" cadastrado.`, 'ok');
@@ -6858,6 +6866,11 @@ async function runImport() {
 
   S.exams.unshift(exam);
   persist();
+  {
+    // FK: o paciente precisa existir na nuvem antes do exame que o referencia
+    const _pt = S.patients.find(x => x.id === exam.patientId);
+    if(_pt) await savePatientCloud(_pt);
+  }
   saveExamCloud(exam);
   // Vincula exame à internação ativa do paciente (se houver)
   if(exam.patientId) linkExamToIntern(exam.id, exam.patientId);
@@ -8233,10 +8246,12 @@ function savePatient(){
   let patientId = id;
   if(id){
     const idx = S.patients.findIndex(p=>p.id===id);
-    if(idx>=0) S.patients[idx] = {...S.patients[idx],...data};
+    if(idx>=0){ S.patients[idx] = {...S.patients[idx],...data}; savePatientCloud(S.patients[idx]); }
   } else {
     patientId = uuid();
-    S.patients.unshift({ id:patientId, ...data, createdAt: new Date().toISOString().slice(0,10) });
+    const _np = { id:patientId, ...data, createdAt: new Date().toISOString().slice(0,10) };
+    S.patients.unshift(_np);
+    savePatientCloud(_np);
   }
 
   persist();
