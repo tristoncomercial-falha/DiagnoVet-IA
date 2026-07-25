@@ -6503,6 +6503,34 @@ Respond ONLY with this exact JSON (no markdown, no text before or after):
   "valoresIlegiveis": ["lista, em português, dos parâmetros que NÃO foi possível ler com segurança no documento; deixe [] se todos foram lidos com clareza"]
 }
 
+━━━ ANALYSIS DEPTH — MANDATORY ━━━
+The veterinarian needs clinical REASONING, not a restatement of numbers.
+
+PATTERNS (mandatory whenever any value is abnormal):
+- Always return 2 to 4 entries in "patterns" when there is at least one altered value.
+- Each entry must be a plausible clinical explanation for the SET of findings, not for a single value.
+- Rank by likelihood: the first entry is the most probable. Use "confidence" honestly
+  (high / moderate / possible) — do not inflate.
+- In "description", state WHY the data supports that hypothesis, citing the specific values.
+  Example style: "Elevacao conjunta de ALT e FA, com GGT normal, pode sugerir lesao
+  hepatocelular; a ausencia de hiperbilirrubinemia torna colestase menos provavel."
+- If findings are ambiguous, say so and give the competing hypotheses instead of omitting them.
+- Include at least one entry that considers a benign or non-pathological explanation when
+  plausible (stress, hemoconcentration, artifact, physiological variation, recent meal).
+
+INSIGHTS (minimum 4 when there are alterations):
+- Do not merely repeat the value and its range. Interpret it.
+- Correlate markers with each other and with signalment (species, age, breed, sex, weight).
+- Explicitly mention relevant NEGATIVE findings when they help rule something out.
+- Flag any pattern that could indicate urgency.
+
+RECOMMENDATIONS (minimum 3 when there are alterations):
+- Name the specific next exam or clinical action, in order of priority.
+- Say what each one would confirm or exclude.
+
+If all values are within reference, still return at least 2 insights and 2 recommendations
+(e.g. what the normal panel rules out, and reasonable monitoring intervals).
+
 ━━━ CLINICAL SAFETY RULES ━━━
 - NEVER provide a definitive diagnosis
 - NEVER prescribe medications
@@ -6650,6 +6678,9 @@ INSTRUÇÃO: Analise o laudo acima e responda APENAS com o JSON solicitado no si
       body: JSON.stringify({
         model: CLAUDE_MODEL,
         max_tokens: 4096,
+        // Contexto clinico: o mesmo exame precisa gerar a mesma leitura.
+        // Sem este parametro a API roda em 1.0 (maxima variacao).
+        temperature: 0.2,
         // NAO usar system em formato de array aqui: o proxy publicado descarta
         // o bloco e o modelo ignora o prompt (retorna JSON fora do schema).
         system: SYSTEM_PROMPT,
@@ -8033,6 +8064,7 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
             body: JSON.stringify({
               model: CLAUDE_MODEL,
               max_tokens: 4096,
+              temperature: 0.2,
               system: SYSTEM_PROMPT,
               messages: [{ role: 'user', content: userContent }]
             })
