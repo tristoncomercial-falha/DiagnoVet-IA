@@ -4486,6 +4486,15 @@ async function enter(acc, isNew = false, isRestore = false){
   acc.planExpiry = acc.planExpiry || acc.plan_expiry  || null;
 
   // O perfil trouxe nome de verdade?
+  // Mapeia snake_case do banco -> camelCase do app (senao o app trata usuario
+  // ja existente como novo e repete o onboarding a cada F5).
+  if(acc.onboardingDone === undefined && acc.onboarding_done !== undefined){
+    acc.onboardingDone = acc.onboarding_done;
+  }
+  // Quem ja escolheu um plano no banco ja passou pelo onboarding.
+  if(acc.onboardingDone === undefined && acc.plan && acc.plan !== 'trial'){
+    acc.onboardingDone = true;
+  }
   const _hadName = !!(acc.name || acc.full_name);
   // Ordem: perfil -> metadados do signup -> e-mail (ultimo recurso)
   acc.name       = acc.name       || acc.full_name    || metaName(acc.supaUser) || acc.email || '';
