@@ -2839,6 +2839,13 @@ body.modal-open {
 </div>
 
 <!-- ── MODAL: ESTUDO INDIVIDUAL DE EXAME ── -->
+<div class="overlay" id="m-history">
+  <div class="modal modal-lg">
+    <button class="modal-close" onclick="closeM('m-history')">&#10005;</button>
+    <div id="history-content"></div>
+  </div>
+</div>
+
 <div class="overlay" id="m-study">
   <div class="modal modal-lg">
     <button class="modal-close" onclick="closeM('m-study')">✕</button>
@@ -3117,7 +3124,7 @@ function showErr(m){
       <!-- Trial banner (shown only during avaliação) -->
       <div class="trial-banner" id="trial-banner" onclick="openUpgradeModal('trial')">
         <div class="trial-dot"></div>
-        <div class="trial-text" id="trial-banner-text">Período avaliação ativo — 7 dias restantes · 0/1 exame hoje</div>
+        <div class="trial-text" id="trial-banner-text">Período de avaliação ativo — 7 dias restantes · 0/10 análises usadas</div>
         <div class="trial-cta">Ver planos →</div>
       </div>
 
@@ -4106,7 +4113,8 @@ const PLANS = {
     color: '#FEF5E7',
     colorText: '#7A4800',
     analysesPerMonth: 9999,
-    analysesPerDay: 1,
+    analysesPerDay: 9999,   // sem trava diaria: o limite do trial e' o pacote total
+    trialTotal: 10,         // 10 analises para usar quando quiser nos 7 dias
     trialDays: 7,
     patients: 9999,
     exportPDF: false,
@@ -4189,17 +4197,18 @@ function getTrialStatus(){
   const msLeft = expiry - now;
   const daysLeft = Math.max(0, Math.ceil(msLeft / (1000*60*60*24)));
   const expired = daysLeft === 0;
-  // Daily usage
-  const today = now.toISOString().slice(0,10);
-  const dailyKey = 'daily_' + S.user.id + '_' + today;
-  const examsToday = DB.g(dailyKey, 0);
-  const dailyLimit = plan.analysesPerDay || 1;
-  const canUse = !expired && examsToday < dailyLimit;
-  return {active:true, expired, daysLeft, examsToday, dailyLimit, canUse};
+  // Pacote do periodo: o veterinario usa as analises quando quiser nos 7 dias
+  const totalKey = 'trialused_' + S.user.id;
+  const used = DB.g(totalKey, 0);
+  const total = plan.trialTotal || 10;
+  const left = Math.max(0, total - used);
+  const canUse = !expired && used < total;
+  // examsToday/dailyLimit mantidos por compatibilidade com a UI existente
+  return {active:true, expired, daysLeft, canUse,
+          used, total, left, examsToday: used, dailyLimit: total};
 }
 function incrementDailyUsage(){
-  const today = new Date().toISOString().slice(0,10);
-  const key = 'daily_' + S.user.id + '_' + today;
+  const key = 'trialused_' + S.user.id;
   DB.s(key, DB.g(key, 0) + 1);
 }
 function canAnalyze(){
@@ -4796,7 +4805,7 @@ function renderOnboarding(){
         <div style="font-size:24px;margin-bottom:8px">⏱</div>
         <div style="font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:4px">Trial</div>
         <div style="font-size:22px;font-weight:800;color:var(--amber);font-family:'Sora',sans-serif;letter-spacing:-1px;margin-bottom:8px">Grátis</div>
-        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">7 dias · 1 exame/dia<br/>Sem cartão de crédito</div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:14px;line-height:1.6">7 dias · 10 análises<br/>Use quando quiser · Sem cartão</div>
         <div style="font-size:11px;color:var(--mist);display:flex;flex-direction:column;gap:5px">
           <div>✓ Hemograma, bioquímica e citologia</div>
           <div>✓ Cão, gato, equino e bovino</div>
@@ -6788,7 +6797,32 @@ async function runImport() {
   await setStep(20, 'Lendo o exame...');
 
   // ── Call Claude AI
-  await setStep(40, (S.key || S.proxyUrl) ? 'Interpretando os parâmetros...' : 'Executando análise local...', 100);
+  // A chamada leva de 30 a 90s. Sem movimento na barra o veterinario acha que
+  // travou — entao avancamos devagar de 40% a 88% e trocamos a mensagem.
+  await setStep(40, (S.key || S.proxyUrl) ? 'Enviando para análise...' : 'Executando análise local...', 100);
+
+  let creepPct = 40;
+  const creepMsgs = [
+    'Lendo os valores do documento...',
+    'Comparando com faixas de referência...',
+    'Correlacionando os marcadores...',
+    'Levantando hipóteses clínicas...',
+    'Revisando a interpretação...',
+    'Ainda analisando — exames longos levam mais tempo...'
+  ];
+  let creepIdx = 0;
+  const creep = setInterval(() => {
+    // desacelera conforme se aproxima de 88% (nunca "completa" sozinha)
+    creepPct += Math.max(0.4, (88 - creepPct) * 0.06);
+    if (creepPct > 88) creepPct = 88;
+    bar.style.width = creepPct.toFixed(1) + '%';
+    if (creepPct > 40 + (creepIdx + 1) * 8 && creepIdx < creepMsgs.length - 1) {
+      creepIdx++;
+      stepEl.textContent = creepMsgs[creepIdx];
+    }
+  }, 700);
+  stepEl.textContent = creepMsgs[0];
+
   if (!S.key && !S.proxyUrl) {
     aiError = 'Proxy não configurado. Configure em Configurações → Claude AI.';
   } else {
@@ -6799,10 +6833,10 @@ async function runImport() {
       console.error('Claude API error:', e);
     }
   }
+  clearInterval(creep);
 
-  await setStep(65, 'Extraindo valores laboratoriais...');
-  await setStep(80, 'Verificando intervalos de referência...');
-  await setStep(100, 'Montando o laudo...');
+  await setStep(92, 'Verificando intervalos de referência...', 180);
+  await setStep(100, 'Montando o laudo...', 180);
 
   proc.classList.remove('on');
 
@@ -7578,7 +7612,7 @@ function renderPlansScreen(){
     usageBlock = `
       <div style="background:rgba(255,255,255,.06);border-radius:var(--r8);padding:14px 16px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6)">Laudos hoje</span>
+          <span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6)">Análises do período</span>
           <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${barC}">${ts.examsToday}<span style="color:rgba(255,255,255,.3);font-weight:400"> / ${ts.dailyLimit}</span></span>
         </div>
         <div style="height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden">
@@ -8187,11 +8221,131 @@ function renderPatients(){
   }).join('');
 }
 
+// ── Histórico e evolução dos marcadores de um paciente ─────────────
+function sparkline(pts, ref){
+  // pts: [{n, date, status}] em ordem cronológica
+  const W = 260, H = 64, PAD = 6;
+  const vals = pts.map(p => p.n);
+  let lo = Math.min(...vals, ref ? ref.min : Infinity);
+  let hi = Math.max(...vals, ref ? ref.max : -Infinity);
+  if (!isFinite(lo) || !isFinite(hi)) return '';
+  if (hi === lo) { hi = lo + 1; lo = lo - 1; }
+  const span = (hi - lo) * 1.15;
+  const base = lo - (hi - lo) * 0.075;
+  const x = i => PAD + (i * (W - PAD*2)) / Math.max(1, pts.length - 1);
+  const y = v => H - PAD - ((v - base) / span) * (H - PAD*2);
+
+  let band = '';
+  if (ref) {
+    const y1 = y(ref.max), y2 = y(ref.min);
+    band = `<rect x="0" y="${Math.min(y1,y2).toFixed(1)}" width="${W}" height="${Math.abs(y2-y1).toFixed(1)}"
+             fill="var(--leaf)" opacity=".10"/>`;
+  }
+  const d = pts.map((p,i) => `${i?'L':'M'}${x(i).toFixed(1)},${y(p.n).toFixed(1)}`).join(' ');
+  const cores = { ok:'var(--leaf)', warn:'var(--amber)', critical:'var(--ruby)' };
+  const dots = pts.map((p,i) =>
+    `<circle cx="${x(i).toFixed(1)}" cy="${y(p.n).toFixed(1)}" r="3.5"
+      fill="${cores[p.status]||'var(--leaf)'}" stroke="#fff" stroke-width="1.5"/>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:64px;overflow:visible">
+    ${band}<path d="${d}" fill="none" stroke="var(--ink3)" stroke-width="1.8"
+      stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>${dots}</svg>`;
+}
+
 function openPatientDetail(id){
-  const p=S.patients.find(x=>x.id===id); if(!p) return;
-  const exams=S.exams.filter(e=>e.patientId===id).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  // for now just navigate to patients and highlight — could be extended
-  nav('patients');
+  const p = S.patients.find(x => x.id === id);
+  if(!p) return;
+  const exams = S.exams
+    .filter(e => e.patientId === id)
+    .sort((a,b) => new Date(a.date) - new Date(b.date));   // cronológico
+  const refs = REFS[p.species] || REFS.Felino;
+  const el = document.getElementById('history-content');
+  if(!el) return;
+
+  const fmt = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) : '—';
+
+  // Marcadores presentes em 2 ou mais exames
+  const serie = {};
+  exams.forEach(ex => {
+    Object.entries(ex.markers || {}).forEach(([k,v]) => {
+      const n = pN(v);
+      if(!v || isNaN(n) || n === 0) return;
+      const ref = refs[k];
+      let st = 'ok';
+      if(ref){
+        if(n < ref.min*0.62 || n > ref.max*1.65) st = 'critical';
+        else if(n < ref.min || n > ref.max) st = 'warn';
+      }
+      (serie[k] = serie[k] || []).push({ n, date: ex.date, status: st });
+    });
+  });
+  const evolutivos = Object.entries(serie).filter(([,pts]) => pts.length >= 2);
+
+  const cabecalho = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">
+      <div style="width:46px;height:46px;border-radius:14px;background:var(--leaf-l);display:flex;align-items:center;justify-content:center;font-size:22px">${p.species==='Canino'?'\u{1F415}':'\u{1F408}'}</div>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.5px;color:var(--ink)">${escapeHTML(p.name||'—')}</div>
+        <div style="font-size:12.5px;color:var(--mist)">${escapeHTML(p.species||'—')} &middot; ${escapeHTML(p.breed||'—')} &middot; ${escapeHTML(String(p.age||'—'))} &middot; ${exams.length} exame${exams.length!==1?'s':''}</div>
+      </div>
+    </div>`;
+
+  if(!exams.length){
+    el.innerHTML = cabecalho + `
+      <div class="empty-state" style="padding:32px 10px">
+        <div class="es-icon">\u{1F52C}</div>
+        <div class="es-title">Nenhum exame para este paciente</div>
+        <div class="es-sub">Importe o primeiro exame para começar o histórico.</div>
+        <button class="btn btn-primary btn-md" onclick="closeM('m-history');nav('import');setTimeout(()=>{const s=document.getElementById('imp-patient');if(s)s.value='${p.id}'},100)">Importar exame</button>
+      </div>`;
+    openM('m-history');
+    return;
+  }
+
+  const stCor = { normal:'var(--leaf)', attention:'var(--amber)', critical:'var(--ruby)' };
+  const linha = exams.slice().reverse().map(ex => `
+    <div onclick="closeM('m-history');showExam('${ex.id}')"
+      style="display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:var(--r12);background:var(--paper);margin-bottom:8px;cursor:pointer;border:1px solid var(--fog)">
+      <span style="width:8px;height:8px;border-radius:50%;background:${stCor[ex.status]||'var(--leaf)'};flex-shrink:0"></span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--ink)">${escapeHTML(ex.type||'Exame')}</div>
+        <div style="font-size:11.5px;color:var(--mist)">${fmt(ex.date)} &middot; ${Object.keys(ex.markers||{}).length} marcadores</div>
+      </div>
+      <span style="font-size:11px;color:var(--mist)">ver &rsaquo;</span>
+    </div>`).join('');
+
+  const graficos = evolutivos.length ? evolutivos.map(([k, pts]) => {
+    const ref = refs[k];
+    const ini = pts[0], fim = pts[pts.length-1];
+    const delta = fim.n - ini.n;
+    const pctVar = ini.n ? (delta / ini.n) * 100 : 0;
+    const seta = Math.abs(pctVar) < 3 ? '\u2192' : (delta > 0 ? '\u2197' : '\u2198');
+    const corVar = fim.status === 'critical' ? 'var(--ruby)'
+                 : fim.status === 'warn' ? 'var(--amber)' : 'var(--leaf)';
+    return `
+      <div style="background:var(--snow);border:1px solid var(--fog);border-radius:var(--r12);padding:14px 16px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
+          <span style="font-size:13px;font-weight:700;color:var(--ink)">${escapeHTML(LABELS[k]||k)}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${corVar}">
+            ${fim.n}${ref&&ref.u?' '+escapeHTML(ref.u):''} ${seta}
+          </span>
+        </div>
+        <div style="font-size:11px;color:var(--mist);margin-bottom:6px">
+          ${ref ? 'Referência '+ref.min+'–'+ref.max+' &middot; ' : ''}
+          ${Math.abs(pctVar) < 3 ? 'estável' : (delta>0?'+':'')+pctVar.toFixed(0)+'% desde '+fmt(ini.date)}
+        </div>
+        ${sparkline(pts, ref)}
+      </div>`;
+  }).join('') : `
+    <div style="background:var(--paper);border:1px dashed var(--fog);border-radius:var(--r12);padding:18px;text-align:center;font-size:12.5px;color:var(--mist)">
+      A evolução aparece quando houver <strong>dois ou mais exames</strong> com o mesmo marcador.
+    </div>`;
+
+  el.innerHTML = cabecalho + `
+    <div style="font-size:11px;color:var(--mist);margin:16px 0 10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Evolução dos marcadores</div>
+    ${graficos}
+    <div style="font-size:11px;color:var(--mist);margin:20px 0 10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Exames (${exams.length})</div>
+    ${linha}`;
+  openM('m-history');
 }
 
 function openPatientModal(fromIntern=false) {
@@ -8371,7 +8525,7 @@ function updateTrialBanner(){
     banner.style.background = 'linear-gradient(90deg,#8B1A20 0%,#6B1015 100%)';
   } else {
     const dayWord = ts.daysLeft === 1 ? 'dia' : 'dias';
-    text.textContent = `Período avaliação ativo — ${ts.daysLeft} ${dayWord} restante${ts.daysLeft!==1?'s':''} · ${ts.examsToday}/${ts.dailyLimit} exames hoje`;
+    text.textContent = `Período de avaliação — ${ts.daysLeft} ${dayWord} restante${ts.daysLeft!==1?'s':''} · ${ts.left} de ${ts.total} análises disponíveis`;
     banner.style.background = '';
   }
 }
@@ -8393,7 +8547,7 @@ function updatePlanUI(){
   if(sbPlanUsage){
     const ts = getTrialStatus();
     if(ts.active && !ts.expired){
-      sbPlanUsage.textContent = `${ts.daysLeft} dias · ${ts.examsToday}/${ts.dailyLimit} hoje`;
+      sbPlanUsage.textContent = `${ts.daysLeft} dias · ${ts.left} de ${ts.total} restantes`;
       sbPlanUsage.style.color = ts.daysLeft <= 2 ? 'var(--ruby)' : 'var(--amber)';
     } else if(plan.analysesPerMonth >= 9999){
       sbPlanUsage.textContent = `${usage.count} análises este mês`;
@@ -8433,7 +8587,7 @@ function renderPlanPanel(){
     usageBlock = `
       <div style="background:var(--paper);border-radius:var(--r12);padding:14px 16px;border:1px solid rgba(232,145,26,.2);margin-bottom:18px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:13px;font-weight:600;color:var(--ink)">Trial · exames hoje</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">Trial · análises usadas</span>
           <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--amber)">${ts.examsToday} / ${ts.dailyLimit}</span>
         </div>
         <div style="height:5px;background:var(--fog);border-radius:3px;overflow:hidden;margin-bottom:6px">
