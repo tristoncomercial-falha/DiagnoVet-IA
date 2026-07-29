@@ -4188,10 +4188,32 @@ function getUserPlan(){
   if(!S.user) return PLANS.trial;
   return PLANS[S.user.plan || 'trial'] || PLANS.trial;
 }
+// Tolerancia apos o vencimento da assinatura (mesmo valor usado no Worker)
+const GRACE_DAYS = 4;
+
+// Situacao da assinatura paga: vencida, em tolerancia ou em dia
+function statusAssinatura(){
+  const plan = getUserPlan();
+  if(!S.user || plan.id === 'trial') return {paga:false, vencida:false, emTolerancia:false, diasAtraso:0};
+  if(!S.user.planExpiry) return {paga:true, vencida:false, emTolerancia:false, diasAtraso:0};
+  const venc = new Date(S.user.planExpiry);
+  const diasAtraso = Math.floor((Date.now() - venc.getTime()) / 86400000);
+  return {
+    paga: true,
+    vencida: diasAtraso > GRACE_DAYS,
+    emTolerancia: diasAtraso > 0 && diasAtraso <= GRACE_DAYS,
+    diasAtraso: Math.max(0, diasAtraso),
+    diasTolerancia: Math.max(0, GRACE_DAYS - diasAtraso + 1)
+  };
+}
+
 function getTrialStatus(){
   if(!S.user) return {active:false, expired:false, daysLeft:0, examsToday:0, canUse:false};
   const plan = getUserPlan();
-  if(plan.id !== 'trial') return {active:false, expired:false, daysLeft:0, examsToday:0, canUse:true};
+  if(plan.id !== 'trial'){
+    const a = statusAssinatura();
+    return {active:false, expired:false, daysLeft:0, examsToday:0, canUse: !a.vencida, assinatura:a};
+  }
   const expiry = S.user.planExpiry ? new Date(S.user.planExpiry) : new Date(Date.now() + 7*24*60*60*1000);
   const now = new Date();
   const msLeft = expiry - now;
@@ -6904,12 +6926,16 @@ async function runImport() {
   const extractionConfidence = aiResult?.extractionConfidence || '';
   const valoresIlegiveis = Array.isArray(aiResult?.valoresIlegiveis) ? aiResult.valoresIlegiveis.filter(Boolean) : [];
 
-  // For cytology exams, determine overall from insights rather than numeric markers
+  // Quadro clinico = pior entre a leitura numerica e os achados da IA.
+  // Nunca rebaixa: se a IA aponta algo critico, o painel NAO pode dizer
+  // "quadro estavel" so porque os numeros reconhecidos ficaram na faixa.
   let finalOverall = overall;
-  if (cytologyFindings && Object.keys(markers).length === 0) {
+  {
     const hasCritInsight = insights.some(i => i.level === 'critical');
     const hasWarnInsight = insights.some(i => i.level === 'warn');
-    finalOverall = hasCritInsight ? 'critical' : hasWarnInsight ? 'attention' : 'normal';
+    const rank = { normal: 0, attention: 1, critical: 2 };
+    const porIA = hasCritInsight ? 'critical' : hasWarnInsight ? 'attention' : 'normal';
+    if (rank[porIA] > rank[finalOverall]) finalOverall = porIA;
   }
 
   const eid = uuid();
@@ -6944,7 +6970,7 @@ async function runImport() {
     patient,
     exam,
     evalResults:     Array.isArray(results)       ? results       : [],
-    overall:         overall                       || 'normal',
+    overall:         finalOverall                  || 'normal',
     insights:        Array.isArray(insights)       ? insights      : [],
     recommendations: Array.isArray(recommendations)? recommendations: [],
     summary:         summary                       || 'Interpretação clínica concluída.',
@@ -6959,6 +6985,7 @@ async function runImport() {
   if (aiResult) {
     incrementUsage();
     if(getUserPlan().id === 'trial') incrementDailyUsage();
+    updatePlanUI();   // atualiza contador da sidebar e banner do trial na hora
   }
 
   updateCritBadge();
@@ -6974,8 +7001,8 @@ async function runImport() {
   } else if (aiResult) {
     const mCount = Object.keys(markers).length;
     toast(
-      overall === 'critical' ? `⚠ Resultado crítico — ${mCount} marcadores extraídos` :
-      overall === 'attention' ? `Análise concluída — ${mCount} marcadores, pontos de atenção` :
+      finalOverall === 'critical' ? `⚠ Resultado crítico — ${mCount} marcadores extraídos` :
+      finalOverall === 'attention' ? `Análise concluída — ${mCount} marcadores, pontos de atenção` :
       `Análise concluída — ${mCount} marcadores extraídos`, 'ok'
     );
   } else {
@@ -8044,6 +8071,12 @@ function openStudy(examId){
 async function reanalyze(examId){
   const exam = S.exams.find(e => e.id === examId);
   if (!exam) return;
+  // Re-análise chama a IA de novo: precisa respeitar a cota como uma análise normal.
+  if (!canAnalyze()) {
+    const ts = getTrialStatus();
+    openUpgradeModal(ts.active ? 'trial' : 'analyses');
+    return;
+  }
   const patient = S.patients.find(p => p.id === exam.patientId) || { name:'—', species:'Felino' };
 
   const proc = document.getElementById('proc');
@@ -8155,11 +8188,20 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
                         .concat(recommendations);
   }
 
+  // Mesmo criterio da analise nova: o quadro nunca contradiz achado critico da IA
+  let finalOverall = overall;
+  {
+    const rank = { normal: 0, attention: 1, critical: 2 };
+    const porIA = insights.some(i => i.level === 'critical') ? 'critical'
+                : insights.some(i => i.level === 'warn') ? 'attention' : 'normal';
+    if (rank[porIA] > rank[finalOverall]) finalOverall = porIA;
+  }
+
   const idx = S.exams.findIndex(e => e.id === examId);
   if (idx >= 0) {
     S.exams[idx] = {
       ...S.exams[idx],
-      status: overall,
+      status: finalOverall,
       usedAI: !!aiResult,
       aiError: aiError || null,
       result: { summary, insights, recommendations, patterns }
@@ -8171,10 +8213,17 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
     patient,
     exam: S.exams[idx] || exam,
     evalResults: results,
-    overall, insights, recommendations, summary,
+    overall: finalOverall, insights, recommendations, summary,
     patterns: Array.isArray(patterns) ? patterns : [],
     usedAI: !!aiResult,
   };
+
+  // Conta o uso só quando a IA respondeu (igual à análise normal)
+  if (aiResult) {
+    incrementUsage();
+    if(getUserPlan().id === 'trial') incrementDailyUsage();
+    updatePlanUI();
+  }
 
   updateCritBadge();
   nav('result');
@@ -8185,8 +8234,8 @@ INSTRUÇÃO: Analise estes dados e responda APENAS com o JSON solicitado no sist
     toast(`IA indisponível: ${shortErr}`, 'warn');
   } else {
     toast(
-      overall === 'critical' ? '⚠ Crítico detectado na re-análise' :
-      overall === 'attention' ? 'Re-análise: pontos de atenção identificados' :
+      finalOverall === 'critical' ? '⚠ Crítico detectado na re-análise' :
+      finalOverall === 'attention' ? 'Re-análise: pontos de atenção identificados' :
       'Re-análise concluída — resultado normal', 'ok'
     );
   }
@@ -8513,7 +8562,27 @@ function delPatient(id){
 /* ══════════════════════════════════════════════
    PLAN UI & UPGRADE
 ══════════════════════════════════════════════ */
+// Banner de pagamento em atraso (dentro da tolerancia)
+function bannerAtraso(){
+  const a = statusAssinatura();
+  const el = document.getElementById('trial-banner');
+  const tx = document.getElementById('trial-banner-text');
+  if(!el || !tx || !a.paga) return false;
+  if(a.emTolerancia){
+    tx.textContent = `Pagamento em atraso — seu acesso continua por mais ${a.diasTolerancia} dia${a.diasTolerancia!==1?'s':''}. Regularize para não perder o acesso.`;
+    el.classList.remove('hidden');
+    return true;
+  }
+  if(a.vencida){
+    tx.textContent = 'Assinatura vencida. Regularize o pagamento para voltar a gerar laudos.';
+    el.classList.remove('hidden');
+    return true;
+  }
+  return false;
+}
+
 function updateTrialBanner(){
+  if(bannerAtraso()) return;
   const banner = document.getElementById('trial-banner');
   const text   = document.getElementById('trial-banner-text');
   if(!banner || !text) return;
@@ -8796,14 +8865,44 @@ function switchBilling(mode){
   if(cards && window._buildUpgradeCards) cards.innerHTML = window._buildUpgradeCards(mode);
 }
 
-function selectPlan(planId, billingMode){
-  closeM('m-upgrade');
+async function selectPlan(planId, billingMode){
   const p = PLANS[planId];
-  const mode = billingMode || _billingMode;
-  const price = mode === 'quarterly'
-    ? `R$ ${p.priceQuarterlyTotal.toFixed(2).replace('.',',')} /trimestre (${p.discount}% off)`
-    : `R$ ${p.priceMonthly.toFixed(2).replace('.',',')} /mês`;
-  toast(`Para assinar o plano ${p.name} (${price}), entre em contato: contato@diagnovet.com.br`, 'ok');
+  if(!p || planId === 'trial'){ closeM('m-upgrade'); return; }
+
+  if(!_supa || !S.user){
+    toast('Faça login para assinar.', 'warn');
+    return;
+  }
+  if(!S.proxyUrl){
+    toast('Pagamento indisponível: proxy não configurado.', 'err');
+    return;
+  }
+
+  const btns = document.querySelectorAll('[onclick*="selectPlan"]');
+  btns.forEach(b => { b.disabled = true; b.dataset._t = b.textContent; b.textContent = 'Abrindo checkout...'; });
+
+  try {
+    const { data:{ session } } = await _supa.auth.getSession();
+    if(!session?.access_token) throw new Error('Sessão expirada. Entre novamente.');
+
+    const base = S.proxyUrl.replace(/\/$/, '');
+    const r = await fetch(base + '/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + session.access_token },
+      body: JSON.stringify({ plan: planId })
+    });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok || !j.url){
+      throw new Error(j?.error?.message || ('Não foi possível abrir o checkout (HTTP ' + r.status + ').'));
+    }
+    closeM('m-upgrade');
+    // Redireciona para o checkout da AbacatePay
+    window.location.href = j.url;
+  } catch(e){
+    console.error('Checkout falhou:', e);
+    toast(e.message || 'Falha ao abrir o checkout.', 'err');
+    btns.forEach(b => { b.disabled = false; if(b.dataset._t) b.textContent = b.dataset._t; });
+  }
 }
 
 /* ── ADMIN: assign plan to any user ── */
