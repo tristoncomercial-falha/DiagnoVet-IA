@@ -3851,6 +3851,23 @@ function escapeHTML(str) {
 
 const DEFAULT_PROXY = 'https://diagnovetia-api.tristoncomercial.workers.dev';
 
+// Autocorrecao: enderecos antigos ou invalidos salvos no navegador voltam ao
+// padrao. Sem isto, um valor errado guardado em Configuracoes deixa o app
+// mudo (sem analise e sem checkout) e o usuario nao descobre o motivo.
+(function _corrigeProxySalvo(){
+  try {
+    const salvo = DB.g('proxyUrl', '');
+    if(!salvo) return;
+    const ok = /^https:\/\/[^\/]*diagnovetia-api[^\/]*\.workers\.dev\/?$/.test(salvo);
+    if(!ok){
+      console.warn('Proxy salvo inválido ou desatualizado (%s). Restaurando o padrão.', salvo);
+      DB.s('proxyUrl', DEFAULT_PROXY);
+    } else if(salvo.endsWith('/')){
+      DB.s('proxyUrl', salvo.replace(/\/+$/, ''));
+    }
+  } catch(e){ /* nao impede o app de carregar */ }
+})();
+
 // ── DEMO ACCOUNT — credenciais fixas (altere aqui quando quiser)
 
 // ════════════════════════════════════════════════════════════════════════════════
