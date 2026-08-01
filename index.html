@@ -4081,7 +4081,8 @@ async function saveExamCloud(exam){
 function localPatientToSupa(pt, userId){
   return { id:pt.id, user_id:userId, name:pt.name||'', species:pt.species||null,
            breed:pt.breed||null, sex:pt.sex||null, age:pt.age||null,
-           weight:pt.weight||null, owner:pt.owner||null, history:pt.history||null };
+           weight:pt.weight||null, owner:pt.owner||null, history:pt.history||null,
+           notes: Array.isArray(pt.notes) ? pt.notes : [] };
 }
 async function savePatientCloud(patient){
   if(DATA_MODE !== 'cloud' || !_supa || !S.user) return;
@@ -8287,6 +8288,73 @@ function renderPatients(){
   }).join('');
 }
 
+// ── Observações do veterinário sobre o paciente ────────────────────
+function addPatientNote(patientId){
+  const ta = document.getElementById('note-input');
+  if(!ta) return;
+  const texto = (ta.value || '').trim();
+  if(!texto){ toast('Escreva a observação antes de salvar.', 'warn'); return; }
+  const p = S.patients.find(x => x.id === patientId);
+  if(!p) return;
+  if(!Array.isArray(p.notes)) p.notes = [];
+  p.notes.unshift({
+    id: uuid(),
+    at: new Date().toISOString(),
+    autor: (S.user && S.user.name) || '',
+    texto
+  });
+  persist();
+  savePatientCloud(p);
+  ta.value = '';
+  openPatientDetail(patientId);       // redesenha com a nova observação
+  toast('Observação registrada.', 'ok');
+}
+
+function delPatientNote(patientId, noteId){
+  const p = S.patients.find(x => x.id === patientId);
+  if(!p || !Array.isArray(p.notes)) return;
+  confirmDel('esta observação', () => {
+    p.notes = p.notes.filter(n => n.id !== noteId);
+    persist();
+    savePatientCloud(p);
+    openPatientDetail(patientId);
+    toast('Observação removida.', 'ok');
+  });
+}
+
+function renderNotes(p){
+  const notas = Array.isArray(p.notes) ? p.notes : [];
+  const fmtDT = iso => {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})
+           + ' · ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    } catch(e){ return ''; }
+  };
+  const lista = notas.length ? notas.map(n => `
+    <div style="background:var(--snow);border:1px solid var(--fog);border-left:3px solid var(--leaf);border-radius:var(--r12);padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:5px">
+        <span style="font-size:11px;color:var(--mist);font-weight:600">${fmtDT(n.at)}${n.autor ? ' · ' + escapeHTML(n.autor) : ''}</span>
+        <span onclick="delPatientNote('${p.id}','${n.id}')"
+          style="font-size:11px;color:var(--mist);cursor:pointer;flex-shrink:0" title="Remover">&#10005;</span>
+      </div>
+      <div style="font-size:13.5px;line-height:1.55;color:var(--ink);white-space:pre-wrap">${escapeHTML(n.texto)}</div>
+    </div>`).join('') : `
+    <div style="font-size:12.5px;color:var(--mist);padding:4px 0 10px">Nenhuma observação registrada ainda.</div>`;
+
+  return `
+    <div style="font-size:11px;color:var(--mist);margin:20px 0 10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">
+      Observações do veterinário${notas.length ? ' (' + notas.length + ')' : ''}
+    </div>
+    <div style="margin-bottom:12px">
+      <textarea id="note-input" class="fld-txt" rows="3"
+        placeholder="Evolução, conduta, resposta ao tratamento, orientações ao tutor..."
+        style="width:100%;margin-bottom:8px"></textarea>
+      <button class="btn btn-primary btn-sm" onclick="addPatientNote('${p.id}')">Adicionar observação</button>
+    </div>
+    ${lista}`;
+}
+
 // ── Histórico e evolução dos marcadores de um paciente ─────────────
 function sparkline(pts, ref){
   // pts: [{n, date, status}] em ordem cronológica
@@ -8357,12 +8425,12 @@ function openPatientDetail(id){
 
   if(!exams.length){
     el.innerHTML = cabecalho + `
-      <div class="empty-state" style="padding:32px 10px">
+      <div class="empty-state" style="padding:26px 10px">
         <div class="es-icon">\u{1F52C}</div>
         <div class="es-title">Nenhum exame para este paciente</div>
         <div class="es-sub">Importe o primeiro exame para começar o histórico.</div>
         <button class="btn btn-primary btn-md" onclick="closeM('m-history');nav('import');setTimeout(()=>{const s=document.getElementById('imp-patient');if(s)s.value='${p.id}'},100)">Importar exame</button>
-      </div>`;
+      </div>` + renderNotes(p);
     openM('m-history');
     return;
   }
@@ -8410,7 +8478,8 @@ function openPatientDetail(id){
     <div style="font-size:11px;color:var(--mist);margin:16px 0 10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Evolução dos marcadores</div>
     ${graficos}
     <div style="font-size:11px;color:var(--mist);margin:20px 0 10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Exames (${exams.length})</div>
-    ${linha}`;
+    ${linha}
+    ${renderNotes(p)}`;
   openM('m-history');
 }
 
@@ -9621,11 +9690,24 @@ function exportOneExam(id){
 </body>
 </html>`;
 
-  const win = window.open('', '_blank');
-  if (!win) { toast('Popup bloqueado. Permita popups para exportar o laudo.', 'warn'); return; }
-  win.document.write(html);
-  win.document.close();
-  toast('Laudo aberto em nova aba. Use o botão "Imprimir" para salvar como PDF.', 'ok');
+  // Abre via Blob em vez de document.write: no Safari, a navegacao para
+  // about:blank termina DEPOIS da escrita e apaga a pagina (tela branca).
+  try {
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    const win = window.open(blobUrl, '_blank');
+    if (!win) {
+      URL.revokeObjectURL(blobUrl);
+      toast('Popup bloqueado. Permita popups para exportar o laudo.', 'warn');
+      return;
+    }
+    // Libera a memoria depois que a aba carregou
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    toast('Laudo aberto em nova aba. Use o botão "Imprimir" para salvar como PDF.', 'ok');
+  } catch (e) {
+    console.error('Falha ao abrir o laudo:', e);
+    toast('Não foi possível abrir o laudo: ' + e.message, 'err');
+  }
 }
 
 /* ══════════════════════════════════════════════
