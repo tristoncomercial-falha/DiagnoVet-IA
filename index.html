@@ -2790,7 +2790,12 @@ body.modal-open {
       <div class="fld-grp"><label>Idade</label><input class="fld-in" id="mp-age" placeholder="ex: 4 anos"/></div>
       <div class="fld-grp"><label>Peso</label><input class="fld-in" id="mp-weight" placeholder="ex: 3,8 kg"/></div>
     </div>
-    <div class="fld-grp"><label>Tutor</label><input class="fld-in" id="mp-owner" placeholder="Nome do responsável"/></div>
+    <div class="fld-row">
+      <div class="fld-grp"><label>Tutor</label><input class="fld-in" id="mp-owner" placeholder="Nome do responsável"/></div>
+      <div class="fld-grp"><label>Telefone do tutor <span style="font-weight:400;color:var(--mist)">(opcional)</span></label>
+        <input class="fld-in" id="mp-phone" type="tel" inputmode="tel" placeholder="(00) 00000-0000"
+          oninput="mascaraTelefone(this)" maxlength="16"/></div>
+    </div>
     <div class="fld-grp" style="margin-bottom:0"><label>Histórico clínico</label><textarea class="fld-txt" id="mp-history" placeholder="Alergias, medicamentos, histórico..."></textarea></div>
 
     <!-- Campos extras para internação (aparecem quando tipo=internado) -->
@@ -4081,7 +4086,8 @@ async function saveExamCloud(exam){
 function localPatientToSupa(pt, userId){
   return { id:pt.id, user_id:userId, name:pt.name||'', species:pt.species||null,
            breed:pt.breed||null, sex:pt.sex||null, age:pt.age||null,
-           weight:pt.weight||null, owner:pt.owner||null, history:pt.history||null,
+           weight:pt.weight||null, owner:pt.owner||null, owner_phone:pt.phone||null,
+           history:pt.history||null,
            notes: Array.isArray(pt.notes) ? pt.notes : [] };
 }
 async function savePatientCloud(patient){
@@ -8288,6 +8294,20 @@ function renderPatients(){
   }).join('');
 }
 
+// Mascara de telefone brasileiro: (11) 91234-5678 / (11) 1234-5678
+function mascaraTelefone(el){
+  let v = (el.value || '').replace(/\D/g, '').slice(0, 11);
+  if(v.length > 6){
+    el.value = v.length > 10
+      ? `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`
+      : `(${v.slice(0,2)}) ${v.slice(2,6)}-${v.slice(6)}`;
+  } else if(v.length > 2){
+    el.value = `(${v.slice(0,2)}) ${v.slice(2)}`;
+  } else {
+    el.value = v ? `(${v}` : '';
+  }
+}
+
 // ── Observações do veterinário sobre o paciente ────────────────────
 function addPatientNote(patientId){
   const ta = document.getElementById('note-input');
@@ -8420,6 +8440,12 @@ function openPatientDetail(id){
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.5px;color:var(--ink)">${escapeHTML(p.name||'—')}</div>
         <div style="font-size:12.5px;color:var(--mist)">${escapeHTML(p.species||'—')} &middot; ${escapeHTML(p.breed||'—')} &middot; ${escapeHTML(String(p.age||'—'))} &middot; ${exams.length} exame${exams.length!==1?'s':''}</div>
+        ${(p.owner || p.phone) ? `<div style="font-size:12.5px;color:var(--mist);margin-top:2px">
+          ${p.owner ? 'Tutor: ' + escapeHTML(p.owner) : ''}
+          ${p.phone ? ` &middot; <a href="tel:${escapeHTML(p.phone.replace(/\D/g,''))}" style="color:var(--leaf-d);font-weight:600;text-decoration:none">${escapeHTML(p.phone)}</a>
+            <a href="https://wa.me/55${escapeHTML(p.phone.replace(/\D/g,''))}" target="_blank" rel="noopener"
+               style="color:var(--leaf-d);text-decoration:none;margin-left:6px" title="WhatsApp">&#128172;</a>` : ''}
+        </div>` : ''}
       </div>
     </div>`;
 
@@ -8521,6 +8547,7 @@ function editPatientModal(id) {
   document.getElementById('mp-age').value     = p.age||'';
   document.getElementById('mp-weight').value  = p.weight||'';
   document.getElementById('mp-owner').value   = p.owner||'';
+  document.getElementById('mp-phone').value   = p.phone||'';
   document.getElementById('mp-history').value = p.history||'';
   openM('m-patient');
 }
@@ -8567,6 +8594,7 @@ function savePatient(){
     age:      document.getElementById('mp-age').value.trim(),
     weight:   document.getElementById('mp-weight').value.trim(),
     owner:    document.getElementById('mp-owner').value.trim(),
+    phone:    document.getElementById('mp-phone').value.trim(),
     history:  document.getElementById('mp-history').value.trim(),
   };
 
@@ -8583,7 +8611,7 @@ function savePatient(){
 
   persist();
   closeM('m-patient');
-  ['mp-name','mp-breed','mp-age','mp-weight','mp-owner','mp-history'].forEach(k=>{
+  ['mp-name','mp-breed','mp-age','mp-weight','mp-owner','mp-phone','mp-history'].forEach(k=>{
     const el=document.getElementById(k); if(el) el.value='';
   });
   // Reset toggle
@@ -8630,6 +8658,7 @@ function editPatient(id){
   document.getElementById('mp-age').value=p.age||'';
   document.getElementById('mp-weight').value=p.weight||'';
   document.getElementById('mp-owner').value=p.owner||'';
+  document.getElementById('mp-phone').value=p.phone||'';
   document.getElementById('mp-history').value=p.history||'';
   openM('m-patient');
 }
