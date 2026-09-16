@@ -13,7 +13,6 @@
 <meta name="description" content="VetLynx IA — Plataforma de Inteligência Artificial para Diagnóstico Veterinário · Software SaaS para interpretação de exames veterinários."/>
 <meta name="theme-color" content="#091610"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
-<meta http-equiv="X-Frame-Options" content="DENY"/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iNiIgZmlsbD0iIzE2QTg3RSIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIuNCAyLjQpIHNjYWxlKC44KSI+PHBhdGggZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNNC40IDIuNiA3LjQgNi42YzIuOS0xLjEgNi4zLTEuMSA5LjIgMGwzLTQtLjUgNi42Yy42IDEuMi45IDIuNS45IDMuOCAwIDIuNi0xLjQgNC45LTMuNiA2LjRsMS41IDItMy42LTEuMmMtMS41LjQtMy4zLjQtNC44IDBMNS45IDIxLjRsMS41LTJDNS4yIDE3LjkgMy44IDE1LjYgMy44IDEzYzAtMS4zLjMtMi42LjktMy44TDQuNCAyLjZaTTkgMTEuMmExLjM1IDEuMzUgMCAxIDAgMCAyLjcgMS4zNSAxLjM1IDAgMCAwIDAtMi43Wm02IDBhMS4zNSAxLjM1IDAgMSAwIDAgMi43IDEuMzUgMS4zNSAwIDAgMCAwLTIuN1oiLz48L2c+PC9zdmc+"/>
 <title>VetLynx IA — Plataforma de Diagnóstico Veterinário</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -3776,8 +3775,12 @@ class SupaQuery {
     return { data: Array.isArray(r) ? r[0] : r, error: null };
   }
 
-  async upsert(row){
-    const r = await supaFetch('POST', `/rest/v1/${this._table}`, row, false, {
+  async upsert(row, conflito){
+    // on_conflict diz ao Supabase QUAL coluna identifica a duplicata.
+    // Sem isso a gravacao vira insert comum e devolve 409 ao reeditar.
+    const col = conflito || 'id';
+    const r = await supaFetch('POST',
+      `/rest/v1/${this._table}?on_conflict=${encodeURIComponent(col)}`, row, false, {
       'Prefer': 'resolution=merge-duplicates,return=representation'
     });
     return { data: r, error: r?.code ? r : null };
@@ -4064,8 +4067,16 @@ async function saveExamCloud(exam){
   if(!isUuid(exam.id) || !isUuid(S.user.id)) return;
   if(exam.patientId && !isUuid(exam.patientId)) return;
   try {
-    await _supa.from('exams').upsert(localExamToSupa(exam, S.user.id));
-  } catch(e) { console.warn('Cloud exam save failed:', e.message); }
+    const r = await _supa.from('exams').upsert(localExamToSupa(exam, S.user.id));
+    if(r && r.error){
+      const msg = r.error.message || JSON.stringify(r.error).slice(0,120);
+      console.warn('Cloud exam save failed:', msg);
+      toast('Exame salvo só neste dispositivo — a nuvem recusou: ' + msg, 'warn');
+    }
+  } catch(e) {
+    console.warn('Cloud exam save failed:', e.message);
+    toast('Exame salvo só neste dispositivo: ' + e.message, 'warn');
+  }
 }
 
 // ── Save patient to cloud
@@ -4082,8 +4093,16 @@ async function savePatientCloud(patient){
   if(DATA_MODE !== 'cloud' || !_supa || !S.user) return;
   if(!isUuid(patient.id) || !isUuid(S.user.id)) return;
   try {
-    await _supa.from('patients').upsert(localPatientToSupa(patient, S.user.id));
-  } catch(e) { console.warn('Cloud patient save failed:', e.message); }
+    const r = await _supa.from('patients').upsert(localPatientToSupa(patient, S.user.id));
+    if(r && r.error){
+      const msg = r.error.message || JSON.stringify(r.error).slice(0,120);
+      console.warn('Cloud patient save failed:', msg);
+      toast('Paciente salvo só neste dispositivo — a nuvem recusou: ' + msg, 'warn');
+    }
+  } catch(e) {
+    console.warn('Cloud patient save failed:', e.message);
+    toast('Paciente salvo só neste dispositivo: ' + e.message, 'warn');
+  }
 }
 
 // ── Increment usage in cloud
